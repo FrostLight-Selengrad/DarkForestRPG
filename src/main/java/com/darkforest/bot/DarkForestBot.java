@@ -40,10 +40,13 @@ public class DarkForestBot implements LongPollingSingleThreadUpdateConsumer {
 
     @Override
     public void consume(Update update) {
+        System.out.println("Received update: " + update);
         if (update.hasMessage() && update.getMessage().hasText()) {
             Long userId = update.getMessage().getFrom().getId();
             String chatId = update.getMessage().getChatId().toString();
+            System.out.println("Chat ID: " + chatId);
             String text = update.getMessage().getText();
+            System.out.println("Message text: " + text);
 
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
@@ -61,8 +64,11 @@ public class DarkForestBot implements LongPollingSingleThreadUpdateConsumer {
             }
 
             try {
+                System.out.println("Sending message: " + message.getText());
                 telegramClient.execute(message); // Используем TelegramClient для отправки сообщения
+                System.out.println("Message sent successfully");
             } catch (TelegramApiException e) {
+                System.err.println("Failed to send message: " + e.getMessage());
                 e.printStackTrace();
             }
         }

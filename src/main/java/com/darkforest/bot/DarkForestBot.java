@@ -25,8 +25,14 @@ public class DarkForestBot implements LongPollingSingleThreadUpdateConsumer {
 
     private TelegramClient telegramClient;
 
+    public DarkForestBot() {
+        System.out.println("DarkForestBot constructor called"); // Лог в конструкторе
+    }
+
     @PostConstruct
     public void init() {
+        System.out.println("Starting bot initialization");
+        System.out.println("Set botToken: " + botToken);
         try {
             // Создаём TelegramClient с токеном
             telegramClient = new OkHttpTelegramClient(botToken);
@@ -55,10 +61,25 @@ public class DarkForestBot implements LongPollingSingleThreadUpdateConsumer {
 
             if ("/start".equals(text)) {
                 playerService.saveProgress(userId, 1, 0, "[]");
-                message.setText("Добро пожаловать в Dark Forest RPG! Твой путь начинается. Уровень: 1, Золото: 0.");
-            } else if ("/progress".equals(text)) {
+                System.out.println("Saved progress for user " + userId);
                 var progress = playerService.getProgress(userId);
-                message.setText("Твой прогресс:\nУровень: " + progress.getLevel() + "\nЗолото: " + progress.getGold() + "\nИнвентарь: " + progress.getInventory());
+                if (progress != null) {
+                    message.setText("Прогресс сохранен: Уровень: " + progress.getLevel() + ", Золото: " + progress.getGold());
+                } else {
+                    message.setText("Не удалось сохранить прогресс.");
+                }
+            } else if ("/progress".equals(text)) {
+                try {
+                    var progress = playerService.getProgress(userId);
+                    if (progress != null) {
+                        message.setText("Твой прогресс:\nУровень: " + progress.getLevel() + "\nЗолото: " + progress.getGold() + "\nИнвентарь: " + progress.getInventory());
+                    } else {
+                        message.setText("Прогресс не найден. Используй /start для начала игры.");
+                    }
+                } catch (Exception e) {
+                    message.setText("Ошибка при получении прогресса: " + e.getMessage());
+                    e.printStackTrace();
+                }
             } else {
                 message.setText("Неизвестная команда. Используй /start или /progress.");
             }

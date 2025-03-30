@@ -15,18 +15,19 @@ public class DarkForestBot extends SpringWebhookBot {
     private final String botToken;
     private final String botUsername;
     private final String webhookPath;
-    private PlayerService playerService;
+    private final PlayerService playerService;
 
     public DarkForestBot(
             @Value("${telegrambot.token}") String botToken,
             @Value("${telegrambot.username}") String botUsername,
             @Value("${telegrambot.webhook.path}") String webhookPath,
-            @Value("${telegrambot.external.url}") String externalUrl
+            @Value("${telegrambot.external.url}") String externalUrl, PlayerService playerService
     ) throws TelegramApiException {
         super(createWebhook(externalUrl + webhookPath));
         this.botToken = botToken;
         this.botUsername = botUsername;
         this.webhookPath = webhookPath;
+        this.playerService = playerService;
     }
 
     private static SetWebhook createWebhook(String url) {

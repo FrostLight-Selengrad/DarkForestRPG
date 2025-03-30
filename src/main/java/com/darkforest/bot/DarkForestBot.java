@@ -3,6 +3,7 @@ package com.darkforest.bot;
 import com.darkforest.service.PlayerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,7 +18,11 @@ public class DarkForestBot extends SpringTelegramWebhookBot {
     private final String webhookPath;
     private static PlayerService playerService;
 
-    public DarkForestBot() {
+    public DarkForestBot(
+            @Value("${telegram.bot.token}") String botToken,
+            @Value("${telegram.bot.username}") String botUsername,
+            @Value("${telegram.bot.webhook-path}") String webhookPath,
+            PlayerService playerService) {
         super(
                 webhookPath,
                 update -> DarkForestBot.onWebhookUpdateReceived(update, playerService), // Передаем обработчик напрямую

@@ -15,6 +15,7 @@ public class DarkForestBot extends SpringWebhookBot {
     private final String botToken;
     private final String botUsername;
     private final String webhookPath;
+    private final String externalUrl;
     private final PlayerService playerService;
 
     public DarkForestBot(
@@ -27,7 +28,9 @@ public class DarkForestBot extends SpringWebhookBot {
         this.botToken = botToken;
         this.botUsername = botUsername;
         this.webhookPath = webhookPath;
+        this.externalUrl = externalUrl;
         this.playerService = playerService;
+        System.out.println("[INIT] Webhook URL: " + externalUrl + webhookPath);
     }
 
     private static SetWebhook createWebhook(String url) {

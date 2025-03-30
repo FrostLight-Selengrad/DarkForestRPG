@@ -8,6 +8,7 @@
         <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>com.darkforest</groupId>
     <artifactId>telegram-rpg</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -31,6 +32,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-spring-boot-starter</artifactId>
+            <version>6.9.7.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -39,23 +45,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-client</artifactId>
-            <version>8.2.0</version>
-        </dependency>
         <!-- Telegram Bots Meta -->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-meta</artifactId>
-            <version>8.2.0</version>
-        </dependency>
-
-        <!-- Telegram Bots Longpolling -->
-        <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambots-longpolling</artifactId>
-            <version>8.2.0</version>
+            <version>6.9.7.1</version>
         </dependency>
 
         <!-- Драйвер PostgreSQL -->

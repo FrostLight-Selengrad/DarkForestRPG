@@ -26,7 +26,7 @@ public class BattleController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("log", player.getBattleLog());
+        response.put("log", String.join("\n", player.getBattleLog()));
         response.put("turn", player.getBattleTurn());
         return response;
     }

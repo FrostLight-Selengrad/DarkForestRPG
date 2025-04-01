@@ -3,6 +3,9 @@ tg.ready();
 tg.expand();
 
 const userId = tg.initDataUnsafe.user.id;
+if (!userId) {
+    logEvent("Ошибка: пользователь не авторизован");
+}
 
 function updateStats() {
     fetch(`/api/game/player?userId=${userId}`)
@@ -27,7 +30,7 @@ function logEvent(message) {
 }
 
 function updateBattleLog() {
-    fetch(`/api/game/log?userId=${userId}`)
+    fetch(`/api/battle/log?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -40,7 +43,7 @@ function updateBattleLog() {
 }
 
 function updateHealth() {
-    fetch(`/api/game/health?userId=${userId}`)
+    fetch(`/api/battle/health?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -83,7 +86,8 @@ function exploreForest() {
 
 function attack() {
     fetch(`/api/game/attack?userId=${userId}`, { method: 'POST' })
-        .then(response => response.text())
+        .then(response => response.json())
+        .then(data => logEvent(data.message))
         .then(message => {
             logEvent(message);
             updateStats();
@@ -95,7 +99,8 @@ function attack() {
 
 function tryFlee() {
     fetch(`/api/game/flee?userId=${userId}`, { method: 'POST' })
-        .then(response => response.text())
+        .then(response => response.json())
+        .then(data => logEvent(data.message))
         .then(message => {
             logEvent(message);
             updateStats();

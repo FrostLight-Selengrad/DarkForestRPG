@@ -17,3 +17,21 @@ button {
 button:hover {
     background-color: #45a049;
 }
+
+#battle-log {
+    background-color: #333;
+    padding: 10px;
+    margin: 10px 0;
+    height: 200px;
+    overflow-y: scroll;
+    text-align: left;
+}
+
+#health-status {
+    margin: 10px 0;
+}
+
+#player-health, #enemy-health {
+    font-weight: bold;
+    margin: 5px 0;
+}

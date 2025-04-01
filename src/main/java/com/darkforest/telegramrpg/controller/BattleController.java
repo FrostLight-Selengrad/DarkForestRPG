@@ -11,45 +11,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-public class GameController {
+public class BattleController {
     @Autowired
     private GameService gameService;
 
     @Autowired
     private PlayerService playerService;
-
-    @GetMapping("/player")
-    public Player getPlayer(@RequestParam Long userId) {
-        return playerService.getPlayer(userId);
-    }
-
-    @PostMapping("/explore")
-    public Map<String, Object> exploreForest(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        String message = gameService.exploreForest(player);
-        boolean inCombat = player.isInCombat();
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("inCombat", inCombat);
-        if (inCombat) {
-            response.put("enemyName", player.getEnemyName());
-            response.put("enemyHp", player.getEnemyHp());
-            response.put("enemyMaxHp", player.getEnemyMaxHp());
-        }
-        return response;
-    }
-
-    @PostMapping("/attack")
-    public String attack(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        return gameService.attack(player);
-    }
-
-    @PostMapping("/flee")
-    public String tryFlee(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        return gameService.tryFlee(player);
-    }
 
     @GetMapping("/battle/log")
     public Map<String, Object> getBattleLog(@RequestParam Long userId) {
@@ -59,12 +26,12 @@ public class GameController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("log", String.join("\n", player.getBattleLog()));
+        response.put("log", player.getBattleLog());
         response.put("turn", player.getBattleTurn());
         return response;
     }
 
-    @GetMapping("/health")
+    @GetMapping("/battle/health")
     public Map<String, Object> getHealthStatus(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
         if (player == null) {
@@ -75,11 +42,13 @@ public class GameController {
         response.put("playerHp", player.getHp());
         response.put("playerMaxHp", player.getMaxHp());
         response.put("playerColor", getHealthColor(player.getHp(), player.getMaxHp()));
-        if (player.isInCombat()) {
-            response.put("enemyHp", player.getEnemyHp());
-            response.put("enemyMaxHp", player.getEnemyMaxHp());
-            response.put("enemyName", player.getEnemyName());
-            response.put("enemyColor", getHealthColor(player.getEnemyHp(), player.getEnemyMaxHp()));
+
+        // Проверяем, находится ли игрок в бою, и передаем player в методы
+        if (gameService.isInCombat(player)) {
+            response.put("enemyHp", gameService.getEnemyHp(player));
+            response.put("enemyMaxHp", player.getEnemyMaxHp()); // Предполагаем, что это поле есть в Player
+            response.put("enemyName", gameService.getEnemyName(player));
+            response.put("enemyColor", getHealthColor(gameService.getEnemyHp(player), player.getEnemyMaxHp()));
         }
         return response;
     }

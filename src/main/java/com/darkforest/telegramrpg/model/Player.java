@@ -1,5 +1,8 @@
 package com.darkforest.telegramrpg.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private int hp = 90;
     private int maxHp = 90;
@@ -16,8 +19,67 @@ public class Player {
     private int physicalAttack = 10;
     private int magicPower = 0;
     private int forestLevel = 1;
+    private List<String> battleLog = new ArrayList<>();
+    private int battleTurn = 0;
 
-    // Геттеры и сеттеры (Alt+Insert → "Getter and Setter")
+    // Новые поля для состояния боя и информации о противнике
+    private boolean inCombat = false; // Состояние боя
+    private String enemyName = "";   // Имя противника
+    private int enemyHp = 0;         // Здоровье противника
+    private int enemyMaxHp = 0;      // Максимальное здоровье противника
+    private int enemyAttack = 0;     // Атака противника
+    private int enemyInitiative = 0; // Инициатива противника
+
+    // Геттеры и сеттеры для новых полей
+    public boolean isInCombat() {
+        return inCombat;
+    }
+
+    public void setInCombat(boolean inCombat) {
+        this.inCombat = inCombat;
+    }
+
+    public String getEnemyName() {
+        return enemyName;
+    }
+
+    public void setEnemyName(String enemyName) {
+        this.enemyName = enemyName;
+    }
+
+    public int getEnemyHp() {
+        return enemyHp;
+    }
+
+    public void setEnemyHp(int enemyHp) {
+        this.enemyHp = enemyHp;
+    }
+
+    public int getEnemyMaxHp() {
+        return enemyMaxHp;
+    }
+
+    public void setEnemyMaxHp(int enemyMaxHp) {
+        this.enemyMaxHp = enemyMaxHp;
+    }
+
+    public int getEnemyAttack() {
+        return enemyAttack;
+    }
+
+    public void setEnemyAttack(int enemyAttack) {
+        this.enemyAttack = enemyAttack;
+    }
+
+    public int getEnemyInitiative() {
+        return enemyInitiative;
+    }
+
+    public void setEnemyInitiative(int enemyInitiative) {
+        this.enemyInitiative = enemyInitiative;
+    }
+
+    // Остальные геттеры и сеттеры для существующих полей
     public int getHp() {
         return hp;
     }
@@ -136,5 +198,26 @@ public class Player {
 
     public void setForestLevel(int forestLevel) {
         this.forestLevel = forestLevel;
+    }
+
+    public List<String> getBattleLog() {
+        return battleLog;
+    }
+
+    public void clearBattleLog() {
+        battleLog.clear();
+        battleTurn = 0;
+    }
+
+    public void addToBattleLog(String logEntry) {
+        battleLog.add(logEntry);
+    }
+
+    public int getBattleTurn() {
+        return battleTurn;
+    }
+
+    public void setBattleTurn(int battleTurn) {
+        this.battleTurn = battleTurn;
     }
 }

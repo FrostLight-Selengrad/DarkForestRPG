@@ -2,8 +2,10 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+const userId = tg.initDataUnsafe.user.id;
+
 function updateStats() {
-    fetch('/api/player')
+    fetch(`/api/player?userId=${userId}`)
         .then(response => response.json())
         .then(player => {
             document.getElementById('player-stats').innerHTML = `
@@ -19,26 +21,86 @@ function logEvent(message) {
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-function exploreForest() {
-    fetch('/api/explore', { method: 'POST' })
-        .then(response => response.text())
-        .then(message => {
-            logEvent(message);
-            updateStats();
-            document.getElementById('actions').innerHTML = `
-                <button onclick="attack('physical')">Атака</button>
-                <button onclick="exploreForest()">Продолжить</button>
-            `;
+function updateBattleLog() {
+    fetch(`/api/battle/log?userId=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('battle-log').innerHTML = data.error;
+                return;
+            }
+            document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>');
+            document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
         });
 }
 
-function attack(type) {
-    fetch(`/api/attack?type=${type}`, { method: 'POST' })
+function updateHealth() {
+    fetch(`/api/health?userId=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('health-status').innerHTML = data.error;
+                return;
+            }
+            document.getElementById('player-health').innerHTML =
+                `Ваше здоровье: <span style="color: ${data.playerColor}">${data.playerHp}/${data.playerMaxHp}</span>`;
+            if (data.enemyHp) {
+                document.getElementById('enemy-health').innerHTML =
+                    `${data.enemyName} здоровье: <span style="color: ${data.enemyColor}">${data.enemyHp}/${data.enemyMaxHp}</span>`;
+            } else {
+                document.getElementById('enemy-health').innerHTML = 'Нет противника';
+            }
+        });
+}
+
+function exploreForest() {
+    fetch(`/api/explore?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            logEvent(data.message);
+            updateStats();
+            updateHealth();
+            if (data.inCombat) {
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="attack()">Атаковать</button>
+                    <button onclick="tryFlee()">Попытаться убежать</button>
+                `;
+                updateBattleLog();
+            } else {
+                document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
+            }
+        });
+}
+
+function attack() {
+    fetch(`/api/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.text())
         .then(message => {
             logEvent(message);
             updateStats();
-            if (message.includes("победили") || message.includes("проиграли")) {
+            updateBattleLog();
+            updateHealth();
+            checkCombatStatus();
+        });
+}
+
+function tryFlee() {
+    fetch(`/api/flee?userId=${userId}`, { method: 'POST' })
+        .then(response => response.text())
+        .then(message => {
+            logEvent(message);
+            updateStats();
+            updateBattleLog();
+            updateHealth();
+            checkCombatStatus();
+        });
+}
+
+function checkCombatStatus() {
+    fetch(`/api/player?userId=${userId}`)
+        .then(response => response.json())
+        .then(player => {
+            if (!player.inCombat) {
                 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
             }
         });

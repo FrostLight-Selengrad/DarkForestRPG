@@ -7,35 +7,53 @@ import java.util.Random;
 
 @Service
 public class GameService {
-    private Player player = new Player();
     private Random random = new Random();
-    private String currentEvent = "";
-    private int enemyHp = 0;
-    private String enemyName = "";
-    private int enemyAttack = 0;
-    private int enemyInitiative = 0;
 
-    public Player getPlayer() {
-        return player;
+    // Проверка, находится ли игрок в бою
+    public boolean isInCombat(Player player) {
+        return player.isInCombat();
     }
 
-    public String exploreForest() {
+    // Получение текущего здоровья противника
+    public int getEnemyHp(Player player) {
+        return player.getEnemyHp();
+    }
+
+    // Получение имени противника
+    public String getEnemyName(Player player) {
+        return player.getEnemyName();
+    }
+
+    // Метод для исследования леса
+    public String exploreForest(Player player) {
+        if (player.isInCombat()) {
+            return "Вы не можете исследовать лес во время боя!";
+        }
+
         String[] events = {"monster", "chest", "trap", "boss"};
-        currentEvent = events[random.nextInt(events.length)];
+        String currentEvent = events[random.nextInt(events.length)];
 
         if (currentEvent.equals("monster")) {
-            enemyName = "Гоблин";
-            enemyHp = 50;
-            enemyAttack = 15;
-            enemyInitiative = 5;
-            return "Вы столкнулись с Гоблином! HP: " + enemyHp;
+            player.setEnemyName("Гоблин");
+            player.setEnemyHp(50);
+            player.setEnemyMaxHp(50);
+            player.setEnemyAttack(15);
+            player.setEnemyInitiative(5);
+            player.setInCombat(true);
+            player.clearBattleLog();
+            player.setBattleTurn(0);
+            return "Вы столкнулись с Гоблином! HP: " + player.getEnemyHp();
         } else if (currentEvent.equals("chest")) {
             if (random.nextDouble() < 0.2) {
-                enemyName = "Мимик";
-                enemyHp = 70;
-                enemyAttack = 20;
-                enemyInitiative = 8;
-                return "Сундук оказался мимиком! HP: " + enemyHp;
+                player.setEnemyName("Мимик");
+                player.setEnemyHp(70);
+                player.setEnemyMaxHp(70);
+                player.setEnemyAttack(20);
+                player.setEnemyInitiative(8);
+                player.setInCombat(true);
+                player.clearBattleLog();
+                player.setBattleTurn(0);
+                return "Сундук оказался мимиком! HP: " + player.getEnemyHp();
             } else {
                 player.setPhysicalAttack(player.getPhysicalAttack() + 5);
                 return "Вы нашли оружие в сундуке! Физ. атака +5";
@@ -45,43 +63,95 @@ public class GameService {
             player.setHp(player.getHp() - damage);
             return "Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp();
         } else if (currentEvent.equals("boss")) {
-            enemyName = "Босс " + player.getForestLevel() + " уровня";
-            enemyHp = 100;
-            enemyAttack = 25;
-            enemyInitiative = 15;
-            return "Вы встретили босса! HP: " + enemyHp;
+            player.setEnemyName("Босс " + player.getForestLevel() + " уровня");
+            player.setEnemyHp(100);
+            player.setEnemyMaxHp(100);
+            player.setEnemyAttack(25);
+            player.setEnemyInitiative(15);
+            player.setInCombat(true);
+            player.clearBattleLog();
+            player.setBattleTurn(0);
+            return "Вы встретили босса! HP: " + player.getEnemyHp();
         }
         return "Ничего не произошло.";
     }
 
-    public String attack(String type) {
-        if (enemyHp <= 0) return "Враг уже побежден!";
+    // Метод для атаки
+    public String attack(Player player) {
+        if (!player.isInCombat()) return "Вы не в бою!";
+        if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
 
-        int damage = type.equals("physical") ? player.getPhysicalAttack() : 20; // Упрощённая магия
-        enemyHp -= damage;
-        String result = "Вы нанесли " + damage + " урона! HP врага: " + enemyHp;
+        player.setBattleTurn(player.getBattleTurn() + 1);
+        int damage = player.getPhysicalAttack();
+        player.setEnemyHp(player.getEnemyHp() - damage);
+        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы применили Атаку и нанесли " + damage + " урона\n");
 
-        if (enemyHp <= 0) {
-            result += "\nВы победили " + enemyName + "!";
-            if (currentEvent.equals("boss")) {
-                player.setForestLevel(player.getForestLevel() + 1);
-                result += "\nВы перешли на " + player.getForestLevel() + " уровень леса!";
-            }
-            dropRunes();
+        if (player.getEnemyHp() <= 0) {
+            player.addToBattleLog(player.getEnemyName() + " повержен!\n");
+            String result = String.join("\n", player.getBattleLog());
+            player.setInCombat(false);
+            dropRunes(player);
             return result;
         }
 
-        int enemyDamage = enemyAttack - player.getToughness() / 2;
+        // Атака монстра
+        int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
         player.setHp(player.getHp() - (enemyDamage > 0 ? enemyDamage : 0));
-        result += "\n" + enemyName + " наносит " + enemyDamage + " урона! Ваш HP: " + player.getHp();
+        player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
 
         if (player.getHp() <= 0) {
-            result += "\nВы проиграли...";
+            player.addToBattleLog("Вы проиграли...\n");
+            String result = String.join("\n", player.getBattleLog());
+            resetProgress(player);
+            player.setInCombat(false);
+            return result;
         }
-        return result;
+
+        return String.join("\n", player.getBattleLog());
     }
 
-    private void dropRunes() {
+    // Метод для попытки бегства
+    public String tryFlee(Player player) {
+        if (!player.isInCombat()) return "Вы не в бою!";
+        if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
+
+        player.setBattleTurn(player.getBattleTurn() + 1);
+        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
+
+        if (random.nextDouble() < 0.1) { // 10% шанс на успех
+            player.addToBattleLog("Вы успешно сбежали!\n");
+            player.setInCombat(false);
+            return String.join("\n", player.getBattleLog());
+        } else {
+            player.addToBattleLog("Попытка бегства не удалась, вы пропустили ход.\n");
+            // Атака монстра
+            int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
+            player.setHp(player.getHp() - (enemyDamage > 0 ? enemyDamage : 0));
+            player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
+
+            if (player.getHp() <= 0) {
+                player.addToBattleLog("Вы проиграли...\n");
+                String result = String.join("\n", player.getBattleLog());
+                resetProgress(player);
+                player.setInCombat(false);
+                return result;
+            }
+
+            return String.join("\n", player.getBattleLog());
+        }
+    }
+
+    // Метод для сброса прогресса
+    private void resetProgress(Player player) {
+        player.setHp(player.getMaxHp()); // Восстанавливаем здоровье
+        player.setForestLevel(1);        // Сбрасываем уровень леса
+        player.clearBattleLog();         // Очищаем лог боя
+        player.setBattleTurn(0);         // Сбрасываем номер хода
+        player.setInCombat(false);       // Завершаем бой
+    }
+
+    // Метод для дропа рун
+    private void dropRunes(Player player) {
         if (player.getForestLevel() < 11) return;
         int maxRunes = player.getForestLevel() - 10;
         if (player.getStamina() < maxRunes && random.nextDouble() < 0.5) {

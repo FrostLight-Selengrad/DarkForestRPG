@@ -34,16 +34,22 @@ public class GameService {
     }
 
     // Метод для исследования леса
-    public String exploreForest(Player player) {
+    public String exploreForest(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        player.clearExplorationLog();
+
         if (player.isInCombat()) {
             return "Вы не можете исследовать лес во время боя!";
         }
+
+        player.addToExplorationLog("Вы вошли в лес уровня " + player.getForestLevel());
 
         String[] events = {"monster", "chest", "trap", "boss"};
         String currentEvent = events[random.nextInt(events.length)];
 
         if (currentEvent.equals("monster")) {
-            player.setEnemyName("Гоблин");
+            player.addToExplorationLog("Вы встретили монстра!");
+            player.setEnemyName("Гоблин" + player.getForestLevel() + " уровня");
             player.setEnemyHp(50);
             player.setEnemyMaxHp(50);
             player.setEnemyAttack(15);
@@ -51,10 +57,11 @@ public class GameService {
             player.setInCombat(true);
             player.clearBattleLog();
             player.setBattleTurn(0);
-            return "Вы столкнулись с Гоблином! HP: " + player.getEnemyHp();
+            return "Вы столкнулись с Гоблином!";
         } else if (currentEvent.equals("chest")) {
+            player.addToExplorationLog("Вы нашли сундук!");
             if (random.nextDouble() < 0.2) {
-                player.setEnemyName("Мимик");
+                player.setEnemyName("Мимик" + player.getForestLevel() + " уровня");
                 player.setEnemyHp(70);
                 player.setEnemyMaxHp(70);
                 player.setEnemyAttack(20);
@@ -62,7 +69,7 @@ public class GameService {
                 player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(0);
-                return "Сундук оказался мимиком! HP: " + player.getEnemyHp();
+                return "Сундук оказался мимиком!";
             } else {
                 player.setPhysicalAttack(player.getPhysicalAttack() + 5);
                 return "Вы нашли оружие в сундуке! Физ. атака +5";

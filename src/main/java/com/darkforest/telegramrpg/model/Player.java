@@ -19,7 +19,10 @@ public class Player {
     private int physicalAttack = 10;
     private int magicPower = 0;
     private int forestLevel = 1;
-    private List<String> battleLog = new ArrayList<>();
+
+    private List<String> explorationLog = new ArrayList<>(); // Лог для путешествия
+
+    private List<String> battleLog = new ArrayList<>(); // Лог для боя
     private int battleTurn = 0;
 
     // Новые поля для состояния боя и информации о противнике
@@ -200,24 +203,22 @@ public class Player {
         this.forestLevel = forestLevel;
     }
 
-    public List<String> getBattleLog() {
-        return battleLog;
-    }
+    public List<String> getBattleLog() {return battleLog;}
+
+    public List<String> getExplorationLog() {return explorationLog;}
 
     public void clearBattleLog() {
         battleLog.clear();
         battleTurn = 0;
     }
 
-    public void addToBattleLog(String logEntry) {
-        battleLog.add(logEntry);
-    }
+    public void clearExplorationLog() {explorationLog.clear();}
 
-    public int getBattleTurn() {
-        return battleTurn;
-    }
+    public void addToBattleLog(String message) {battleLog.add(message);}
 
-    public void setBattleTurn(int battleTurn) {
-        this.battleTurn = battleTurn;
-    }
+    public void addToExplorationLog(String message) {explorationLog.add(message);}
+
+    public int getBattleTurn() {return battleTurn;}
+
+    public void setBattleTurn(int battleTurn) {this.battleTurn = battleTurn;}
 }

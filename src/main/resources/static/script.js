@@ -23,6 +23,13 @@ function updateStats() {
         .catch(error => console.error('Error fetching stats:', error));
 }
 
+// Обновление боевого интерфейса
+function updateBattleUI(data) {
+    document.getElementById('battle-interface').style.display = 'block';
+    document.getElementById('enemy-name').textContent = data.enemyName;
+    document.getElementById('enemy-hp').textContent = `${data.enemyHp}/${data.enemyMaxHp}`;
+}
+
 function logEvent(message) {
     const logDiv = document.getElementById('event-log');
     logDiv.innerHTML += `<p>${message}</p>`;
@@ -39,6 +46,16 @@ function updateBattleLog() {
             }
             document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>'); // <- Теперь data.log строка
             document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
+        });
+}
+
+// Для путешествия
+function updateExplorationLog() {
+    fetch(`/api/game/exploration-log?userId=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("exploration-log").innerHTML =
+                data.log.join("<br>");
         });
 }
 
@@ -76,7 +93,7 @@ function exploreForest() {
                     <button onclick="attack()">Атаковать</button>
                     <button onclick="tryFlee()">Попытаться убежать</button>
                 `;
-                updateBattleLog();
+                updateExplorationLog();
             } else {
                 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
             }
@@ -119,6 +136,63 @@ function checkCombatStatus() {
             }
         });
 }
+
+function updateBattleInterface(player, enemy) {
+    // Показываем боевой интерфейс
+    document.getElementById('battle-interface').style.display = 'block';
+
+    // Обновляем здоровье
+    document.getElementById('player-hp').textContent = `${player.hp}/${player.maxHp}`;
+    document.getElementById('enemy-hp').textContent = `${enemy.hp}/${enemy.maxHp}`;
+
+    // Обновляем лог боя
+    document.getElementById('battle-log').innerHTML = player.battleLog.join('<br>');
+}
+
+function openPotionsModal() {
+    fetch(`/api/player/inventory?userId=${userId}`)
+        .then(response => response.json())
+        .then(inventory => {
+            const potions = inventory.filter(item => item.type === 'potion');
+            if (potions.length === 0) {
+                logEvent("У вас нет зелий!");
+                return;
+            }
+
+            const grid = document.getElementById('potions-grid');
+            grid.innerHTML = potions.map(potion => `
+                <div class="potion" onclick="usePotion('${potion.id}')">
+                    <img src="${potion.image}" alt="${potion.name}">
+                    <span class="count">${potion.count}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('potions-modal').style.display = 'block';
+        });
+}
+
+// Использование зелья
+function usePotion(potionId) {
+    fetch(`/api/use-potion?userId=${userId}&potionId=${potionId}`, {
+        method: 'POST'
+    }).then(response => {
+        // Обновляем интерфейс
+        updateHealth();
+        updateBattleLog();
+    });
+}
+
+function toggleMenu() {
+    const menu = document.getElementById('char-menu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Закрытие при клике вне меню
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#char-menu-btn, #char-menu')) {
+        document.getElementById('char-menu').style.display = 'none';
+    }
+});
 
 updateStats();
 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Выйти в лес</button>`;

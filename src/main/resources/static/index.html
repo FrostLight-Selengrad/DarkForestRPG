@@ -15,11 +15,47 @@
         <div id="enemy-health"></div>
     </div>
     <div id="event-log"></div>
-    <div id="battle-log"></div>
+    <!-- Боевой интерфейс (изначально скрыт) -->
+    <div id="battle-interface" style="display: none;">
+        <img id="enemy-image" src="goblin.png">
+        <div class="health-bars">
+            <div id="player-health-bar">
+                <span>Ваше здоровье:</span>
+                <span id="player-hp">100/100</span>
+            </div>
+            <div id="enemy-health-bar">
+                <span id="enemy-name">Гоблин</span>
+                <span id="enemy-hp">50/50</span>
+            </div>
+        </div>
+        <div id="battle-log"></div>
+        <div class="battle-actions">
+            <button onclick="attack()">Атака</button>
+            <button onclick="openAbilitiesModal()">Способности</button>
+            <button onclick="openPotionsModal()">Зелья</button>
+            <button onclick="tryFlee()">Сбежать</button>
+        </div>
+    </div>
+    <!-- Модальное окно зелий -->
+    <div id="potions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePotionsModal()">&times;</span>
+            <div id="potions-grid"></div>
+        </div>
+    </div>
     <div id="turn"></div>
     <div id="actions"></div>
+</div>
+<button id="char-menu-btn" onclick="toggleMenu()">
+    <img src="char_icon.png" alt="Персонаж">
+</button>
+
+<div id="char-menu" class="dropdown-menu">
+    <button onclick="openInventory()"><img src="backpack_icon.png"></button>
+    <button onclick="openSkills()"><img src="skills_icon.png"></button>
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="/script.js"></script>
 </body>
 </html>
+

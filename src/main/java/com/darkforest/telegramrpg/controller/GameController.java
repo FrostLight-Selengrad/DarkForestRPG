@@ -26,7 +26,7 @@ public class GameController {
     @PostMapping("/explore")
     public Map<String, Object> exploreForest(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
-        String message = gameService.exploreForest(player);
+        String message = gameService.exploreForest(userId);
         boolean inCombat = player.isInCombat();
         Map<String, Object> response = new HashMap<>();
         response.put("message", message);
@@ -57,16 +57,15 @@ public class GameController {
         return gameService.tryFlee(player);
     }
 
-    @GetMapping("/battle/log")
-    public Map<String, Object> getBattleLog(@RequestParam Long userId) {
+    @GetMapping("/exploration-log")
+    public Map<String, Object> getExplorationLog(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
         if (player == null) {
             return Map.of("error", "Player not found.");
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("log", String.join("\n", player.getBattleLog()));
-        response.put("turn", player.getBattleTurn());
+        response.put("log", String.join("\n", player.getExplorationLog()));
         return response;
     }
 

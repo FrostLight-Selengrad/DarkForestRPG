@@ -18,7 +18,7 @@ public class BattleController {
     @Autowired
     private PlayerService playerService;
 
-    @GetMapping("/battle/log")
+    @GetMapping("/log")
     public Map<String, Object> getBattleLog(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
         if (player == null) {
@@ -31,7 +31,7 @@ public class BattleController {
         return response;
     }
 
-    @GetMapping("/battle/health")
+    @GetMapping("/health")
     public Map<String, Object> getHealthStatus(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
         if (player == null) {

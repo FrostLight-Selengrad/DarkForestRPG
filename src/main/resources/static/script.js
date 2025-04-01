@@ -5,7 +5,7 @@ tg.expand();
 const userId = tg.initDataUnsafe.user.id;
 
 function updateStats() {
-    fetch(`/api/player?userId=${userId}`)
+    fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
         .then(player => {
             if (player.error) {
@@ -27,7 +27,7 @@ function logEvent(message) {
 }
 
 function updateBattleLog() {
-    fetch(`/api/battle/log?userId=${userId}`)
+    fetch(`/api/game/log?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -40,7 +40,7 @@ function updateBattleLog() {
 }
 
 function updateHealth() {
-    fetch(`/api/health?userId=${userId}`)
+    fetch(`/api/game/health?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -59,7 +59,7 @@ function updateHealth() {
 }
 
 function exploreForest() {
-    fetch(`/api/explore?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
@@ -82,7 +82,7 @@ function exploreForest() {
 }
 
 function attack() {
-    fetch(`/api/attack?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/game/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.text())
         .then(message => {
             logEvent(message);
@@ -94,7 +94,7 @@ function attack() {
 }
 
 function tryFlee() {
-    fetch(`/api/flee?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/game/flee?userId=${userId}`, { method: 'POST' })
         .then(response => response.text())
         .then(message => {
             logEvent(message);
@@ -106,7 +106,7 @@ function tryFlee() {
 }
 
 function checkCombatStatus() {
-    fetch(`/api/player?userId=${userId}`)
+    fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
         .then(player => {
             if (!player.inCombat) {

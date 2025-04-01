@@ -1,12 +1,21 @@
 package com.darkforest.telegramrpg.service;
 
 import com.darkforest.telegramrpg.model.Player;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
 @Service
 public class GameService {
+    private final PlayerService playerService; // Добавляем зависимость
+
+    // Конструктор для внедрения зависимости
+    @Autowired
+    public GameService(PlayerService playerService) {
+        this.playerService = playerService;
+    }
+
     private Random random = new Random();
 
     // Проверка, находится ли игрок в бою
@@ -77,7 +86,8 @@ public class GameService {
     }
 
     // Метод для атаки
-    public String attack(Player player) {
+    public String attack(Long userId) {
+        Player player = playerService.getPlayer(userId);
         if (!player.isInCombat()) return "Вы не в бою!";
         if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
 
@@ -106,7 +116,7 @@ public class GameService {
             player.setInCombat(false);
             return result;
         }
-
+        playerService.savePlayer(userId, player);
         return String.join("\n", player.getBattleLog());
     }
 

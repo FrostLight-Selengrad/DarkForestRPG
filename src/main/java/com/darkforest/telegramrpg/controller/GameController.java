@@ -40,14 +40,20 @@ public class GameController {
     }
 
     @PostMapping("/attack")
-    public String attack(@RequestParam Long userId) {
+    public Map<String, Object> attack(@RequestParam Long userId) {
+        String message = gameService.attack(userId);
         Player player = playerService.getPlayer(userId);
-        return gameService.attack(player);
+        playerService.savePlayer(userId, player); // Сохраняем изменения
+        return Map.of(
+                "message", message,
+                "inCombat", player.isInCombat()
+        );
     }
 
     @PostMapping("/flee")
     public String tryFlee(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
+        playerService.savePlayer(userId, player); // Сохраняем изменения
         return gameService.tryFlee(player);
     }
 

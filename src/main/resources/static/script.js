@@ -30,20 +30,20 @@ function logEvent(message) {
 }
 
 function updateBattleLog() {
-    fetch(`/api/battle/log?userId=${userId}`)
+    fetch(`/api/battle/log?userId=${userId}`) // <- Правильный URL
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 document.getElementById('battle-log').innerHTML = data.error;
                 return;
             }
-            document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>');
+            document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>'); // <- Теперь data.log строка
             document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
         });
 }
 
 function updateHealth() {
-    fetch(`/api/battle/health?userId=${userId}`)
+    fetch(`/api/battle/health?userId=${userId}`) // <- Правильный URL
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -86,28 +86,28 @@ function exploreForest() {
 
 function attack() {
     fetch(`/api/game/attack?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => logEvent(data.message))
-        .then(message => {
-            logEvent(message);
+        .then(response => response.json()) // <- Парсим JSON
+        .then(data => {
+            logEvent(data.message); // <- Используем data.message
             updateStats();
             updateBattleLog();
             updateHealth();
             checkCombatStatus();
-        });
+        })
+        .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function tryFlee() {
     fetch(`/api/game/flee?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => logEvent(data.message))
-        .then(message => {
-            logEvent(message);
+        .then(response => response.json()) // <- Парсим JSON
+        .then(data => {
+            logEvent(data.message); // <- Используем data.message
             updateStats();
             updateBattleLog();
             updateHealth();
             checkCombatStatus();
-        });
+        })
+        .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function checkCombatStatus() {

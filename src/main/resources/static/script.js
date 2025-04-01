@@ -8,11 +8,16 @@ function updateStats() {
     fetch(`/api/player?userId=${userId}`)
         .then(response => response.json())
         .then(player => {
-            document.getElementById('player-stats').innerHTML = `
-                <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
-                <p>Физ. атака: ${player.physicalAttack}</p>
-            `;
-        });
+            if (player.error) {
+                document.getElementById('player-stats').innerHTML = player.error;
+            } else {
+                document.getElementById('player-stats').innerHTML = `
+                    <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
+                    <p>Физ. атака: ${player.physicalAttack}</p>
+                `;
+            }
+        })
+        .catch(error => console.error('Error fetching stats:', error));
 }
 
 function logEvent(message) {
@@ -55,7 +60,10 @@ function updateHealth() {
 
 function exploreForest() {
     fetch(`/api/explore?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             logEvent(data.message);
             updateStats();
@@ -69,7 +77,8 @@ function exploreForest() {
             } else {
                 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
             }
-        });
+        })
+        .catch(error => logEvent('Ошибка: ' + error.message));
 }
 
 function attack() {

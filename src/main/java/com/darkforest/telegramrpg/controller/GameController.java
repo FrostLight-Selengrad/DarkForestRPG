@@ -27,14 +27,22 @@ public class GameController {
     @GetMapping("/exploration-event")
     public Map<String, Object> getExplorationEvent(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
-        List<String> log = player.getExplorationLog();
-
         Map<String, Object> response = new HashMap<>();
-        if (!log.isEmpty()) {
-            String[] parts = log.get(log.size() - 1).split(":");
-            response.put("type", parts[0]);
-            response.put("message", parts[1]);
+
+        if (!player.getExplorationLog().isEmpty()) {
+            String lastEvent = player.getExplorationLog().getLast();
+
+            // Проверка на наличие разделителя ":"
+            if (lastEvent.contains(":")) {
+                String[] parts = lastEvent.split(":", 2); // Ограничиваем split до 2 частей
+                response.put("type", parts[0]);
+                response.put("message", parts[1]);
+            } else {
+                response.put("type", "forest");
+                response.put("message", lastEvent);
+            }
         }
+
         return response;
     }
 
@@ -66,10 +74,13 @@ public class GameController {
     }
 
     @PostMapping("/flee")
-    public String tryFlee(@RequestParam Long userId) {
+    public Map<String, Object> tryFlee(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
-        playerService.savePlayer(userId, player); // Сохраняем изменения
-        return gameService.tryFlee(player);
+        String message = gameService.tryFlee(player);
+        return Map.of(
+                "message", message,
+                "inCombat", player.isInCombat()
+        );
     }
 
     @GetMapping("/exploration-log")

@@ -124,7 +124,12 @@ function updateHealth() {
 
 function exploreForest() {
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.inCombat) {
                 // Вызываем enterCombat и передаем данные о враге
@@ -141,7 +146,11 @@ function exploreForest() {
                 // Показываем событие путешествия
                 updateExplorationEvent(data.message);
             }
-        });
+        })
+        .catch(error => {
+        console.error('Error:', error);
+        logEvent('Ошибка соединения с сервером');
+    });
 }
 
 function attack() {
@@ -149,10 +158,9 @@ function attack() {
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
             logEvent(data.message); // <- Используем data.message
-            updateStats();
+            updateCombatHealth(); // Обновляем здоровье
             updateBattleLog();
-            updateHealth();
-            checkCombatStatus();
+            checkCombatStatus(); // Проверка окончания боя
         })
         .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
@@ -175,6 +183,15 @@ function checkCombatStatus() {
         .then(response => response.json())
         .then(player => {
             if (!player.inCombat) {
+                // Скрываем боевой интерфейс
+                document.getElementById('battle-interface').style.display = 'none';
+
+                // Показываем элементы путешествия
+                document.getElementById('event-log').style.display = 'block';
+                document.getElementById('player-stats').style.display = 'block';
+                document.getElementById('actions').style.display = 'block';
+
+                // Обновляем события
                 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
             }
         });
@@ -231,11 +248,29 @@ function usePotion(potionType) {
         });
 }
 
-// Подсветка HP при изменении
 function updateCombatHealth() {
-    const playerHp = document.getElementById('player-combat-hp');
-    playerHp.style.color = '#ff5555';
-    setTimeout(() => playerHp.style.color = '#4CAF50', 500);
+    const playerHpElement = document.getElementById('player-combat-hp');
+    const enemyHpElement = document.getElementById('enemy-combat-hp');
+
+    // Анимация при изменении
+    playerHpElement.classList.add('damage');
+    setTimeout(() => playerHpElement.classList.remove('damage'), 300);
+
+    fetch(`/api/game/player?userId=${userId}`)
+        .then(response => response.json())
+        .then(player => {
+            playerHpElement.style.color = '#ff5555';
+            setTimeout(() => playerHpElement.style.color = '#4CAF50', 500);
+            playerHpElement.textContent =
+                `${player.hp}/${player.maxHp}`;
+
+            if (player.inCombat) {
+                enemyHpElement.style.color = '#ff5555';
+                setTimeout(() => enemyHpElement.style.color = '#4CAF50', 500);
+                enemyHpElement.textContent =
+                    `${player.enemyHp}/${player.enemyMaxHp}`;
+            }
+        });
 }
 
 function toggleMenu() {

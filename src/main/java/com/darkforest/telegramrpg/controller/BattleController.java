@@ -81,6 +81,7 @@ public class BattleController {
         int heal = 15 + (int) (0.1 * currentHp);
         return heal;
     }
+
     private String getHealthColor(int hp, int maxHp) {
         double percentage = (double) hp / maxHp * 100;
         if (percentage > 80) return "green";

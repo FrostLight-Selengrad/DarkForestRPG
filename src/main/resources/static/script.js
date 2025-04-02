@@ -4,7 +4,7 @@ tg.expand();
 
 const userId = tg.initDataUnsafe.user.id;
 if (!userId) {
-    logEvent("Ошибка: пользователь не авторизован");
+    logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
 function updateStats() {
@@ -70,15 +70,8 @@ function getEventControls(eventType) {
     }
 }
 
-// Обновление боевого интерфейса
-function updateBattleUI(data) {
-    document.getElementById('battle-interface').style.display = 'block';
-    document.getElementById('enemy-name').textContent = data.enemyName;
-    document.getElementById('enemy-hp').textContent = `${data.enemyHp}/${data.enemyMaxHp}`;
-}
-
-function logEvent(message) {
-    const logDiv = document.getElementById('event-log');
+function logExplorationEvent(message) {
+    const logDiv = document.getElementById('exploration-log');
     logDiv.innerHTML += `<p>${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
 }
@@ -95,16 +88,6 @@ function updateBattleLog() {
             document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
             // Автопрокрутка вниз
             logDiv.scrollTop = logDiv.scrollHeight;
-        });
-}
-
-// Для путешествия
-function updateExplorationLog() {
-    fetch(`/api/game/exploration-log?userId=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("exploration-log").innerHTML =
-                data.log.join("<br>");
         });
 }
 
@@ -141,7 +124,7 @@ function exploreForest() {
         })
         .catch(error => {
         console.error('Error:', error);
-        logEvent('Ошибка соединения с сервером');
+        logExplorationEvent('Ошибка соединения с сервером');
     });
 }
 
@@ -149,24 +132,24 @@ function attack() {
     fetch(`/api/game/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
-            logEvent(data.message); // <- Используем data.message
+            logExplorationEvent(data.message); // <- Используем data.message
             updateCombatHealth(); // Обновляем здоровье
             updateBattleLog();
             checkCombatStatus(); // Проверка окончания боя
         })
-        .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
+        .catch(error => logExplorationEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function tryFlee() {
     fetch(`/api/game/flee?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
-            logEvent(data.message); // <- Используем data.message
+            logExplorationEvent(data.message); // <- Используем data.message
             updateStats();
             updateBattleLog();
             checkCombatStatus();
         })
-        .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
+        .catch(error => logExplorationEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function checkCombatStatus() {
@@ -176,6 +159,9 @@ function checkCombatStatus() {
             if (!player.inCombat) {
                 // Скрываем боевой интерфейс
                 document.getElementById('battle-interface').style.display = 'none';
+
+                // Показываем сообщение после леса
+                logDiv.innerHTML = `<p>Бой завершен</p>`;
 
                 // Показываем элементы путешествия
                 document.getElementById('exploration-interface').style.display = 'block';
@@ -192,7 +178,7 @@ function openPotionsModal() {
         .then(inventory => {
             const potions = inventory.filter(item => item.type === 'potion');
             if (potions.length === 0) {
-                logEvent("У вас нет зелий!");
+                logExplorationEvent("У вас нет зелий!");
                 return;
             }
 

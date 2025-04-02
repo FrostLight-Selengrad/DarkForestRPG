@@ -146,8 +146,8 @@ public class GameService {
         if (!player.isInCombat()) return "Вы не в бою!";
         if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
 
-        player.setBattleTurn(player.getBattleTurn() + 1);
         player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
+        player.setBattleTurn(player.getBattleTurn() + 1);
 
         if (random.nextDouble() < 0.1) { // 10% шанс на успех
             player.addToBattleLog("Вы успешно сбежали!\n");

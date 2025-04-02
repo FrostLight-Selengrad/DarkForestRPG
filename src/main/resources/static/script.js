@@ -148,6 +148,7 @@ function tryFlee() {
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
             logExplorationEvent(data.message); // <- Используем data.message
+            updateCombatHealth(); // Обновляем здоровье
             updateStats();
             updateBattleLog();
             checkCombatStatus();

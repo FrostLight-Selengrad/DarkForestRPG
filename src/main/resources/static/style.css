@@ -166,3 +166,28 @@ button:hover {
 .action-btn:active {
     transform: scale(0.95);
 }
+
+/* Стили для логов путешествия */
+#exploration-log {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.event-card {
+    background: #333;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+
+.event-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}

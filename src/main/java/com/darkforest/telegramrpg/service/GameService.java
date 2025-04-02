@@ -36,7 +36,10 @@ public class GameService {
     // Метод для исследования леса
     public String exploreForest(Long userId) {
         Player player = playerService.getPlayer(userId);
-        player.clearExplorationLog();
+        player.clearExplorationLog(); // Очищаем предыдущие сообщения
+
+        // Добавляем событие в explorationLog
+        player.addToExplorationLog("forest:Вы исследуете лес уровня " + player.getForestLevel());
 
         if (player.isInCombat()) {
             return "Вы не можете исследовать лес во время боя!";
@@ -47,51 +50,56 @@ public class GameService {
         String[] events = {"monster", "chest", "trap", "boss"};
         String currentEvent = events[random.nextInt(events.length)];
 
-        if (currentEvent.equals("monster")) {
-            player.addToExplorationLog("Вы встретили монстра!");
-            player.setEnemyName("Гоблин");
-            player.setEnemyHp(50);
-            player.setEnemyMaxHp(50);
-            player.setEnemyAttack(15);
-            player.setEnemyInitiative(5);
-            player.setInCombat(true);
-            player.clearBattleLog();
-            player.setBattleTurn(1);
-            player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-            return "Начался бой с " + player.getEnemyName();
-        } else if (currentEvent.equals("chest")) {
-            if (random.nextDouble() < 0.2) {
-                player.setEnemyName("Мимик" + player.getForestLevel() + " уровня");
-                player.setEnemyHp(70);
-                player.setEnemyMaxHp(70);
-                player.setEnemyAttack(20);
-                player.setEnemyInitiative(8);
+        switch (currentEvent) {
+            case "monster" -> {
+                player.addToExplorationLog("Вы встретили монстра!");
+                player.setEnemyName("Гоблин");
+                player.setEnemyHp(50);
+                player.setEnemyMaxHp(50);
+                player.setEnemyAttack(15);
+                player.setEnemyInitiative(5);
                 player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
                 player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-                return "Сундук оказался мимиком!";
-            } else {
-                player.addToExplorationLog("Вы нашли сундук!");
-                player.setPhysicalAttack(player.getPhysicalAttack() + 5);
-                return "Найден сундук!";
+                return "Начался бой с " + player.getEnemyName();
             }
-        } else if (currentEvent.equals("trap")) {
-            int damage = 20 - player.getResistance() / 2;
-            player.setHp(player.getHp() - damage);
-            player.addToExplorationLog("Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp());
-            return "Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp();
-        } else if (currentEvent.equals("boss")) {
-            player.setEnemyName("Босс " + player.getForestLevel() + " уровня");
-            player.setEnemyHp(100);
-            player.setEnemyMaxHp(100);
-            player.setEnemyAttack(25);
-            player.setEnemyInitiative(15);
-            player.setInCombat(true);
-            player.clearBattleLog();
-            player.setBattleTurn(1);
-            player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-            return "Вы встретили босса! HP: " + player.getEnemyHp();
+            case "chest" -> {
+                if (random.nextDouble() < 0.2) {
+                    player.setEnemyName("Мимик" + player.getForestLevel() + " уровня");
+                    player.setEnemyHp(70);
+                    player.setEnemyMaxHp(70);
+                    player.setEnemyAttack(20);
+                    player.setEnemyInitiative(8);
+                    player.setInCombat(true);
+                    player.clearBattleLog();
+                    player.setBattleTurn(1);
+                    player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
+                    return "Сундук оказался мимиком!";
+                } else {
+                    player.addToExplorationLog("Вы нашли сундук!");
+                    player.setPhysicalAttack(player.getPhysicalAttack() + 5);
+                    return "Найден сундук!";
+                }
+            }
+            case "trap" -> {
+                int damage = 20 - player.getResistance() / 2;
+                player.setHp(player.getHp() - damage);
+                player.addToExplorationLog("Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp());
+                return "Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp();
+            }
+            case "boss" -> {
+                player.setEnemyName("Босс " + player.getForestLevel() + " уровня");
+                player.setEnemyHp(100);
+                player.setEnemyMaxHp(100);
+                player.setEnemyAttack(25);
+                player.setEnemyInitiative(15);
+                player.setInCombat(true);
+                player.clearBattleLog();
+                player.setBattleTurn(1);
+                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
+                return "Вы встретили босса! HP: " + player.getEnemyHp();
+            }
         }
         return "Ничего не произошло.";
     }
@@ -182,6 +190,4 @@ public class GameService {
             player.setMaxHp(player.getMaxHp() + 10);
         }
     }
-
-
 }

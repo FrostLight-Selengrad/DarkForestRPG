@@ -28,6 +28,12 @@ function enterCombat(enemyData) {
     // Скрыть элементы путешествия
     document.getElementById('exploration-interface').style.display = 'none';
 
+    // Устанавливаем картинку врага
+    let enemyImage = "goblin.png"; // по умолчанию
+    if (enemyData.name.includes("Мимик")) enemyImage = "mimic.png";
+    if (enemyData.name.includes("Босс")) enemyImage = "boss.png";
+    document.getElementById('enemy-image').src = `images/${enemyImage}`;
+
     // Показать боевой интерфейс
     document.getElementById('battle-interface').style.display = 'block';
 
@@ -41,21 +47,18 @@ function updateExplorationEvent() {
     fetch(`/api/game/exploration-event?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            const eventDiv = document.getElementById('exploration-event');
-            eventDiv.innerHTML = `
-                <div class="event-card">
-                    <img src="images/${data.type}.png" class="event-image">
-                    <div class="event-content">
-                        <p class="event-message">${data.message}</p>
-                        ${getEventControls(data.type)}
-                    </div>
-                </div>
-            `;
+            const logDiv = document.getElementById('exploration-log');
 
-            // Всегда показываем кнопку "Продолжить"
-            document.getElementById('actions').innerHTML = `
-        <button onclick="exploreForest()">${data.inCombat ? 'Атаковать' : 'Продолжить'}</button>
-    `;
+            // Добавляем новое сообщение
+            if (data.message) {
+                logDiv.innerHTML += `
+                    <div class="event-card">
+                        <img src="images/${data.type}.png" class="event-image">
+                        <p>${data.message}</p>
+                    </div>
+                `;
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
         });
 }
 
@@ -157,17 +160,17 @@ function checkCombatStatus() {
         .then(response => response.json())
         .then(player => {
             if (!player.inCombat) {
+                // Показываем сообщение в логе путешествия
+                logExplorationEvent("Бой завершен!");
+
                 // Скрываем боевой интерфейс
                 document.getElementById('battle-interface').style.display = 'none';
 
-                // Показываем сообщение после леса
-                logDiv.innerHTML = `<p>Бой завершен</p>`;
-
-                // Показываем элементы путешествия
+                // Показываем интерфейс путешествия
                 document.getElementById('exploration-interface').style.display = 'block';
 
                 // Обновляем события
-                document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
+                updateExplorationEvent();
             }
         });
 }

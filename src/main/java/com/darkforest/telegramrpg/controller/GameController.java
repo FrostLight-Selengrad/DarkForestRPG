@@ -31,16 +31,14 @@ public class GameController {
 
         if (!player.getExplorationLog().isEmpty()) {
             String lastEvent = player.getExplorationLog().getLast();
+            String[] parts = lastEvent.split(":", 2);
 
-            // Проверка на наличие разделителя ":"
-            if (lastEvent.contains(":")) {
-                String[] parts = lastEvent.split(":", 2); // Ограничиваем split до 2 частей
-                response.put("type", parts[0]);
-                response.put("message", parts[1]);
-            } else {
-                response.put("type", "forest");
-                response.put("message", lastEvent);
-            }
+            // Определяем тип события
+            String type = parts[0];
+            String message = parts.length > 1 ? parts[1] : lastEvent;
+
+            response.put("type", type);
+            response.put("message", message);
         }
 
         return response;

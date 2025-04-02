@@ -47,30 +47,42 @@ function updateExplorationEvent() {
     fetch(`/api/game/exploration-event?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            const logDiv = document.getElementById('exploration-log');
+            const eventDiv = document.getElementById('exploration-log');
 
-            // Добавляем новое сообщение
-            if (data.message) {
-                logDiv.innerHTML += `
-                    <div class="event-card">
-                        <img src="images/${data.type}.png" class="event-image">
-                        <p>${data.message}</p>
-                    </div>
-                `;
-                logDiv.scrollTop = logDiv.scrollHeight;
+            // Определяем изображение
+            let image = "trap.png";
+            if (data.type === "trap") {
+                image = data.message.includes("уклонились") ? "trap_escaped.png" : "trap_active.png";
             }
+
+            eventDiv.innerHTML = `
+                <div class="event-card">
+                    <img src="images/${image}" class="event-image">
+                    <p>${data.message}</p>
+                    ${getTrapControls(data)}
+                </div>
+            `;
         });
 }
 
-function getEventControls(eventType) {
-    switch(eventType) {
-        case 'chest':
-            return `<button class="event-btn" onclick="openChest()">Открыть</button>`;
-        case 'trap':
-            return `<button class="event-btn" onclick="escapeTrap()">Выбраться (10% шанс)</button>`;
-        default:
-            return `<button class="event-btn" onclick="exploreForest()">Продолжить</button>`;
+function getTrapControls(data) {
+    if (data.type === "trap") {
+        if (data.message.includes("упали")) {
+            return `<button onclick="escapeTrap()">Попытаться выбраться</button>`;
+        } else {
+            return `<button onclick="exploreForest()">Продолжить</button>`;
+        }
     }
+    return '';
+}
+
+// Новая функция для побега из ловушки
+function escapeTrap() {
+    fetch(`/api/game/escape-trap?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            updateExplorationEvent(data);
+        });
 }
 
 function logExplorationEvent(message) {
@@ -87,10 +99,13 @@ function updateBattleLog() {
                 document.getElementById('battle-log').innerHTML = data.error;
                 return;
             }
-            document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>'); // <- Теперь data.log строка
-            document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
+
+            const battleLog = document.getElementById('battle-log');
+            battleLog.innerHTML = data.log.replace(/\n/g, '<br>');
             // Автопрокрутка вниз
-            logDiv.scrollTop = logDiv.scrollHeight;
+            battleLog.scrollTop = battleLog.scrollHeight;
+
+            document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
         });
 }
 
@@ -132,7 +147,7 @@ function exploreForest() {
 }
 
 function attack() {
-    fetch(`/api/game/attack?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
             logExplorationEvent(data.message); // <- Используем data.message
@@ -140,11 +155,10 @@ function attack() {
             updateBattleLog();
             checkCombatStatus(); // Проверка окончания боя
         })
-        .catch(error => logExplorationEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function tryFlee() {
-    fetch(`/api/game/flee?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
             logExplorationEvent(data.message); // <- Используем data.message
@@ -153,7 +167,6 @@ function tryFlee() {
             updateBattleLog();
             checkCombatStatus();
         })
-        .catch(error => logExplorationEvent('Ошибка: ' + error.message)); // <- Добавлен catch
 }
 
 function checkCombatStatus() {

@@ -228,4 +228,9 @@ public class Player {
     public int getBattleTurn() {return battleTurn;}
 
     public void setBattleTurn(int battleTurn) {this.battleTurn = battleTurn;}
+
+    private boolean inTrap = false;
+
+    public boolean isInTrap() { return inTrap; }
+    public void setInTrap(boolean inTrap) { this.inTrap = inTrap; }
 }

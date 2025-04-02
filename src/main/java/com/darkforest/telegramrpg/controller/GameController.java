@@ -60,27 +60,6 @@ public class GameController {
         return response;
     }
 
-    @PostMapping("/attack")
-    public Map<String, Object> attack(@RequestParam Long userId) {
-        String message = gameService.attack(userId);
-        Player player = playerService.getPlayer(userId);
-        playerService.savePlayer(userId, player); // Сохраняем изменения
-        return Map.of(
-                "message", message,
-                "inCombat", player.isInCombat()
-        );
-    }
-
-    @PostMapping("/flee")
-    public Map<String, Object> tryFlee(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        String message = gameService.tryFlee(player);
-        return Map.of(
-                "message", message,
-                "inCombat", player.isInCombat()
-        );
-    }
-
     @GetMapping("/exploration-log")
     public Map<String, Object> getExplorationLog(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);

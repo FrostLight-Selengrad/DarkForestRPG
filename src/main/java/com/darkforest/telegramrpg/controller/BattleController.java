@@ -33,6 +33,27 @@ public class BattleController {
         return response;
     }
 
+    @PostMapping("/attack")
+    public Map<String, Object> attack(@RequestParam Long userId) {
+        String message = gameService.attack(userId);
+        Player player = playerService.getPlayer(userId);
+        playerService.savePlayer(userId, player); // Сохраняем изменения
+        return Map.of(
+                "message", message,
+                "inCombat", player.isInCombat()
+        );
+    }
+
+    @PostMapping("/flee")
+    public Map<String, Object> tryFlee(@RequestParam Long userId) {
+        Player player = playerService.getPlayer(userId);
+        String message = gameService.tryFlee(player);
+        return Map.of(
+                "message", message,
+                "inCombat", player.isInCombat()
+        );
+    }
+
     @GetMapping("/health")
     public Map<String, Object> getHealthStatus(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
@@ -78,8 +99,7 @@ public class BattleController {
 
     private int calculateHeal(String type, Player player) {
         int currentHp = player.getHp();
-        int heal = 15 + (int) (0.1 * currentHp);
-        return heal;
+        return 15 + (int) (0.1 * currentHp);
     }
 
     private String getHealthColor(int hp, int maxHp) {

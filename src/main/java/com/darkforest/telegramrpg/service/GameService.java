@@ -83,10 +83,20 @@ public class GameService {
                 }
             }
             case "trap" -> {
-                int damage = 20 - player.getResistance() / 2;
-                player.setHp(player.getHp() - damage);
-                player.addToExplorationLog("Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp());
-                return "Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp();
+                player.setInTrap(true);
+                player.addToExplorationLog("trap:Вы попали в ловушку!");
+
+                // 50% шанс избежать
+                if (random.nextBoolean()) {
+                    player.addToExplorationLog("trap:Вы успешно избежали ловушку!");
+                    player.setInTrap(false);
+                    return "Вы ловко уклонились от ловушки!";
+                } else {
+                    int damage = 10;
+                    player.setHp(player.getHp() - damage);
+                    player.addToExplorationLog("trap:Вы упали в ловушку! Урон: " + damage);
+                    return "Вы упали в ловушку! Урон: " + damage;
+                }
             }
             case "boss" -> {
                 player.setEnemyName("Босс " + player.getForestLevel() + " уровня");

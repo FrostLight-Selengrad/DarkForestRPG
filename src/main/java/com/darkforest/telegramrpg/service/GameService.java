@@ -49,7 +49,7 @@ public class GameService {
 
         if (currentEvent.equals("monster")) {
             player.addToExplorationLog("Вы встретили монстра!");
-            player.setEnemyName("Гоблин" + player.getForestLevel() + " уровня");
+            player.setEnemyName("Гоблин");
             player.setEnemyHp(50);
             player.setEnemyMaxHp(50);
             player.setEnemyAttack(15);
@@ -102,16 +102,17 @@ public class GameService {
         if (!player.isInCombat()) return "Вы не в бою!";
         if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
 
-        player.setBattleTurn(player.getBattleTurn() + 1);
         int damage = player.getPhysicalAttack();
         player.setEnemyHp(player.getEnemyHp() - damage);
         player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы применили Атаку и нанесли " + damage + " урона\n");
+        player.setBattleTurn(player.getBattleTurn() + 1);
 
         if (player.getEnemyHp() <= 0) {
             player.addToBattleLog(player.getEnemyName() + " повержен!\n");
             String result = String.join("\n", player.getBattleLog());
             player.setInCombat(false);
             dropRunes(player);
+            player.clearBattleLog();
             return result;
         }
 
@@ -125,6 +126,7 @@ public class GameService {
             String result = String.join("\n", player.getBattleLog());
             resetProgress(player);
             player.setInCombat(false);
+            player.clearBattleLog();
             return result;
         }
         playerService.savePlayer(userId, player);

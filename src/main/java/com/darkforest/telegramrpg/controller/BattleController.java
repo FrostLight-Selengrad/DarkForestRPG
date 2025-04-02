@@ -48,7 +48,7 @@ public class BattleController {
         // Проверяем, находится ли игрок в бою, и передаем player в методы
         if (gameService.isInCombat(player)) {
             response.put("enemyHp", gameService.getEnemyHp(player));
-            response.put("enemyMaxHp", player.getEnemyMaxHp()); // Предполагаем, что это поле есть в Player
+            response.put("enemyMaxHp", player.getEnemyMaxHp());
             response.put("enemyName", gameService.getEnemyName(player));
             response.put("enemyColor", getHealthColor(gameService.getEnemyHp(player), player.getEnemyMaxHp()));
         }

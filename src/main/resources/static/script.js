@@ -29,6 +29,7 @@ function enterCombat(enemyData) {
     document.getElementById('event-log').style.display = 'none';
     document.getElementById('player-stats').style.display = 'none';
     document.getElementById('health-status').style.display = 'none';
+    document.getElementById('actions').style.display = 'none';
 
     // Показать боевой интерфейс
     document.getElementById('battle-interface').style.display = 'block';
@@ -53,6 +54,11 @@ function updateExplorationEvent() {
                     </div>
                 </div>
             `;
+
+            // Всегда показываем кнопку "Продолжить"
+            document.getElementById('actions').innerHTML = `
+        <button onclick="exploreForest()">${data.inCombat ? 'Атаковать' : 'Продолжить'}</button>
+    `;
         });
 }
 
@@ -90,6 +96,8 @@ function updateBattleLog() {
             }
             document.getElementById('battle-log').innerHTML = data.log.replace(/\n/g, '<br>'); // <- Теперь data.log строка
             document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
+            // Автопрокрутка вниз
+            logDiv.scrollTop = logDiv.scrollHeight;
         });
 }
 
@@ -104,7 +112,7 @@ function updateExplorationLog() {
 }
 
 function updateHealth() {
-    fetch(`/api/battle/health?userId=${userId}`) // <- Правильный URL
+    fetch(`/api/battle/health?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -131,12 +139,18 @@ function exploreForest() {
             return response.json();
         })
         .then(data => {
+            // Принудительно обновляем весь интерфейс
+            updateStats();
+            updateHealth();
+            updateExplorationEvent(data);
+
             if (data.inCombat) {
+                document.getElementById('player-combat-hp').textContent = `${data.hp}/${data.maxHp}`;
                 // Вызываем enterCombat и передаем данные о враге
                 enterCombat({
                     name: data.enemyName,
                     hp: data.enemyHp,
-                    maxHp: data.enemyMaxHp
+                    maxHp: data.enemyMaxHp,
                 });
 
                 // Обновляем боевой интерфейс
@@ -145,6 +159,8 @@ function exploreForest() {
             } else {
                 // Показываем событие путешествия
                 updateExplorationEvent(data.message);
+                document.getElementById('actions').innerHTML =
+                    `<button onclick="exploreForest()">Продолжить</button>`;
             }
         })
         .catch(error => {
@@ -185,6 +201,7 @@ function checkCombatStatus() {
             if (!player.inCombat) {
                 // Скрываем боевой интерфейс
                 document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('turn').style.display = 'none';
 
                 // Показываем элементы путешествия
                 document.getElementById('event-log').style.display = 'block';
@@ -286,4 +303,4 @@ document.addEventListener('click', (e) => {
 });
 
 updateStats();
-document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Выйти в лес</button>`;
+document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Начать путешествие в Тёмном лесу</button>`;

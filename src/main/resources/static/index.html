@@ -9,12 +9,14 @@
 <body>
 <div id="game-container">
     <h1>Forest RPG</h1>
-    <div id="player-stats"></div>
-    <div id="health-status">
-        <div id="player-health"></div>
-        <div id="enemy-health"></div>
+    <!-- Интерфейс путешествия (изначально скрыт) -->
+    <div id="exploration-interface" style="display: none;">
+        <div id="player-stats"></div>
+        <img id="forest-image" src="images/forest.png" class="enemy-img">
+
+        <div id="event-log"></div>
+        <div id="actions"></div>
     </div>
-    <div id="event-log"></div>
     <!-- Боевой интерфейс (изначально скрыт) -->
     <div id="battle-interface" style="display: none;">
         <img id="enemy-image" src="images/goblin.png" class="enemy-img">
@@ -33,6 +35,8 @@
         </div>
 
         <div id="battle-log" class="scrollable-log"></div>
+
+        <div id="turn"></div>
 
         <div class="battle-action-grid">
             <button class="action-btn" onclick="attack()">
@@ -56,8 +60,6 @@
             <div id="potions-grid"></div>
         </div>
     </div>
-    <div id="turn" style="display: none;"></div>
-    <div id="actions"></div>
 </div>
 <button id="character-btn" onclick="toggleMenu()">
     <img src="character-icon.png" width="30">

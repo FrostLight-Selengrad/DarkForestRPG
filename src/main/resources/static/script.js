@@ -26,10 +26,7 @@ function updateStats() {
 // При начале боя
 function enterCombat(enemyData) {
     // Скрыть элементы путешествия
-    document.getElementById('event-log').style.display = 'none';
-    document.getElementById('player-stats').style.display = 'none';
-    document.getElementById('health-status').style.display = 'none';
-    document.getElementById('actions').style.display = 'none';
+    document.getElementById('exploration-interface').style.display = 'none';
 
     // Показать боевой интерфейс
     document.getElementById('battle-interface').style.display = 'block';
@@ -111,25 +108,6 @@ function updateExplorationLog() {
         });
 }
 
-function updateHealth() {
-    fetch(`/api/battle/health?userId=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                document.getElementById('health-status').innerHTML = data.error;
-                return;
-            }
-            document.getElementById('player-health').innerHTML =
-                `Ваше здоровье: <span style="color: ${data.playerColor}">${data.playerHp}/${data.playerMaxHp}</span>`;
-            if (data.enemyHp) {
-                document.getElementById('enemy-health').innerHTML =
-                    `${data.enemyName} здоровье: <span style="color: ${data.enemyColor}">${data.enemyHp}/${data.enemyMaxHp}</span>`;
-            } else {
-                document.getElementById('enemy-health').innerHTML = 'Нет противника';
-            }
-        });
-}
-
 function exploreForest() {
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
         .then(response => {
@@ -141,11 +119,9 @@ function exploreForest() {
         .then(data => {
             // Принудительно обновляем весь интерфейс
             updateStats();
-            updateHealth();
             updateExplorationEvent(data);
 
             if (data.inCombat) {
-                document.getElementById('player-combat-hp').textContent = `${data.hp}/${data.maxHp}`;
                 // Вызываем enterCombat и передаем данные о враге
                 enterCombat({
                     name: data.enemyName,
@@ -155,7 +131,7 @@ function exploreForest() {
 
                 // Обновляем боевой интерфейс
                 updateBattleLog();
-                updateHealth();
+                updateCombatHealth();
             } else {
                 // Показываем событие путешествия
                 updateExplorationEvent(data.message);
@@ -188,7 +164,6 @@ function tryFlee() {
             logEvent(data.message); // <- Используем data.message
             updateStats();
             updateBattleLog();
-            updateHealth();
             checkCombatStatus();
         })
         .catch(error => logEvent('Ошибка: ' + error.message)); // <- Добавлен catch
@@ -201,29 +176,14 @@ function checkCombatStatus() {
             if (!player.inCombat) {
                 // Скрываем боевой интерфейс
                 document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('turn').style.display = 'none';
 
                 // Показываем элементы путешествия
-                document.getElementById('event-log').style.display = 'block';
-                document.getElementById('player-stats').style.display = 'block';
-                document.getElementById('actions').style.display = 'block';
+                document.getElementById('exploration-interface').style.display = 'block';
 
                 // Обновляем события
                 document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
             }
         });
-}
-
-function updateBattleInterface(player, enemy) {
-    // Показываем боевой интерфейс
-    document.getElementById('battle-interface').style.display = 'block';
-
-    // Обновляем здоровье
-    document.getElementById('player-hp').textContent = `${player.hp}/${player.maxHp}`;
-    document.getElementById('enemy-hp').textContent = `${enemy.hp}/${enemy.maxHp}`;
-
-    // Обновляем лог боя
-    document.getElementById('battle-log').innerHTML = player.battleLog.join('<br>');
 }
 
 function openPotionsModal() {

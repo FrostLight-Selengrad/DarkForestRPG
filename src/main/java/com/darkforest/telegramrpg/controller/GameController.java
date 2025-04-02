@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,6 +22,20 @@ public class GameController {
     @GetMapping("/player")
     public Player getPlayer(@RequestParam Long userId) {
         return playerService.getPlayer(userId);
+    }
+
+    @GetMapping("/exploration-event")
+    public Map<String, Object> getExplorationEvent(@RequestParam Long userId) {
+        Player player = playerService.getPlayer(userId);
+        List<String> log = player.getExplorationLog();
+
+        Map<String, Object> response = new HashMap<>();
+        if (!log.isEmpty()) {
+            String[] parts = log.get(log.size() - 1).split(":");
+            response.put("type", parts[0]);
+            response.put("message", parts[1]);
+        }
+        return response;
     }
 
     @PostMapping("/explore")

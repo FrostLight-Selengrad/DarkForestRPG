@@ -37,15 +37,58 @@ button:hover {
 }
 /* Боевой интерфейс */
 #battle-interface {
-    border: 2px solid #444;
-    padding: 15px;
-    margin: 10px 0;
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 15px 0;
 }
 
-.health-bars {
-    display: flex;
-    justify-content: space-between;
-    margin: 15px 0;
+.combat-health-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.combat-hp {
+    font-size: 1.2em;
+    color: #4CAF50;
+    margin-top: 5px;
+    transition: color 0.3s;
+}
+
+.scrollable-log {
+    height: 150px;
+    overflow-y: auto;
+    background: #2a2a2a;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.battle-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-btn {
+    padding: 15px;
+    background: #333;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    background: #444;
+}
+
+.action-btn img {
+    width: 40px;
+    height: 40px;
 }
 
 .modal {
@@ -78,11 +121,10 @@ button:hover {
     font-weight: bold;
 }
 
-#char-menu-btn {
+#character-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 1000;
 }
 
 .dropdown-menu {
@@ -90,12 +132,29 @@ button:hover {
     position: fixed;
     bottom: 70px;
     right: 20px;
-    background: #333;
+    background: #2c2c2c;
     padding: 10px;
     border-radius: 5px;
 }
 
-.dropdown-menu button {
+.menu-item {
     display: block;
-    margin: 5px 0;
+    margin: 5px;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.event-card {
+    animation: slideIn 0.3s ease-out;
+}
+
+.combat-hp {
+    transition: color 0.3s;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
 }

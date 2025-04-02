@@ -56,10 +56,10 @@ public class GameService {
             player.setEnemyInitiative(5);
             player.setInCombat(true);
             player.clearBattleLog();
-            player.setBattleTurn(0);
-            return "Вы столкнулись с Гоблином!";
+            player.setBattleTurn(1);
+            player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
+            return "Начался бой с " + player.getEnemyName();
         } else if (currentEvent.equals("chest")) {
-            player.addToExplorationLog("Вы нашли сундук!");
             if (random.nextDouble() < 0.2) {
                 player.setEnemyName("Мимик" + player.getForestLevel() + " уровня");
                 player.setEnemyHp(70);
@@ -68,15 +68,18 @@ public class GameService {
                 player.setEnemyInitiative(8);
                 player.setInCombat(true);
                 player.clearBattleLog();
-                player.setBattleTurn(0);
+                player.setBattleTurn(1);
+                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
                 return "Сундук оказался мимиком!";
             } else {
+                player.addToExplorationLog("Вы нашли сундук!");
                 player.setPhysicalAttack(player.getPhysicalAttack() + 5);
-                return "Вы нашли оружие в сундуке! Физ. атака +5";
+                return "Найден сундук!";
             }
         } else if (currentEvent.equals("trap")) {
             int damage = 20 - player.getResistance() / 2;
             player.setHp(player.getHp() - damage);
+            player.addToExplorationLog("Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp());
             return "Вы попали в ловушку! Урон: " + damage + ". HP: " + player.getHp();
         } else if (currentEvent.equals("boss")) {
             player.setEnemyName("Босс " + player.getForestLevel() + " уровня");
@@ -86,7 +89,8 @@ public class GameService {
             player.setEnemyInitiative(15);
             player.setInCombat(true);
             player.clearBattleLog();
-            player.setBattleTurn(0);
+            player.setBattleTurn(1);
+            player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
             return "Вы встретили босса! HP: " + player.getEnemyHp();
         }
         return "Ничего не произошло.";
@@ -176,4 +180,6 @@ public class GameService {
             player.setMaxHp(player.getMaxHp() + 10);
         }
     }
+
+
 }

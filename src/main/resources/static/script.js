@@ -23,6 +23,50 @@ function updateStats() {
         .catch(error => console.error('Error fetching stats:', error));
 }
 
+// При начале боя
+function enterCombat(enemyData) {
+    // Скрыть элементы путешествия
+    document.getElementById('event-log').style.display = 'none';
+    document.getElementById('player-stats').style.display = 'none';
+    document.getElementById('health-status').style.display = 'none';
+
+    // Показать боевой интерфейс
+    document.getElementById('battle-interface').style.display = 'block';
+
+    // Обновить данные
+    document.getElementById('enemy-combat-name').textContent = enemyData.name;
+    document.getElementById('enemy-combat-hp').textContent = `${enemyData.hp}/${enemyData.maxHp}`;
+    updateBattleLog();
+}
+
+function updateExplorationEvent() {
+    fetch(`/api/game/exploration-event?userId=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            const eventDiv = document.getElementById('exploration-event');
+            eventDiv.innerHTML = `
+                <div class="event-card">
+                    <img src="images/${data.type}.png" class="event-image">
+                    <div class="event-content">
+                        <p class="event-message">${data.message}</p>
+                        ${getEventControls(data.type)}
+                    </div>
+                </div>
+            `;
+        });
+}
+
+function getEventControls(eventType) {
+    switch(eventType) {
+        case 'chest':
+            return `<button class="event-btn" onclick="openChest()">Открыть</button>`;
+        case 'trap':
+            return `<button class="event-btn" onclick="escapeTrap()">Выбраться (10% шанс)</button>`;
+        default:
+            return `<button class="event-btn" onclick="exploreForest()">Продолжить</button>`;
+    }
+}
+
 // Обновление боевого интерфейса
 function updateBattleUI(data) {
     document.getElementById('battle-interface').style.display = 'block';
@@ -80,25 +124,24 @@ function updateHealth() {
 
 function exploreForest() {
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            logEvent(data.message);
-            updateStats();
-            updateHealth();
             if (data.inCombat) {
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="attack()">Атаковать</button>
-                    <button onclick="tryFlee()">Попытаться убежать</button>
-                `;
-                updateExplorationLog();
+                // Вызываем enterCombat и передаем данные о враге
+                enterCombat({
+                    name: data.enemyName,
+                    hp: data.enemyHp,
+                    maxHp: data.enemyMaxHp
+                });
+
+                // Обновляем боевой интерфейс
+                updateBattleLog();
+                updateHealth();
             } else {
-                document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Продолжить</button>`;
+                // Показываем событие путешествия
+                updateExplorationEvent(data.message);
             }
-        })
-        .catch(error => logEvent('Ошибка: ' + error.message));
+        });
 }
 
 function attack() {
@@ -172,18 +215,31 @@ function openPotionsModal() {
 }
 
 // Использование зелья
-function usePotion(potionId) {
-    fetch(`/api/use-potion?userId=${userId}&potionId=${potionId}`, {
+function usePotion(potionType) {
+    fetch(`/api/battle/use-potion?userId=${userId}&type=${potionType}`, {
         method: 'POST'
-    }).then(response => {
-        // Обновляем интерфейс
-        updateHealth();
-        updateBattleLog();
-    });
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addToBattleLog(`Использовано зелье: +${data.heal} HP`);
+                updateCombatHealth();
+                enemyTurn(); // Ход врага после использования
+            } else {
+                addToBattleLog(data.error);
+            }
+        });
+}
+
+// Подсветка HP при изменении
+function updateCombatHealth() {
+    const playerHp = document.getElementById('player-combat-hp');
+    playerHp.style.color = '#ff5555';
+    setTimeout(() => playerHp.style.color = '#4CAF50', 500);
 }
 
 function toggleMenu() {
-    const menu = document.getElementById('char-menu');
+    const menu = document.getElementById('character-menu');
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 

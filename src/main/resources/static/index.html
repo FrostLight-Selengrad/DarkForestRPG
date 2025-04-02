@@ -17,23 +17,36 @@
     <div id="event-log"></div>
     <!-- Боевой интерфейс (изначально скрыт) -->
     <div id="battle-interface" style="display: none;">
-        <img id="enemy-image" src="goblin.png">
-        <div class="health-bars">
-            <div id="player-health-bar">
+        <img id="enemy-image" src="images/goblin.png" class="enemy-img">
+
+        <div class="combat-health-bars">
+            <div class="combat-health-player">
                 <span>Ваше здоровье:</span>
-                <span id="player-hp">100/100</span>
+                <div class="combat-hp" id="player-combat-hp">100/100</div>
             </div>
-            <div id="enemy-health-bar">
-                <span id="enemy-name">Гоблин</span>
-                <span id="enemy-hp">50/50</span>
+
+            <div class="combat-health-enemy">
+                <span id="enemy-combat-name">Гоблин</span>
+                <span class="enemy-level">Уровень 1</span>
+                <div class="combat-hp" id="enemy-combat-hp">50/50</div>
             </div>
         </div>
-        <div id="battle-log"></div>
-        <div class="battle-actions">
-            <button onclick="attack()">Атака</button>
-            <button onclick="openAbilitiesModal()">Способности</button>
-            <button onclick="openPotionsModal()">Зелья</button>
-            <button onclick="tryFlee()">Сбежать</button>
+
+        <div id="battle-log" class="scrollable-log"></div>
+
+        <div class="battle-action-grid">
+            <button class="action-btn" onclick="attack()">
+                <img src="icons/sword.png" alt="Атака" title="Атаковать">
+            </button>
+            <button class="action-btn" onclick="openAbilities()">
+                <img src="icons/spell.png" alt="Способности" title="Способности">
+            </button>
+            <button class="action-btn" onclick="openPotions()">
+                <img src="icons/potion.png" alt="Зелья" title="Зелья">
+            </button>
+            <button class="action-btn" onclick="tryFlee()">
+                <img src="icons/escape.png" alt="Сбежать" title="Сбежать">
+            </button>
         </div>
     </div>
     <!-- Модальное окно зелий -->
@@ -46,14 +59,17 @@
     <div id="turn"></div>
     <div id="actions"></div>
 </div>
-<button id="char-menu-btn" onclick="toggleMenu()">
-    <img src="char_icon.png" alt="Персонаж">
+<button id="character-btn" onclick="toggleMenu()">
+    <img src="character-icon.png" width="30">
 </button>
 
-<div id="char-menu" class="dropdown-menu">
-    <button onclick="openInventory()"><img src="backpack_icon.png"></button>
-    <button onclick="openSkills()"><img src="skills_icon.png"></button>
+<div id="character-menu" class="dropdown-menu">
+    <button class="menu-item"><img src="backpack-icon.png"></button>
+    <button class="menu-item"><img src="talents-icon.png"></button>
+    <button class="menu-item"><img src="skills-icon.png"></button>
+    <button class="menu-item"><img src="settings-icon.png"></button>
 </div>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="/script.js"></script>
 </body>

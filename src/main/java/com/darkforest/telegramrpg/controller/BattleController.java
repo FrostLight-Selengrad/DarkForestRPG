@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.round;
+
 @RestController
 @RequestMapping("/api/battle")
 public class BattleController {
@@ -53,6 +55,32 @@ public class BattleController {
         return response;
     }
 
+    @PostMapping("/use-potion")
+    public Map<String, Object> usePotion(
+            @RequestParam Long userId,
+            @RequestParam String type
+    ) {
+        Player player = playerService.getPlayer(userId);
+        Map<String, Object> response = new HashMap<>();
+
+        if (player.getInventory().getOrDefault(type, 0) > 0) {
+            int heal = calculateHeal(type, player);
+            player.setHp(Math.min(player.getMaxHp(), player.getHp() + heal));
+            player.getInventory().put(type, player.getInventory().get(type) - 1);
+            response.put("success", true);
+            response.put("heal", heal);
+        } else {
+            response.put("error", "Зелье закончилось!");
+        }
+
+        return response;
+    }
+
+    private int calculateHeal(String type, Player player) {
+        int currentHp = player.getHp();
+        int heal = 15 + (int) (0.1 * currentHp);
+        return heal;
+    }
     private String getHealthColor(int hp, int maxHp) {
         double percentage = (double) hp / maxHp * 100;
         if (percentage > 80) return "green";

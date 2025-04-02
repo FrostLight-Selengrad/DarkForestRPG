@@ -2,6 +2,8 @@ package com.darkforest.telegramrpg.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Player {
     private int hp = 90;
@@ -18,6 +20,7 @@ public class Player {
     private int toxicity = 0;
     private int physicalAttack = 10;
     private int magicPower = 0;
+    private Map<String, Integer> inventory = new HashMap<>(); // Пример: {"weak_health_potion": 3}
     private int forestLevel = 1;
 
     private List<String> explorationLog = new ArrayList<>(); // Лог для путешествия
@@ -52,6 +55,10 @@ public class Player {
 
     public int getEnemyHp() {
         return enemyHp;
+    }
+
+    public Map<String, Integer> getInventory() {
+        return inventory;
     }
 
     public void setEnemyHp(int enemyHp) {

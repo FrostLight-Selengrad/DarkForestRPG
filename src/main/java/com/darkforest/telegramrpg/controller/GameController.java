@@ -92,6 +92,16 @@ public class GameController {
         return response;
     }
 
+    @PostMapping("/escape-trap")
+    public Map<String, Object> escapeTrap(@RequestParam Long userId) {
+        Player player = playerService.getPlayer(userId);
+        String message = gameService.handleTrapEscape(player);
+        return Map.of(
+                "type", "trap",
+                "message", message
+        );
+    }
+
     private String getHealthColor(int hp, int maxHp) {
         double percentage = (double) hp / maxHp * 100;
         if (percentage > 80) return "green";

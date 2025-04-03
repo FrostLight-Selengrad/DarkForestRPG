@@ -43,26 +43,29 @@ function enterCombat(enemyData) {
     updateBattleLog();
 }
 
-function updateExplorationEvent() {
-    fetch(`/api/game/exploration-event?userId=${userId}`)
+function updateExplorationEvent(data) {
+    fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
-        .then(data => {
+        .then(player => {
             const eventDiv = document.getElementById('exploration-log');
+            let image = "forest.png";
+            let buttons = '';
 
-            // Определяем изображение
-            let image = "trap.png";
             if (data.type === "trap") {
-                image = data.message.includes("уклонились") ? "trap_escaped.png" : "trap_active.png";
-            }
-            else if (data.type === "chest") {
-                image = "chest.png";
+                if (player.isInTrap()) {
+                    image = "trap_active.png";
+                    buttons = `<button onclick="escapeTrap()">Попытаться выбраться (${player.trapEscapeChance}%)</button>`;
+                } else {
+                    image = "trap_escaped.png";
+                    buttons = `<button onclick="exploreForest()">Продолжить</button>`;
+                }
             }
 
             eventDiv.innerHTML = `
                 <div class="event-card">
                     <img src="images/${image}" class="event-image">
                     <p>${data.message}</p>
-                    ${getTrapControls(data)}
+                    ${buttons}
                 </div>
             `;
         });

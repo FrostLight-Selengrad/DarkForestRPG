@@ -84,7 +84,8 @@ public class GameService {
             }
             case "trap" -> {
                 player.setInTrap(true);
-                player.addToExplorationLog("trap:Вы попали в ловушку!");
+                player.setTrapEscapeChance(60); // Сброс при новом попадании
+                player.setTrapAttempts(0);
 
                 // 50% шанс избежать
                 if (random.nextBoolean()) {
@@ -198,6 +199,30 @@ public class GameService {
         if (player.getStamina() < maxRunes && random.nextDouble() < 0.5) {
             player.setStamina(player.getStamina() + 1);
             player.setMaxHp(player.getMaxHp() + 10);
+        }
+    }
+
+    // Добавьте новый метод для обработки побега
+    public String handleTrapEscape(Player player) {
+        player.setTrapAttempts(player.getTrapAttempts() + 1);
+
+        // Расчет шанса
+        int currentChance = player.getTrapEscapeChance();
+        boolean success = new Random().nextInt(100) < currentChance;
+
+        if (success) {
+            player.setInTrap(false);
+            player.setTrapEscapeChance(60); // Сброс при успехе
+            player.setTrapAttempts(0);
+            return "trap:Вы успешно выбрались!";
+        } else {
+            int damage = 10;
+            player.setHp(player.getHp() - damage);
+
+            // Увеличиваем шанс на 6% с каждой попыткой
+            player.setTrapEscapeChance(currentChance + 6);
+
+            return "trap:Попытка не удалась! Урон: " + damage + ". Новый шанс: " + player.getTrapEscapeChance() + "%";
         }
     }
 }

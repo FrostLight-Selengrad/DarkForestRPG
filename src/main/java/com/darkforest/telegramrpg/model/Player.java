@@ -23,6 +23,8 @@ public class Player {
     private int magicPower = 0;
     private Map<String, Integer> inventory = new HashMap<>(Map.of("weak_elixir", 3)); // Пример: {"weak_health_potion": 3}
     private int forestLevel = 1;
+    private boolean InCamp = true;
+
     // Поля для ловушек
     private int trapEscapeChance = 60;
     private int trapAttempts = 0;
@@ -48,6 +50,14 @@ public class Player {
 
     public void setInCombat(boolean inCombat) {
         this.inCombat = inCombat;
+    }
+
+    public boolean isInCamp() {
+        return InCamp;
+    }
+
+    public void setInCamp(boolean InCamp) {
+        this.InCamp = InCamp;
     }
 
     public String getEnemyName() {
@@ -113,6 +123,10 @@ public class Player {
 
     public int getStamina() {
         return stamina;
+    }
+
+    public int getMaxStamina() {
+        return maxStamina;
     }
 
     public void setStamina(int stamina) {

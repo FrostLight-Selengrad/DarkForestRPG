@@ -154,6 +154,20 @@ function exploreForest() {
         .then(data => {
             // Принудительно обновляем весь интерфейс
             updateStats();
+            // Анимация перехода
+            const travelTime = calculateTravelTime(player.stamina);
+            document.getElementById('actions').innerHTML = '<div class="progress-bar" id="travel-progress"></div>';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 100 / (travelTime / 100);
+                document.getElementById('travel-progress').style.width = `${progress}%`;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    fetchExplore();
+                }
+            }, 100);
+            // Принудительно обновляем весь интерфейс
+            updateStats();
             updateExplorationEvent(data);
 
             if (data.inCombat) {
@@ -185,7 +199,6 @@ function attack() {
     fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
-            logExplorationEvent(data.message); // <- Используем data.message
             updateCombatHealth(); // Обновляем здоровье
             updateBattleLog();
             checkCombatStatus(); // Проверка окончания боя
@@ -196,7 +209,6 @@ function tryFlee() {
     fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' })
         .then(response => response.json()) // <- Парсим JSON
         .then(data => {
-            logExplorationEvent(data.message); // <- Используем data.message
             updateCombatHealth(); // Обновляем здоровье
             updateStats();
             updateBattleLog();

@@ -4,6 +4,7 @@ import com.darkforest.telegramrpg.model.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -224,5 +225,33 @@ public class GameService {
 
             return "trap:Попытка не удалась! Урон: " + damage + ". Новый шанс: " + player.getTrapEscapeChance() + "%";
         }
+    }
+
+    public Map<String, Object> rest(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        if (!player.isInCamp()) return Map.of("success", false, "message", "Вы не в лагере!");
+        if (player.getStamina() < player.getMaxStamina()) {
+            player.setStamina(player.getStamina() + 1);
+        }
+        playerService.savePlayer(userId, player);
+        return Map.of("success", true);
+    }
+
+    public Map<String, Object> leaveCamp(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        player.setInCamp(false);
+        playerService.savePlayer(userId, player);
+        return Map.of("success", true);
+    }
+
+    public Map<String, Object> returnToCamp(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        int time = 5 + (100 - player.getStamina()) / 5; // 5-25 сек
+        String message = player.getStamina() > 80 ? "Герой бодро возвращается в лагерь" :
+                player.getStamina() > 20 ? "Герой неспеша ковыляет в лагерь" :
+                        "Герой из последних сил возвращается в лагерь. Это займет больше времени";
+        player.setInCamp(true);
+        playerService.savePlayer(userId, player);
+        return Map.of("message", message, "time", time);
     }
 }

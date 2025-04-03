@@ -102,6 +102,21 @@ public class GameController {
         );
     }
 
+    @PostMapping("/rest")
+    public Map<String, Object> rest(@RequestParam Long userId) {
+        return gameService.rest(userId);
+    }
+
+    @PostMapping("/leave-camp")
+    public Map<String, Object> leaveCamp(@RequestParam Long userId) {
+        return gameService.leaveCamp(userId);
+    }
+
+    @PostMapping("/return-to-camp")
+    public Map<String, Object> returnToCamp(@RequestParam Long userId) {
+        return gameService.returnToCamp(userId);
+    }
+
     private String getHealthColor(int hp, int maxHp) {
         double percentage = (double) hp / maxHp * 100;
         if (percentage > 80) return "green";

@@ -43,6 +43,9 @@ function leaveCamp() {
                 updateStats();
                 const logDiv = document.getElementById('exploration-log');
                 logDiv.innerHTML = '<p>Вы покинули лагерь и отправились в лес.</p>';
+
+                document.getElementById('exploration-interface').style.display = 'block';
+                document.getElementById('battle-interface').style.display = 'none';
             } else {
                 alert("Не удалось выйти из лагеря!");
             }

@@ -94,7 +94,7 @@ function updateExplorationEvent(data) {
 
             eventDiv.innerHTML = `
                 <div class="event-card">
-                    <img src="images/${image}" class="event-image">
+                    <img src="images/${image}" class="event-image" alt="${image}">
                     <p>${data.message}</p>
                     ${buttons}
                 </div>

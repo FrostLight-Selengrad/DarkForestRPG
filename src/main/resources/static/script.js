@@ -30,8 +30,8 @@ function updateStats() {
 // Начальная загрузка и лог лагеря
 function initializeGame() {
     updateStats();
-    const logDiv = document.getElementById('camp-log');
-    logDiv.innerHTML = '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
+    document.getElementById('camp-log').innerHTML =
+        '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
 }
 
 // Выход из лагеря
@@ -73,34 +73,6 @@ function enterCombat(enemyData) {
     document.getElementById('enemy-level').textContent = "Уровень " + enemyData.level;
     document.getElementById('enemy-combat-hp').textContent = `${enemyData.hp}/${enemyData.maxHp}`;
     updateBattleLog();
-}
-
-function updateExplorationEvent(data) {
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(player => {
-            const eventDiv = document.getElementById('exploration-log');
-            let image = "forest.png";
-            let buttons = '';
-
-            if (data.type === "trap") {
-                if (player.isInTrap()) {
-                    image = "trap_active.png";
-                    buttons = `<button onclick="escapeTrap()">Попытаться выбраться (${player.trapEscapeChance}%)</button>`;
-                } else {
-                    image = "trap_escaped.png";
-                    buttons = `<button onclick="exploreForest()">Продолжить</button>`;
-                }
-            }
-
-            eventDiv.innerHTML = `
-                <div class="event-card">
-                    <img src="images/${image}" class="event-image" alt="${image}">
-                    <p>${data.message}</p>
-                    ${buttons}
-                </div>
-            `;
-        });
 }
 
 function getTrapControls(data) {
@@ -147,12 +119,16 @@ function updateBattleLog() {
         });
 }
 
+// Исследование леса
 function exploreForest() {
-    fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/game/explore?userId=${userId}`)
+        .then(response => response.json())
         .then(data => {
-            // Принудительно обновляем весь интерфейс
-            updateStats();
-            // Анимация перехода
+            if (data.stamina <= 0) {
+                logExplorationEvent("Герой устал и нуждается в отдыхе!");
+                document.getElementById('actions').innerHTML = `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
+                return;
+            }
             const travelTime = calculateTravelTime(data.stamina);
             document.getElementById('actions').innerHTML = '<div class="progress-bar" id="travel-progress"></div>';
             let progress = 0;
@@ -164,47 +140,99 @@ function exploreForest() {
                     fetchExplore();
                 }
             }, 100);
-            // Принудительно обновляем весь интерфейс
+        });
+}
+
+function fetchExplore() {
+    fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
             updateStats();
             updateExplorationEvent(data);
-
-            if (data.inCombat) {
-                // Вызываем enterCombat и передаем данные о враге
-                enterCombat({
-                    name: data.enemyName,
-                    hp: data.enemyHp,
-                    maxHp: data.enemyMaxHp,
-                    level: data.level,
-                });
-
-                // Обновляем боевой интерфейс
-                updateBattleLog();
-                updateCombatHealth();
-            } else {
-                // Показываем событие путешествия
-                updateExplorationEvent(data.message);
-                document.getElementById('actions').innerHTML =
-                    `<button onclick="exploreForest()">Продолжить</button>`;
-            }
-        })
-        .catch(error => {
-        console.error('Error:', error);
-        logExplorationEvent('Ошибка соединения с сервером');
-    });
+            if (data.inCombat) enterCombat(data);
+        });
 }
 
 function calculateTravelTime(stamina) {
-    return 5000 + Math.floor((100 - stamina) / 8) * 1000; // 5 сек + 1 сек за каждые 8 недостающей выносливости
+    return 5000 + Math.floor((100 - stamina) / 8) * 1000;
 }
 
-function attack() {
-    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json()) // <- Парсим JSON
+// Обновление событий
+function updateExplorationEvent(data) {
+    fetch(`/api/game/player?userId=${userId}`)
+        .then(response => response.json())
+        .then(player => {
+            const eventDiv = document.getElementById('exploration-log');
+            const [type, image, message] = data.message.split(":", 3);
+            eventDiv.innerHTML = `<div class="event-card"><img src="images/${image}" class="event-image"><p>${message}</p></div>`;
+            document.getElementById('forest-image').src = `images/${image}`;
+            document.getElementById('actions').innerHTML =
+                `<button onclick="exploreForest()" class="action-btn">Продолжить</button>`;
+            if (type === "chest") {
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="openChest()" class="action-btn">Открыть сундук</button>
+                    <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
+                `;
+            } else if (type === "trap" && message.includes("попали")) {
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="escapeTrap()" class="action-btn">Попытаться выбраться (${data.chance || player.trapEscapeChance}%)</button>
+                `;
+            } else if (type === "monster") {
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
+                    <button onclick="tryFleeBeforeCombat()" class="action-btn">Попытаться убежать</button>
+                `;
+            } else if (type === "abandoned_camp") {
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
+                    <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
+                `;
+            } else {
+                document.getElementById('actions').innerHTML = `
+                <button onClick="exploreForest()" class="action-btn">Пройти мимо ничего</button>
+            `}
+        });
+}
+
+function fightMonster() {
+    fetch(`/api/game/fight-monster?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
         .then(data => {
-            updateCombatHealth(); // Обновляем здоровье
-            updateBattleLog();
-            checkCombatStatus(); // Проверка окончания боя
-        })
+            if (data.inCombat) enterCombat(data);
+        });
+}
+
+function tryFleeBeforeCombat() {
+    fetch(`/api/game/flee-before-combat?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            updateExplorationEvent(data);
+        });
+}
+
+function restAtCamp() {
+    fetch(`/api/game/rest-at-camp?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let time = 0;
+                const interval = setInterval(() => {
+                    time += 1;
+                    updateStats();
+                    if (time >= 20) clearInterval(interval);
+                }, 1000);
+            }
+        });
+}
+
+function openChest() {
+    fetch(`/api/game/open-chest?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            updateStats();
+            updateExplorationEvent(data);
+            if (data.inCombat) enterCombat(data);
+        });
 }
 
 function tryFlee() {
@@ -215,6 +243,16 @@ function tryFlee() {
             updateStats();
             updateBattleLog();
             checkCombatStatus();
+        })
+}
+
+function attack() {
+    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json()) // <- Парсим JSON
+        .then(data => {
+            updateCombatHealth(); // Обновляем здоровье
+            updateBattleLog();
+            checkCombatStatus(); // Проверка окончания боя
         })
 }
 

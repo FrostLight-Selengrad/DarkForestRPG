@@ -244,6 +244,32 @@ public class GameService {
         return Map.of("success", true);
     }
 
+    // Начало боя с монстром
+    public Map<String, Object> fightMonster(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        player.setInCombat(true);
+        player.clearBattleLog();
+        player.addToBattleLog("Бой начался с " + player.getEnemyName() + "!");
+        player.setStamina(player.getStamina() - (player.getEnemyName().contains("Босс") ? 5 : player.getEnemyName().contains("Элитный") ? 3 : 2));
+        return Map.of("inCombat", true, "enemyName", player.getEnemyName(), "enemyHp", player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
+    }
+
+    // Побег до начала боя
+    public Map<String, Object> fleeBeforeCombat(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        boolean noticed = player.getExplorationLog().getLast().contains("заметил");
+        double fleeChance = noticed ? 0.25 : 0.5;
+        if (random.nextDouble() < fleeChance) {
+            player.addToExplorationLog("Вы успешно сбежали!");
+            return Map.of("message", "Вы успешно сбежали!");
+        } else {
+            player.setInCombat(true);
+            player.clearBattleLog();
+            player.addToBattleLog("Побег не удался! Бой начался!");
+            return Map.of("inCombat", true, "enemyName", player.getEnemyName(), "enemyHp", player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
+        }
+    }
+
     public Map<String, Object> returnToCamp(Long userId) {
         Player player = playerService.getPlayer(userId);
         int time = 5 + (100 - player.getStamina()) / 5; // 5-25 сек
@@ -253,5 +279,16 @@ public class GameService {
         player.setInCamp(true);
         playerService.savePlayer(userId, player);
         return Map.of("message", message, "time", time);
+    }
+
+    // Отдых в лагере
+    public Map<String, Object> restAtCamp(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        int staminaGain = player.getMaxStamina() / 5;
+        int healthGain = player.getMaxHp() / 3;
+        player.setStamina(Math.min(player.getMaxStamina(), player.getStamina() + staminaGain));
+        player.setHp(Math.min(player.getMaxHp(), player.getHp() + healthGain));
+        playerService.savePlayer(userId, player);
+        return Map.of("success", true);
     }
 }

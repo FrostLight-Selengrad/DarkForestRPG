@@ -102,6 +102,16 @@ public class GameController {
         );
     }
 
+    @PostMapping("/fight-monster")
+    public Map<String, Object> fightMonster(@RequestParam Long userId) {
+        return gameService.fightMonster(userId);
+    }
+
+    @PostMapping("/flee-before-combat")
+    public Map<String, Object> fleeBeforeCombat(@RequestParam Long userId) {
+        return gameService.fleeBeforeCombat(userId);
+    }
+
     @PostMapping("/rest")
     public Map<String, Object> rest(@RequestParam Long userId) {
         return gameService.rest(userId);
@@ -115,6 +125,11 @@ public class GameController {
     @PostMapping("/return-to-camp")
     public Map<String, Object> returnToCamp(@RequestParam Long userId) {
         return gameService.returnToCamp(userId);
+    }
+
+    @PostMapping("/rest-at-camp")
+    public Map<String, Object> restAtCamp(@RequestParam Long userId) {
+        return gameService.restAtCamp(userId);
     }
 
     private String getHealthColor(int hp, int maxHp) {

@@ -54,6 +54,9 @@ function updateExplorationEvent() {
             if (data.type === "trap") {
                 image = data.message.includes("уклонились") ? "trap_escaped.png" : "trap_active.png";
             }
+            else if (data.type === "chest") {
+                image = "chest.png";
+            }
 
             eventDiv.innerHTML = `
                 <div class="event-card">

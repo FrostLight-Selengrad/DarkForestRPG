@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="ForestRPG_title" style="display: none;">Forest RPG</title>
+    <title>Forest RPG</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div id="game-container">
-    <h1>Forest RPG</h1>
+    <h1  id="ForestRPG_title" style="display: none;">Forest RPG</h1>
     <!-- Интерфейс путешествия (изначально скрыт) -->
     <div id="exploration-interface" style="display: block;">
         <div id="player-stats"></div>
         <img id="forest-image" src="images/forest.png" class="enemy-img">
-
         <div id="exploration-log"></div>
         <div id="actions">
             <button onclick="exploreForest()" class="action-btn">Продолжить</button>

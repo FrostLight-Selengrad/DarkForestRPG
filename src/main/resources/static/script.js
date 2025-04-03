@@ -24,7 +24,7 @@ function updateStats() {
                 `;
             }
         })
-        .catch(error => console.error('Error fetching stats:', error));
+        .catch(handleExplorationError);
 }
 
 // Начальная загрузка и лог лагеря
@@ -56,6 +56,16 @@ function leaveCamp() {
 
 // При начале боя
 function enterCombat(enemyData) {
+    const exploration = document.getElementById('exploration-interface');
+    const battle = document.getElementById('battle-interface');
+
+    exploration.classList.add('hide-to-left');
+    setTimeout(() => {
+        exploration.style.display = 'none';
+        battle.style.display = 'block';
+        battle.classList.add('show-from-right');
+    }, 500);
+
     // Скрыть элементы путешествия
     document.getElementById('exploration-interface').style.display = 'none';
 
@@ -92,7 +102,8 @@ function escapeTrap() {
         .then(response => response.json())
         .then(data => {
             updateExplorationEvent(data);
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function logExplorationEvent(message) {
@@ -116,41 +127,99 @@ function updateBattleLog() {
             battleLog.scrollTop = battleLog.scrollHeight;
 
             document.getElementById('turn').innerText = `Текущий ход: ${data.turn}`;
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 // Исследование леса
 function exploreForest() {
+    // Сначала скрываем кнопку с анимацией
+    const actionsDiv = document.getElementById('actions');
+    actionsDiv.style.opacity = '0';
+    actionsDiv.style.transition = 'opacity 0.3s';
+
     fetch(`/api/game/explore?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.stamina <= 0) {
+
+                // Показываем кнопку снова при ошибке
+                actionsDiv.style.opacity = '1';
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
-                document.getElementById('actions').innerHTML = `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
+                document.getElementById('actions').innerHTML =
+                    `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
                 return;
             }
+
+            // Создаем контейнер для анимации
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            progressContainer.innerHTML = `
+                <p>Исследование леса...</p>
+                <div class="progress-bar" id="travel-progress">
+                    <div class="progress-fill"></div>
+                </div>
+            `;
+
+            // Добавляем прогресс-бар с анимацией
+            actionsDiv.replaceWith(progressContainer);
+            const progressFill = document.querySelector('.progress-fill');
+
             const travelTime = calculateTravelTime(data.stamina);
-            document.getElementById('actions').innerHTML = '<div class="progress-bar" id="travel-progress"></div>';
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 100 / (travelTime / 100);
-                document.getElementById('travel-progress').style.width = `${progress}%`;
-                if (progress >= 100) {
-                    clearInterval(interval);
+            let startTime = Date.now();
+
+            const animationFrame = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / travelTime, 1);
+
+                progressFill.style.width = `${progress * 100}%`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animationFrame);
+                } else {
                     fetchExplore();
                 }
-            }, 100);
-        });
+            };
+
+            requestAnimationFrame(animationFrame);
+        })
+        .catch(handleExplorationError);
 }
 
 function fetchExplore() {
+    // Показываем индикатор загрузки
+    const progressContainer = document.querySelector('.progress-container');
+    progressContainer.classList.add('loading-pulse');
+
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            updateStats();
-            updateExplorationEvent(data);
-            if (data.inCombat) enterCombat(data);
-        });
+            // Плавное исчезновение прогресс-бара
+            progressContainer.style.opacity = '0';
+            progressContainer.style.transition = 'opacity 0.5s';
+
+            setTimeout(() => {
+                updateStats();
+                updateExplorationEvent(data);
+                if (data.inCombat) enterCombat(data);
+
+                // Восстанавливаем кнопки действий
+                const actionsDiv = document.getElementById('actions');
+                actionsDiv.style.opacity = '1';
+                actionsDiv.style.transition = 'opacity 0.3s';
+            }, 500);
+        })
+        .catch(handleExplorationError);
+}
+
+function handleExplorationError(error) {
+    console.error('Ошибка:', error);
+    const actionsDiv = document.getElementById('actions');
+    actionsDiv.innerHTML = `
+        <p class="error-message">Произошла ошибка!</p>
+        <button onclick="exploreForest()" class="action-btn">Повторить попытку</button>
+    `;
+    actionsDiv.style.opacity = '1';
 }
 
 function calculateTravelTime(stamina) {
@@ -191,7 +260,8 @@ function updateExplorationEvent(data) {
                 document.getElementById('actions').innerHTML = `
                 <button onClick="exploreForest()" class="action-btn">Пройти мимо ничего</button>
             `}
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function fightMonster() {
@@ -199,7 +269,8 @@ function fightMonster() {
         .then(response => response.json())
         .then(data => {
             if (data.inCombat) enterCombat(data);
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function tryFleeBeforeCombat() {
@@ -207,7 +278,8 @@ function tryFleeBeforeCombat() {
         .then(response => response.json())
         .then(data => {
             updateExplorationEvent(data);
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function restAtCamp() {
@@ -222,7 +294,8 @@ function restAtCamp() {
                     if (time >= 20) clearInterval(interval);
                 }, 1000);
             }
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function openChest() {
@@ -232,7 +305,8 @@ function openChest() {
             updateStats();
             updateExplorationEvent(data);
             if (data.inCombat) enterCombat(data);
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function tryFlee() {
@@ -244,6 +318,7 @@ function tryFlee() {
             updateBattleLog();
             checkCombatStatus();
         })
+        .catch(handleExplorationError);
 }
 
 function attack() {
@@ -254,6 +329,7 @@ function attack() {
             updateBattleLog();
             checkCombatStatus(); // Проверка окончания боя
         })
+        .catch(handleExplorationError);
 }
 
 function checkCombatStatus() {
@@ -273,7 +349,8 @@ function checkCombatStatus() {
                 // Обновляем события
                 updateExplorationEvent();
             }
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 // Эликсиры
@@ -293,7 +370,8 @@ function openPotionsModal() {
                 </div>
             `).join('');
             document.getElementById('potions-modal').style.display = 'block';
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function closePotionsModal() {
@@ -309,7 +387,8 @@ function usePotion(potionType) {
                 updateCombatHealth();
             }
             closePotionsModal();
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function updateCombatHealth() {
@@ -334,12 +413,20 @@ function updateCombatHealth() {
                 enemyHpElement.textContent =
                     `${player.enemyHp}/${player.enemyMaxHp}`;
             }
-        });
+        })
+        .catch(handleExplorationError);
 }
 
 function toggleMenu() {
     const menu = document.getElementById('character-menu');
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function preloadImages() {
+    const images = ['forest.png', 'goblin.png', 'mimic.png'];
+    images.forEach(img => {
+        new Image().src = `images/${img}`;
+    });
 }
 
 // Закрытие при клике вне меню
@@ -351,3 +438,4 @@ document.addEventListener('click', (e) => {
 
 // Инициализация
 initializeGame();
+preloadImages();

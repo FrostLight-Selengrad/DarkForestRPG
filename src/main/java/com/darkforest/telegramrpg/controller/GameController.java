@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -47,10 +46,11 @@ public class GameController {
     @PostMapping("/explore")
     public Map<String, Object> exploreForest(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
-        String message = gameService.exploreForest(userId);
         boolean inCombat = player.isInCombat();
+        player.setInCamp(false);
         Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
+        response.put("message", gameService.exploreForest(userId));
+        response.put("stamina", player.getStamina());
         response.put("inCombat", inCombat);
         if (inCombat) {
             response.put("enemyName", player.getEnemyName());

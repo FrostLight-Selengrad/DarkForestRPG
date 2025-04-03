@@ -16,7 +16,7 @@ function updateStats() {
             } else {
                 document.getElementById('player-stats').innerHTML = `
                     <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
-                    <p>Физ. атака: ${player.physicalAttack}</p>
+                    <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                 `;
 
                 document.getElementById('player-camp-stats').innerHTML = `
@@ -46,6 +46,7 @@ function leaveCamp() {
 
                 document.getElementById('exploration-interface').style.display = 'block';
                 document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('camp-interface').style.display = 'none';
             } else {
                 alert("Не удалось выйти из лагеря!");
             }
@@ -148,17 +149,11 @@ function updateBattleLog() {
 
 function exploreForest() {
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
         .then(data => {
             // Принудительно обновляем весь интерфейс
             updateStats();
             // Анимация перехода
-            const travelTime = calculateTravelTime(player.stamina);
+            const travelTime = calculateTravelTime(data.stamina);
             document.getElementById('actions').innerHTML = '<div class="progress-bar" id="travel-progress"></div>';
             let progress = 0;
             const interval = setInterval(() => {
@@ -196,6 +191,10 @@ function exploreForest() {
         console.error('Error:', error);
         logExplorationEvent('Ошибка соединения с сервером');
     });
+}
+
+function calculateTravelTime(stamina) {
+    return 5000 + Math.floor((100 - stamina) / 8) * 1000; // 5 сек + 1 сек за каждые 8 недостающей выносливости
 }
 
 function attack() {

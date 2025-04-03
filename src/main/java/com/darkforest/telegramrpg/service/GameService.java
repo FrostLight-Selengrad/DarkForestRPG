@@ -66,7 +66,7 @@ public class GameService {
             }
             case "chest" -> {
                 if (random.nextDouble() < 0.2) {
-                    player.setEnemyName("Мимик" + player.getForestLevel() + " уровня");
+                    player.setEnemyName("Мимик");
                     player.setEnemyHp(70);
                     player.setEnemyMaxHp(70);
                     player.setEnemyAttack(20);
@@ -100,7 +100,7 @@ public class GameService {
                 }
             }
             case "boss" -> {
-                player.setEnemyName("Босс " + player.getForestLevel() + " уровня");
+                player.setEnemyName("Босс");
                 player.setEnemyHp(100);
                 player.setEnemyMaxHp(100);
                 player.setEnemyAttack(25);

@@ -18,9 +18,36 @@ function updateStats() {
                     <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
                     <p>Физ. атака: ${player.physicalAttack}</p>
                 `;
+
+                document.getElementById('player-camp-stats').innerHTML = `
+                    <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
+                `;
             }
         })
         .catch(error => console.error('Error fetching stats:', error));
+}
+
+// Начальная загрузка и лог лагеря
+function initializeGame() {
+    updateStats();
+    const logDiv = document.getElementById('camp-log');
+    logDiv.innerHTML = '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
+}
+
+// Выход из лагеря
+function leaveCamp() {
+    fetch(`/api/game/leave-camp?userId=${userId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateStats();
+                const logDiv = document.getElementById('exploration-log');
+                logDiv.innerHTML = '<p>Вы покинули лагерь и отправились в лес.</p>';
+            } else {
+                alert("Не удалось выйти из лагеря!");
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе из лагеря:', error));
 }
 
 // При начале боя
@@ -39,6 +66,7 @@ function enterCombat(enemyData) {
 
     // Обновить данные
     document.getElementById('enemy-combat-name').textContent = enemyData.name;
+    document.getElementById('enemy-level').textContent = "Уровень " + enemyData.level;
     document.getElementById('enemy-combat-hp').textContent = `${enemyData.hp}/${enemyData.maxHp}`;
     updateBattleLog();
 }
@@ -134,6 +162,7 @@ function exploreForest() {
                     name: data.enemyName,
                     hp: data.enemyHp,
                     maxHp: data.enemyMaxHp,
+                    level: data.level,
                 });
 
                 // Обновляем боевой интерфейс
@@ -195,42 +224,39 @@ function checkCombatStatus() {
         });
 }
 
+// Эликсиры
 function openPotionsModal() {
-    fetch(`/api/player/inventory?userId=${userId}`)
+    fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
-        .then(inventory => {
-            const potions = inventory.filter(item => item.type === 'potion');
+        .then(player => {
+            const potions = Object.entries(player.inventory).filter(([key]) => key.includes("elixir"));
             if (potions.length === 0) {
-                logExplorationEvent("У вас нет зелий!");
+                document.getElementById('battle-log').innerHTML += '<p class="log-entry">У вас нет эликсиров!</p>';
                 return;
             }
-
-            const grid = document.getElementById('potions-grid');
-            grid.innerHTML = potions.map(potion => `
-                <div class="potion" onclick="usePotion('${potion.id}')">
-                    <img src="${potion.image}" alt="${potion.name}">
-                    <span class="count">${potion.count}</span>
+            document.getElementById('potions-grid').innerHTML = potions.map(([type, count]) => `
+                <div class="potion" onclick="usePotion('${type}')">
+                    <img src="images/${type}.png" alt="${type}">
+                    <span class="count">${count}</span>
                 </div>
             `).join('');
-
             document.getElementById('potions-modal').style.display = 'block';
         });
 }
 
-// Использование зелья
+function closePotionsModal() {
+    document.getElementById('potions-modal').style.display = 'none';
+}
+
 function usePotion(potionType) {
-    fetch(`/api/battle/use-potion?userId=${userId}&type=${potionType}`, {
-        method: 'POST'
-    })
+    fetch(`/api/battle/use-potion?userId=${userId}&type=${potionType}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                addToBattleLog(`Использовано зелье: +${data.heal} HP`);
+                document.getElementById('battle-log').innerHTML += `<p class="log-entry">Вы применили эликсир: +${data.heal} HP</p>`;
                 updateCombatHealth();
-                enemyTurn(); // Ход врага после использования
-            } else {
-                addToBattleLog(data.error);
             }
+            closePotionsModal();
         });
 }
 
@@ -271,5 +297,5 @@ document.addEventListener('click', (e) => {
     }
 });
 
-updateStats();
-document.getElementById('actions').innerHTML = `<button onclick="exploreForest()">Начать путешествие в Тёмном лесу</button>`;
+// Инициализация
+initializeGame();

@@ -4,24 +4,59 @@ body {
     color: #fff;
     text-align: center;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
 }
+
+#game-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.interface {
+    transition: opacity 0.5s ease;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+#player-stats {
+    margin-bottom: 20px;
+}
+
+#player-stats p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
 button {
-    padding: 10px 20px;
+    padding: 10px;
     margin: 5px;
     background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
+    font-size: 16px;
+    width: 120px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
+
 button:hover {
     background-color: #45a049;
+    transform: scale(1.05);
+}
+
+#camp-actions, #actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 #battle-log {
     background-color: #333;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 8px;
+    margin: 8px 0;
     height: 200px;
     overflow-y: scroll;
     text-align: left;
@@ -50,11 +85,23 @@ button:hover {
     margin: 20px 0;
 }
 
+.combat-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.combat-player, .combat-enemy {
+    text-align: center;
+    width: 150px;
+}
+
 .combat-hp {
     font-size: 1.2em;
     color: #4CAF50;
     margin-top: 5px;
-    transition: color 0.3s;
+    transition: color 0.3s ease;
 }
 
 .scrollable-log {
@@ -63,6 +110,21 @@ button:hover {
     background: #2a2a2a;
     padding: 10px;
     border-radius: 5px;
+    font-size: 16px;
+    text-align: left;
+    width: 94%;
+    margin: 0 auto;
+}
+
+.log-entry {
+    margin: 5px 0;
+    padding: 5px;
+    border-bottom: 1px solid #444;
+}
+
+.log-entry.highlight {
+    font-weight: bold;
+    color: #ffcc00;
 }
 
 .battle-action-grid {
@@ -101,6 +163,14 @@ button:hover {
     background: rgba(0,0,0,0.5);
 }
 
+.modal-content {
+    background: #333;
+    margin: 15% auto;
+    padding: 20px;
+    width: 70%;
+    border-radius: 8px;
+}
+
 .potions-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -119,6 +189,7 @@ button:hover {
     right: 5px;
     color: white;
     font-weight: bold;
+    font-size: 8px;
 }
 
 #character-btn {
@@ -184,10 +255,19 @@ button:hover {
     border-radius: 8px;
 }
 
-.event-image {
+.event-image, .enemy-img {
+    display: block;
+    margin: 0 auto;
     width: 200px;
     height: 200px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
 }

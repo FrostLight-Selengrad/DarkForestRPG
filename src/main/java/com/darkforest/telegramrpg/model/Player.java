@@ -8,7 +8,8 @@ import java.util.HashMap;
 public class Player {
     private int hp = 90;
     private int maxHp = 90;
-    private int stamina = 0;
+    private int stamina = 100;
+    private int maxStamina = 100;
     private int toughness = 0;
     private int magicalResistance = 0;
     private int initiative = 0;
@@ -20,9 +21,8 @@ public class Player {
     private int toxicity = 0;
     private int physicalAttack = 10;
     private int magicPower = 0;
-    private Map<String, Integer> inventory = new HashMap<>(); // Пример: {"weak_health_potion": 3}
+    private Map<String, Integer> inventory = new HashMap<>(Map.of("weak_elixir", 3)); // Пример: {"weak_health_potion": 3}
     private int forestLevel = 1;
-
     // Поля для ловушек
     private int trapEscapeChance = 60;
     private int trapAttempts = 0;

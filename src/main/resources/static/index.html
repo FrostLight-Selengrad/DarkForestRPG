@@ -7,8 +7,18 @@
 </head>
 <body>
 <div id="game-container">
+    <!-- Лагерь -->
+    <div id="camp-interface" class="interface" style="display: block;">
+        <div id="player-camp-stats"></div>
+        <img id="camp-image" src="images/camp.png" class="event-image">
+        <div id="camp-log"></div>
+        <div id="camp-actions">
+            <button onclick="leaveCamp()">Выйти в лес</button>
+            <button onclick="rest()">Отдохнуть</button>
+        </div>
+    </div>
     <!-- Интерфейс путешествия (изначально скрыт) -->
-    <div id="exploration-interface" style="display: block;">
+    <div id="exploration-interface" style="display: none;">
         <div id="player-stats"></div>
         <img id="forest-image" src="images/forest.png" class="enemy-img">
         <div id="exploration-log"></div>
@@ -32,11 +42,8 @@
                 <div class="combat-hp" id="enemy-combat-hp">50/50</div>
             </div>
         </div>
-
-        <div id="battle-log" class="scrollable-log"></div>
-
         <div id="turn"></div>
-
+        <div id="battle-log" class="scrollable-log"></div>
         <div class="battle-action-grid">
             <button class="action-btn" onclick="attack()">
                 Атаковать
@@ -75,4 +82,3 @@
 <script src="/script.js"></script>
 </body>
 </html>
-

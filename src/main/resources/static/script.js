@@ -141,8 +141,18 @@ function exploreForest() {
     fetch(`/api/game/explore?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.stamina <= 0) {
+            // Добавляем проверку данных
+            if (!data || typeof data.stamina === 'undefined') {
+                throw new Error('Некорректный ответ сервера');
+            }
 
+            // Преобразуем stamina в число
+            const stamina = Number(data.stamina);
+            if (isNaN(stamina)) {
+                throw new Error('Ошибка данных выносливости');
+            }
+
+            if (data.stamina <= 1) {
                 // Показываем кнопку снова при ошибке
                 actionsDiv.style.opacity = '1';
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
@@ -167,6 +177,12 @@ function exploreForest() {
 
             const travelTime = calculateTravelTime(data.stamina);
             let startTime = Date.now();
+
+            // Проверка времени анимации
+            if (travelTime <= 0) {
+                console.error('Некорректное время путешествия:', travelTime);
+                return;
+            }
 
             const animationFrame = () => {
                 const elapsed = Date.now() - startTime;

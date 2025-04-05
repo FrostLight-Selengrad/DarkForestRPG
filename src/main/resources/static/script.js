@@ -138,7 +138,13 @@ function exploreForest() {
     actionsDiv.style.opacity = '0';
     actionsDiv.style.transition = 'opacity 0.3s';
 
-    fetch(`/api/game/explore?userId=${userId}`)
+        // Исправляем метод запроса и добавляем заголовки
+        fetch(`/api/game/explore?userId=${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
         .then(response => response.json())
         .then(data => {
             // Добавляем проверку данных
@@ -228,17 +234,24 @@ function fetchExplore() {
         .catch(handleExplorationError);
 }
 
-function handleExplorationError(error) {
-    console.error('Ошибка:', error);
-    const actionsDiv = document.getElementById('actions');
-    actionsDiv.innerHTML = `
-        <p class="error-message">Произошла ошибка!</p>
-        <button onclick="exploreForest()" class="action-btn">Повторить попытку</button>
-        <br>
-        <p>${error}</p>
+    function handleExplorationError(error) {
+        console.error('Ошибка:', error);
+        const actionsDiv = document.getElementById('actions');
+        actionsDiv.style.opacity = '1';
+
+        if (error instanceof SyntaxError) {
+            logExplorationEvent("Ошибка формата данных сервера!");
+        } else if (error.message.includes("Некорректный")) {
+            logExplorationEvent(error.message);
+        } else {
+            logExplorationEvent("Сервер не отвечает!");
+        }
+
+        actionsDiv.innerHTML = `
+        <button onclick="exploreForest()" class="action-btn">Повторить</button>
+        <button onclick="returnToCamp()" class="action-btn">В лагерь</button>
     `;
-    actionsDiv.style.opacity = '1';
-}
+    }
 
 function calculateTravelTime(stamina) {
     return 5000 + Math.floor((100 - stamina) / 8) * 1000;

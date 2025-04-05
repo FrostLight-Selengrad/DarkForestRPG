@@ -4,6 +4,8 @@ import com.darkforest.telegramrpg.model.Player;
 import com.darkforest.telegramrpg.service.GameService;
 import com.darkforest.telegramrpg.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -44,20 +46,31 @@ public class GameController {
     }
 
     @PostMapping("/explore")
-    public Map<String, Object> exploreForest(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        boolean inCombat = player.isInCombat();
-        player.setInCamp(false);
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", gameService.exploreForest(userId));
-        response.put("stamina", player.getStamina());
-        response.put("inCombat", inCombat);
-        if (inCombat) {
-            response.put("enemyName", player.getEnemyName());
-            response.put("enemyHp", player.getEnemyHp());
-            response.put("enemyMaxHp", player.getEnemyMaxHp());
+    public ResponseEntity<Map<String, Object>> exploreForest(
+            @RequestParam("userId") Long userId) { // Явное указание параметра
+        try {
+            Player player = playerService.getPlayer(userId);
+            if (player == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Игрок не найден"));
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", gameService.exploreForest(userId));
+            response.put("stamina", player.getStamina());
+            response.put("inCombat", player.isInCombat());
+
+            if (player.isInCombat()) {
+                response.put("enemyName", player.getEnemyName());
+                response.put("enemyHp", player.getEnemyHp());
+                response.put("enemyMaxHp", player.getEnemyMaxHp());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", e.getMessage()));
         }
-        return response;
     }
 
     @GetMapping("/exploration-log")

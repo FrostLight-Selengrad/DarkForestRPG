@@ -18,10 +18,10 @@ function updateStats() {
                     <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
                     <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                 `;
-
-                document.getElementById('player-camp-stats').innerHTML = `
-                    <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
-                `;
+                if (player.inCamp)
+                    document.getElementById('player-camp-stats').innerHTML = `
+                        <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
+                    `;
             }
         })
         .catch(handleExplorationError);
@@ -234,6 +234,8 @@ function handleExplorationError(error) {
     actionsDiv.innerHTML = `
         <p class="error-message">Произошла ошибка!</p>
         <button onclick="exploreForest()" class="action-btn">Повторить попытку</button>
+        <br>
+        <p>${error}</p>
     `;
     actionsDiv.style.opacity = '1';
 }

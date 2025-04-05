@@ -143,6 +143,16 @@ button:hover {
     transition: transform 0.2s;
 }
 
+.action-btn.danger {
+    background: #ff4444;
+    border-color: #cc0000;
+}
+
+.action-btn.combat {
+    background: #ffaa00;
+    border-color: #cc8800;
+}
+
 .action-btn:hover {
     transform: scale(1.05);
     background: #444;

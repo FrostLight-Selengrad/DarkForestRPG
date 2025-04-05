@@ -259,40 +259,76 @@ function calculateTravelTime(stamina) {
 
 // Обновление событий
 function updateExplorationEvent(data) {
+    // Дефолтные значения для защиты от undefined
+    const defaultData = {
+        message: "unknown:forest.png:Неизвестное событие",
+        chance: 0
+    };
+    data = {...defaultData, ...data};
+
+    // Безопасное разбиение сообщения
+    const [type = "unknown",
+        image = "forest.png",
+        message = "Неизвестное событие"] = data.message.split(/:(.+)/).slice(0,3);
+
+    // Обновление основного интерфейса
+    const safeImage = image.endsWith('.png') ? image : `${image}.png`;
+    const eventHTML = `
+        <div class="event-card">
+            <img src="images/${safeImage}" 
+                 class="event-image"
+                 onerror="this.onerror=null;this.src='images/forest.png'">
+            <p>${message}</p>
+        </div>
+    `;
+
+    document.getElementById('exploration-log').innerHTML = eventHTML;
+    document.getElementById('forest-image').src = `images/${safeImage}`;
+
+    // Получение данных игрока для специфичных условий
     fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(player => {
-            const eventDiv = document.getElementById('exploration-log');
-            const [type, image, message] = data.message.split(":", 3);
-            eventDiv.innerHTML = `<div class="event-card"><img src="images/${image}" class="event-image"><p>${message}</p></div>`;
-            document.getElementById('forest-image').src = `images/${image}`;
-            document.getElementById('actions').innerHTML =
-                `<button onclick="exploreForest()" class="action-btn">Продолжить</button>`;
-            if (type === "chest") {
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="openChest()" class="action-btn">Открыть сундук</button>
-                    <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
-                `;
-            } else if (type === "trap" && message.includes("попали")) {
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="escapeTrap()" class="action-btn">Попытаться выбраться (${data.chance || player.trapEscapeChance}%)</button>
-                `;
-            } else if (type === "monster") {
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
-                    <button onclick="tryFleeBeforeCombat()" class="action-btn">Попытаться убежать</button>
-                `;
-            } else if (type === "abandoned_camp") {
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
-                    <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
-                `;
-            } else {
-                document.getElementById('actions').innerHTML = `
-                <button onClick="exploreForest()" class="action-btn">Пройти мимо ничего</button>
-            `}
+        .then(response => {
+            if(!response.ok) throw new Error('Ошибка получения данных игрока');
+            return response.json();
         })
-        .catch(handleExplorationError);
+        .then(player => {
+            const actions = getActionsByType(type, message, data, player);
+            document.getElementById('actions').innerHTML = actions;
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            document.getElementById('actions').innerHTML = `
+                <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+                <button onclick="returnToCamp()" class="action-btn">Вернуться</button>
+            `;
+        });
+}
+
+// Вспомогательная функция для генерации действий
+function getActionsByType(type, message, data, player) {
+    const baseAction = `<button onclick="exploreForest()" class="action-btn">Продолжить</button>`;
+
+    const actionTemplates = {
+        chest: `
+            <button onclick="openChest()" class="action-btn">Открыть сундук</button>
+            ${baseAction}
+        `,
+        trap: message.includes("попали") ? `
+            <button onclick="escapeTrap()" class="action-btn danger">
+                Попытаться выбраться (${data.chance || player.trapEscapeChance}%)
+            </button>
+        ` : baseAction,
+        monster: `
+            <button onclick="fightMonster()" class="action-btn combat">Вступить в бой</button>
+            <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
+        `,
+        abandoned_camp: `
+            <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
+            ${baseAction}
+        `
+    };
+
+    return actionTemplates[type] || baseAction;
 }
 
 function fightMonster() {

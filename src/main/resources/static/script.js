@@ -198,7 +198,11 @@ function exploreForest() {
                 if (progress < 1) {
                     requestAnimationFrame(animationFrame);
                 } else {
-                    fetchExplore();
+                    // Добавляем задержку перед удалением
+                    setTimeout(() => {
+                        progressContainer.remove();
+                        fetchExplore();
+                    }, 300);
                 }
             };
 
@@ -208,42 +212,39 @@ function exploreForest() {
 }
 
 function fetchExplore() {
-    // Показываем индикатор загрузки
     const progressContainer = document.querySelector('.progress-container');
-    progressContainer.classList.add('loading-pulse');
 
     fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            // Плавное исчезновение прогресс-бара
-            progressContainer.style.opacity = '0';
-            progressContainer.style.transition = 'opacity 0.5s';
+            // Удаляем прогресс-бар независимо от результата
+            if(progressContainer) {
+                progressContainer.remove();
+            }
 
-            setTimeout(() => {
-                updateStats();
+            // Обновляем данные
+            updateStats();
+
+            // Проверяем тип события
+            if(data.message.includes("forest")) {
+                // Для обычного перемещения обновляем интерфейс
+                document.getElementById('exploration-log').innerHTML += `
+                    <p>${data.message.split(':')[2] || "Вы продолжаете путь"}</p>
+                `;
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+                `;
+            } else {
+                // Для событий с изменением типа
                 updateExplorationEvent(data);
+            }
 
-                if (!data.inCombat) {
-                    // Удаляем прогресс-бар через 500ms
-                    setTimeout(() => {
-                        const progressContainer = document.querySelector('.progress-container');
-                        if (progressContainer) progressContainer.remove();
-                    }, 500);
-
-                    // Форсируем обновление интерфейса
-                    document.getElementById('exploration-interface').style.display = 'block';
-                    document.getElementById('actions').style.opacity = '1';
-                } else {
-                    enterCombat(data);
-                }
-
-                // Восстанавливаем кнопки действий
-                const actionsDiv = document.getElementById('actions');
-                actionsDiv.style.opacity = '1';
-                actionsDiv.style.transition = 'opacity 0.3s';
-            }, 500);
+            if (data.inCombat) enterCombat(data);
         })
-        .catch(handleExplorationError);
+        .catch(error => {
+            if(progressContainer) progressContainer.remove();
+            handleExplorationError(error);
+        });
 }
 
     function handleExplorationError(error) {
@@ -302,6 +303,14 @@ function updateExplorationEvent(data) {
 
     // Обновление действий
     updateActions(type, message, data);
+
+    // После обновления действий добавляем кнопку Продолжить:
+    const actionsDiv = document.getElementById('actions');
+    if(actionsDiv.children.length === 0) {
+        actionsDiv.innerHTML = `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+        `;
+    }
 }
 
 function updateActions(type, message, data) {
@@ -524,7 +533,7 @@ function toggleMenu() {
 }
 
 function preloadImages() {
-    const images = ['forest.png', 'goblin.png', 'mimic.png'];
+    const images = ['forest_v2.png', 'goblin.png', 'mimic.png'];
     images.forEach(img => {
         new Image().src = `images/${img}`;
     });

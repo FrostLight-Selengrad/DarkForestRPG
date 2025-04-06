@@ -29,13 +29,11 @@
     <!-- Боевой интерфейс (изначально скрыт) -->
     <div id="battle-interface" style="display: none;">
         <img id="enemy-image" src="images/goblin.png" class="enemy-img">
-
         <div class="combat-health-bars">
             <div class="combat-health-player">
                 <span>Ваше здоровье:</span>
                 <div class="combat-hp" id="player-combat-hp">100/100</div>
             </div>
-
             <div class="combat-health-enemy">
                 <span id="enemy-combat-name">Гоблин</span>
                 <span class="enemy-level">Уровень 1</span>
@@ -45,40 +43,36 @@
         <div id="turn"></div>
         <div id="battle-log" class="scrollable-log"></div>
         <div class="battle-action-grid">
-            <button class="action-btn" onclick="attack()">
-                Атаковать
-            </button>
-            <button class="action-btn" onclick="openAbilities()">
-                Способности
-            </button>
-            <button class="action-btn" onclick="openPotionsModal()">
-                Зелья
-            </button>
-            <button class="action-btn" onclick="tryFlee()">
-                Сбежать
-            </button>
+            <button class="action-btn" onclick="attack()">Атаковать</button>
+            <button class="action-btn" onclick="openAbilities()">Способности</button>
+            <button class="action-btn" onclick="openPotionsModal()">Зелья</button>
+            <button class="action-btn" onclick="tryFlee()">Сбежать</button>
         </div>
     </div>
     <!-- Модальное окно зелий -->
     <div id="potions-modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closePotionsModal()">&times;</span>
+            <span class="close" onclick="closePotionsModal()">×</span>
             <div id="potions-grid"></div>
         </div>
     </div>
 </div>
 <button id="character-btn" onclick="toggleMenu()">
-    <img src="character-icon.png" width="30">
+    <img src="images/character-icon.png" width="30">
 </button>
-
 <div id="character-menu" class="dropdown-menu">
-    <button class="menu-item"><img src="backpack-icon.png"></button>
-    <button class="menu-item"><img src="talents-icon.png"></button>
-    <button class="menu-item"><img src="skills-icon.png"></button>
-    <button class="menu-item"><img src="settings-icon.png"></button>
+    <button class="menu-item"><img src="images/backpack-icon.png"></button>
+    <button class="menu-item"><img src="images/talents-icon.png"></button>
+    <button class="menu-item"><img src="images/skills-icon.png"></button>
+    <button class="menu-item"><img src="images/settings-icon.png"></button>
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/script.js"></script>
+<script src="/js/init.js"></script>
+<script src="/js/camp.js"></script>
+<script src="/js/exploration.js"></script>
+<script src="/js/battle.js"></script>
+<script src="/js/modals.js"></script>
+<script src="/js/characterMenu.js"></script>
 </body>
 </html>

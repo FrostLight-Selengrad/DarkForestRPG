@@ -66,9 +66,6 @@ function enterCombat(enemyData) {
         battle.classList.add('show-from-right');
     }, 500);
 
-    // Скрыть элементы путешествия
-    document.getElementById('exploration-interface').style.display = 'none';
-
     // Устанавливаем картинку врага
     let enemyImage = "goblin.png"; // по умолчанию
     if (enemyData.name.includes("Мимик")) enemyImage = "mimic.png";
@@ -259,49 +256,66 @@ function calculateTravelTime(stamina) {
 
 // Обновление событий
 function updateExplorationEvent(data) {
-    // Дефолтные значения для защиты от undefined
+    // Добавляем обязательные значения по умолчанию
     const defaultData = {
-        message: "unknown:forest.png:Неизвестное событие",
-        chance: 0
+        message: "forest:forest.png:Вы продолжаете свой путь через лес",
+        chance: 0,
+        inCombat: false
     };
     data = {...defaultData, ...data};
 
-    // Безопасное разбиение сообщения
-    const [type = "unknown",
-        image = "forest.png",
-        message = "Неизвестное событие"] = data.message.split(/:(.+)/).slice(0,3);
+    // Безопасное разделение сообщения
+    const parts = data.message.split(/:(.+)/);
+    const type = parts[0] || "forest";
+    const image = (parts[1] || "forest.png").trim();
+    const message = parts[2] || "Вы продолжаете путь";
 
-    // Обновление основного интерфейса
+    // Обработка изображений
     const safeImage = image.endsWith('.png') ? image : `${image}.png`;
-    const eventHTML = `
+    const imgFallback = "onerror='this.src=\"images/forest.png\";this.onerror=null'";
+
+    // Обновление DOM
+    document.getElementById('exploration-log').innerHTML = `
         <div class="event-card">
-            <img src="images/${safeImage}" 
-                 class="event-image"
-                 onerror="this.onerror=null;this.src='images/forest.png'">
+            <img src="images/${safeImage}" ${imgFallback} class="event-image">
             <p>${message}</p>
         </div>
     `;
 
-    document.getElementById('exploration-log').innerHTML = eventHTML;
     document.getElementById('forest-image').src = `images/${safeImage}`;
+    document.getElementById('exploration-interface').style.display = 'block';
 
-    // Получение данных игрока для специфичных условий
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => {
-            if(!response.ok) throw new Error('Ошибка получения данных игрока');
-            return response.json();
-        })
-        .then(player => {
-            const actions = getActionsByType(type, message, data, player);
-            document.getElementById('actions').innerHTML = actions;
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            document.getElementById('actions').innerHTML = `
-                <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-                <button onclick="returnToCamp()" class="action-btn">Вернуться</button>
-            `;
-        });
+    // Обновление действий
+    updateActions(type, message, data);
+}
+
+function updateActions(type, message, data) {
+    const actionMap = {
+        chest: () => `
+            <button onclick="openChest()" class="action-btn">Открыть сундук</button>
+            <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
+        `,
+        trap: () => message.includes("попали") ? `
+            <button onclick="escapeTrap()" class="action-btn danger">
+                Попытаться выбраться (${data.chance}%)
+            </button>
+        ` : null,
+        monster: () => `
+            <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
+            <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
+        `,
+        abandoned_camp: () => `
+            <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
+            <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
+        `
+    };
+
+    const defaultAction = `
+        <button onclick="exploreForest()" class="action-btn">Продолжить путь</button>
+    `;
+
+    document.getElementById('actions').innerHTML =
+        actionMap[type]?.() || defaultAction;
 }
 
 // Вспомогательная функция для генерации действий
@@ -404,17 +418,22 @@ function checkCombatStatus() {
         .then(response => response.json())
         .then(player => {
             if (!player.inCombat) {
-                // Показываем сообщение в логе путешествия
-                logExplorationEvent("Бой завершен!");
-
-                // Скрываем боевой интерфейс
-                document.getElementById('battle-interface').style.display = 'none';
-
-                // Показываем интерфейс путешествия
-                document.getElementById('exploration-interface').style.display = 'block';
-
-                // Обновляем события
-                updateExplorationEvent();
+                // Получаем актуальные данные о событии
+                fetch(`/api/game/post-combat?userId=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Обновляем интерфейс исследования
+                        document.getElementById('battle-interface').style.display = 'none';
+                        document.getElementById('exploration-interface').style.display = 'block';
+                        updateExplorationEvent(data);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка получения данных:', error);
+                        // Fallback на базовый интерфейс
+                        document.getElementById('battle-interface').style.display = 'none';
+                        document.getElementById('exploration-interface').style.display = 'block';
+                        logExplorationEvent("Бой завершен! Продолжаем путь...");
+                    });
             }
         })
         .catch(handleExplorationError);

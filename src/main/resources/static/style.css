@@ -330,3 +330,16 @@ button:hover {
     transform: translateX(0);
     opacity: 1;
 }
+
+/* Гарантируем видимость exploration-interface */
+#exploration-interface {
+    display: block !important;
+    opacity: 1 !important;
+    transition: opacity 0.5s ease;
+}
+
+/* Скрываем интерфейс при необходимости */
+.hidden-interface {
+    display: none !important;
+    opacity: 0 !important;
+}

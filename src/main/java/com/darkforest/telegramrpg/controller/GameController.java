@@ -122,8 +122,24 @@ public class GameController {
     }
 
     @PostMapping("/fight-monster")
-    public Map<String, Object> fightMonster(@RequestParam Long userId) {
-        return gameService.fightMonster(userId);
+    public ResponseEntity<Map<String, Object>> fightMonster(@RequestParam Long userId) {
+        try {
+            Player player = playerService.getPlayer(userId);
+            System.out.println("Player: " + player + ", inCombat: " + player.isInCombat());
+            if (player == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Игрок не найден"));
+            }
+            if (!player.isInCombat()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Вы не в бою"));
+            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Бой начался!");
+            response.put("enemyName", player.getEnemyName());
+            response.put("enemyHp", player.getEnemyHp());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/flee-before-combat")

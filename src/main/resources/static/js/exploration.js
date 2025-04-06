@@ -151,10 +151,29 @@ function escapeTrap() {
 }
 
 function fightMonster() {
-    fetch(`/api/game/fight-monster?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => { if (data.inCombat) enterCombat(data); })
-        .catch(handleExplorationError);
+    console.log('Отправка запроса fightMonster с userId:', userId);
+    fetch(`/api/game/fight-monster?userId=${userId}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            console.log('Статус ответа:', response.status);
+            if (!response.ok) {
+                throw new Error(`Ошибка HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Полученные данные:', data);
+            if (data.error) {
+                logExplorationEvent(data.error);
+            } else {
+                enterCombat(data);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при запросе fightMonster:', error.message);
+            handleExplorationError(error);
+        });
 }
 
 function tryFleeBeforeCombat() {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/game")
@@ -56,17 +57,24 @@ public class GameController {
             }
 
             Map<String, Object> response = new HashMap<>();
-            response.put("message", gameService.exploreForest(userId));
-            response.put("stamina", player.getStamina());
-            response.put("inCombat", player.isInCombat());
 
-            if (player.isInCombat()) {
-                response.put("enemyName", player.getEnemyName());
-                response.put("enemyHp", player.getEnemyHp());
-                response.put("enemyMaxHp", player.getEnemyMaxHp());
+            // Вызываем генерацию события
+            if(Objects.equals(gameService.exploreForest(userId), "Вы не можете исследовать лес во время боя!")) {
+                response.put("inCombat", player.isInCombat());
+                response.put("message", "Вы не можете исследовать лес во время боя!");
+            } else if(!Objects.equals(gameService.exploreForest(userId), "Ничего не произошло")) {
+                response.put("message", player.getExplorationLog().getLast());
+                response.put("stamina", player.getStamina());
+                response.put("inCombat", player.isInCombat());
+                if (player.isInCombat()) {
+                    response.put("enemyName", player.getEnemyName());
+                    response.put("enemyHp", player.getEnemyHp());
+                    response.put("enemyMaxHp", player.getEnemyMaxHp());
+                }
             }
 
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", e.getMessage()));

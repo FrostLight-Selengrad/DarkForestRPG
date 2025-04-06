@@ -94,13 +94,9 @@ function updateExplorationEvent(data) {
     const message = parts[2] || "Вы продолжаете путь";
 
     const safeImage = image.endsWith('.png') ? image : `${image}.png`;
-    const imgFallback = "onerror='this.src=\"images/forest.png\";this.onerror=null'";
 
     document.getElementById('exploration-log').innerHTML = `
-        <div class="event-card">
-            <img src="images/${safeImage}" ${imgFallback} class="event-image">
             <p>${message}</p>
-        </div>
     `;
     document.getElementById('forest-image').src = `images/${safeImage}`;
     document.getElementById('exploration-interface').style.display = 'block';

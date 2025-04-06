@@ -265,8 +265,9 @@ public class GameService {
         player.setInCombat(true);
         player.clearBattleLog();
         player.addToBattleLog("Бой начался с " + player.getEnemyName() + "!");
-        player.setStamina(player.getStamina() - (player.getEnemyName().contains("Босс") ? 5 : player.getEnemyName().contains("Элитный") ? 3 : 2));
-        return Map.of("inCombat", true, "enemyName", player.getEnemyName(), "enemyHp", player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
+        //player.setStamina(player.getStamina() - (player.getEnemyName().contains("Босс") ? 5 : player.getEnemyName().contains("Элитный") ? 3 : 2));
+        return Map.of("inCombat", player.isInCombat(), "enemyName", player.getEnemyName(), "enemyHp",
+                player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
     }
 
     // Побег до начала боя
@@ -281,7 +282,8 @@ public class GameService {
             player.setInCombat(true);
             player.clearBattleLog();
             player.addToBattleLog("Побег не удался! Бой начался!");
-            return Map.of("inCombat", true, "enemyName", player.getEnemyName(), "enemyHp", player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
+            return Map.of("inCombat", player.isInCombat(), "enemyName", player.getEnemyName(), "enemyHp",
+                    player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
         }
     }
 

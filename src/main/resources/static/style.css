@@ -267,12 +267,11 @@ button:hover {
 
 .event-image, .enemy-img {
     display: block;
-    margin: 0 auto;
-    width: 80%;
+    width: 90%;
     height: 80%;
     object-fit: cover;
     border-radius: 8px;
-    margin-bottom: 8px;
+    margin: 0 auto 8px;
 }
 
 .close {

@@ -32,8 +32,8 @@ function exploreForest() {
                     <div class="progress-fill"></div>
                 </div>
             `;
-            progressContainer.style.opacity = '0';
-            progressContainer.style.transition = 'opacity 0.3s';
+            //progressContainer.style.opacity = '0';
+            //progressContainer.style.transition = 'opacity 0.3s';
             actionsDiv.parentNode.insertBefore(progressContainer, actionsDiv.nextSibling);
 
             const progressFill = document.querySelector('.progress-fill');

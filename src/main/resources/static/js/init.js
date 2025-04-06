@@ -61,7 +61,8 @@ function initializeGame() {
 }
 
 function preloadImages() {
-    const images = ['forest_v2.png', 'goblin.png', 'mimic.png'];
+    const images = ['forest.png','forest_v1.png','forest_v2.png', 'goblin.png', 'mimic.png','boss.png',
+        'event_chest.png'];
     images.forEach(img => {
         new Image().src = `images/${img}`;
     });

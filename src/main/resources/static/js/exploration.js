@@ -1,9 +1,7 @@
 function exploreForest() {
-    const button = document.querySelector('#actions .action-btn');
-    button.disabled = true;
     const actionsDiv = document.getElementById('actions');
-    actionsDiv.style.opacity = '0';
-    actionsDiv.style.transition = 'opacity 0.3s';
+    const button = document.querySelector('#actions .action-btn');
+    if (button) button.remove; // Удаляем кнопку, если она есть
 
     fetch(`/api/game/explore?userId=${userId}`, {
         method: 'POST',
@@ -16,14 +14,16 @@ function exploreForest() {
             if (isNaN(stamina)) throw new Error('Ошибка данных выносливости');
 
             if (stamina <= 1) {
-                actionsDiv.style.opacity = '1';
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
                 document.getElementById('actions').innerHTML =
                     `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
-                button.disabled = false;
+                actionsDiv.style.display = 'block'; // Показываем actionsDiv
                 return;
             }
 
+            actionsDiv.style.display = 'none'; // Скрываем actionsDiv вместо удаления
+
+            // Создаем progressContainer и добавляем его после actionsDiv
             const progressContainer = document.createElement('div');
             progressContainer.className = 'progress-container';
             progressContainer.innerHTML = `
@@ -32,9 +32,11 @@ function exploreForest() {
                     <div class="progress-fill"></div>
                 </div>
             `;
-            actionsDiv.replaceWith(progressContainer);
-            const progressFill = document.querySelector('.progress-fill');
+            progressContainer.style.opacity = '0';
+            progressContainer.style.transition = 'opacity 0.3s';
+            actionsDiv.parentNode.insertBefore(progressContainer, actionsDiv.nextSibling);
 
+            const progressFill = document.querySelector('.progress-fill');
             const travelTime = calculateTravelTime(stamina);
             let startTime = Date.now();
 
@@ -47,10 +49,9 @@ function exploreForest() {
                     requestAnimationFrame(animationFrame);
                 } else {
                     setTimeout(() => {
-                        progressContainer.remove();
-                        // Передаем данные из первого запроса напрямую
-                        processExplorationResult(data);
-                        button.disabled = false; // Включаем кнопку обратно
+                        progressContainer.remove(); // Удаляем progressContainer
+                        actionsDiv.style.display = 'block'; // Показываем actionsDiv
+                        processExplorationResult(data); // Обрабатываем результат
                     }, 300);
                 }
             };

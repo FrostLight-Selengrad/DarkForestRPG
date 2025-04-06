@@ -300,7 +300,7 @@ button:hover {
 }
 
 .progress-fill {
-    width: 0%;
+    width: 0;
     height: 100%;
     background: linear-gradient(90deg, #4CAF50, #8BC34A);
     transition: width 0.5s ease-out;

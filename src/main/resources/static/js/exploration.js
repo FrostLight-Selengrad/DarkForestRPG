@@ -94,7 +94,7 @@ function updateExplorationEvent(data) {
     document.getElementById('forest-image').src = `images/${safeImage}`;
     document.getElementById('exploration-interface').style.display = 'block';
 
-    updateActions(type, message, data);
+    updateActions(type);
 
     const actionsDiv = document.getElementById('actions');
     if (actionsDiv.children.length === 0) {
@@ -104,7 +104,7 @@ function updateExplorationEvent(data) {
     }
 }
 
-function updateActions(type, message, data) {
+function updateActions(type) {
     const actionMap = {
         chest: () => `
             <button onclick="openChest()" class="action-btn">Открыть сундук</button>
@@ -112,7 +112,7 @@ function updateActions(type, message, data) {
         `,
         trap: () => message.includes("попали") ? `
             <button onclick="escapeTrap()" class="action-btn danger">
-                Попытаться выбраться (${data.chance}%)
+                Попытаться выбраться (%)
             </button>
         ` : null,
         monster: () => `

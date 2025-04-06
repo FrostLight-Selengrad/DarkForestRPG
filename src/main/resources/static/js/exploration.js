@@ -100,13 +100,6 @@ function updateExplorationEvent(data) {
     document.getElementById('exploration-interface').style.display = 'block';
 
     updateActions(type);
-
-    const actionsDiv = document.getElementById('actions');
-    if (actionsDiv.children.length === 0) {
-        actionsDiv.innerHTML = `
-            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-        `;
-    }
 }
 
 function updateActions(type) {
@@ -134,10 +127,15 @@ function updateActions(type) {
         `
     };
 
-    const defaultAction = `
-        <button onclick="exploreForest()" class="action-btn">Продолжить путь</button>
-    `;
-    document.getElementById('actions').innerHTML = actionMap[type]?.() || defaultAction;
+    const actionsDiv = document.getElementById('actions');
+    const actionsHTML = actionMap[type]?.(); // Получаем HTML-код или undefined
+    if (actionsHTML) {
+        actionsDiv.innerHTML = actionsHTML; // Записываем кнопки для события
+    } else {
+        actionsDiv.innerHTML = `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+        `; // Если нет действий, добавляем "Продолжить"
+    }
 }
 
 function calculateTravelTime(stamina) {

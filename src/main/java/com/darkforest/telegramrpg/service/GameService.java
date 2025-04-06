@@ -117,7 +117,17 @@ public class GameService {
     public String attack(Long userId) {
         Player player = playerService.getPlayer(userId);
         if (!player.isInCombat()) return "Вы не в бою!";
-        if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
+        if (player.getEnemyHp() <= 0) {
+            player.setInCombat(false);
+            player.clearBattleLog();
+            return "Враг уже побежден!";
+        }
+        if (player.getHp() <= 0) {
+            player.setInCombat(false);
+            player.clearBattleLog();
+            return "Духи не могут сражаться!";
+        }
+
 
         int damage = player.getPhysicalAttack();
         player.setEnemyHp(player.getEnemyHp() - damage);
@@ -153,8 +163,16 @@ public class GameService {
     // Метод для попытки бегства
     public String tryFlee(Player player) {
         if (!player.isInCombat()) return "Вы не в бою!";
-        if (player.getEnemyHp() <= 0) return "Враг уже побежден!";
-
+        if (player.getEnemyHp() <= 0) {
+            player.setInCombat(false);
+            player.clearBattleLog();
+            return "Враг уже побежден!";
+        }
+        if (player.getHp() <= 0) {
+            player.setInCombat(false);
+            player.clearBattleLog();
+            return "Духам незачем убегать!";
+        }
         player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
         player.setBattleTurn(player.getBattleTurn() + 1);
 
@@ -163,7 +181,7 @@ public class GameService {
             player.setInCombat(false);
             return String.join("\n", player.getBattleLog());
         } else {
-            player.addToBattleLog("Попытка бегства не удалась, вы пропустили ход.\n");
+            player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
             // Атака монстра
             int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
             player.setHp(player.getHp() - (Math.max(enemyDamage, 0)));

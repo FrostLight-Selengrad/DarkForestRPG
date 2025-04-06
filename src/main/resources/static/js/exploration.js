@@ -1,4 +1,6 @@
 function exploreForest() {
+    const button = document.querySelector('#actions .action-btn');
+    button.disabled = true;
     const actionsDiv = document.getElementById('actions');
     actionsDiv.style.opacity = '0';
     actionsDiv.style.transition = 'opacity 0.3s';
@@ -18,6 +20,7 @@ function exploreForest() {
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
                 document.getElementById('actions').innerHTML =
                     `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
+                button.disabled = false;
                 return;
             }
 
@@ -47,6 +50,7 @@ function exploreForest() {
                         progressContainer.remove();
                         // Передаем данные из первого запроса напрямую
                         processExplorationResult(data);
+                        button.disabled = false; // Включаем кнопку обратно
                     }, 300);
                 }
             };
@@ -75,13 +79,20 @@ function processExplorationResult(data) {
 }
 
 function updateExplorationEvent(data) {
-    const parts = data.message.split(/:(.+)/);
+    // Разбиваем строку message по символу ':'
+    const parts = data.message.split(':');
+    if (parts.length < 3) {
+        console.error("Некорректный формат сообщения:", data.message);
+        return;
+    }
     const type = parts[0] || "forest";
-    const image = (parts[1] || "forest.png").trim();
-    const message = parts[2] || "Вы продолжаете путь";
+    const image = parts[1] || "forest.png";
+    const message = parts.slice(2).join(':') || "Вы продолжаете путь";
 
+    // Убеждаемся, что имя файла заканчивается на .png
     const safeImage = image.endsWith('.png') ? image : `${image}.png`;
 
+    // Обновляем интерфейс
     document.getElementById('exploration-log').innerHTML = `
             <p>${message}</p>
     `;

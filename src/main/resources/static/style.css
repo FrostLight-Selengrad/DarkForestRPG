@@ -288,6 +288,7 @@ button:hover {
     background: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
     margin: 10px 0;
+    transition: opacity 0.5s ease-in-out !important;
 }
 
 .progress-bar {
@@ -308,9 +309,9 @@ button:hover {
 
 /* Анимация пульсации */
 @keyframes pulse {
-    0% { opacity: 0.6; }
+    0% { opacity: 0.8; }
     50% { opacity: 1; }
-    100% { opacity: 0.6; }
+    100% { opacity: 0.8; }
 }
 
 .loading-pulse {
@@ -331,9 +332,8 @@ button:hover {
     opacity: 1;
 }
 
-/* Гарантируем видимость exploration-interface */
 #exploration-interface {
-    display: block !important;
+    display: none; /* Скрываем по умолчанию */
     opacity: 1 !important;
     transition: opacity 0.5s ease;
 }

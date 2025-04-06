@@ -32,6 +32,8 @@ function initializeGame() {
     updateStats();
     document.getElementById('camp-log').innerHTML =
         '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
+    document.getElementById('exploration-interface').style.display = 'none';
+    document.getElementById('battle-interface').style.display = 'none';
 }
 
 // Выход из лагеря
@@ -220,7 +222,20 @@ function fetchExplore() {
             setTimeout(() => {
                 updateStats();
                 updateExplorationEvent(data);
-                if (data.inCombat) enterCombat(data);
+
+                if (!data.inCombat) {
+                    // Удаляем прогресс-бар через 500ms
+                    setTimeout(() => {
+                        const progressContainer = document.querySelector('.progress-container');
+                        if (progressContainer) progressContainer.remove();
+                    }, 500);
+
+                    // Форсируем обновление интерфейса
+                    document.getElementById('exploration-interface').style.display = 'block';
+                    document.getElementById('actions').style.opacity = '1';
+                } else {
+                    enterCombat(data);
+                }
 
                 // Восстанавливаем кнопки действий
                 const actionsDiv = document.getElementById('actions');

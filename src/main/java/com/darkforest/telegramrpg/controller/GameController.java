@@ -59,10 +59,7 @@ public class GameController {
             Map<String, Object> response = new HashMap<>();
 
             // Вызываем генерацию события
-            if(Objects.equals(gameService.exploreForest(userId), "Вы не можете исследовать лес во время боя!")) {
-                response.put("inCombat", player.isInCombat());
-                response.put("message", "Вы не можете исследовать лес во время боя!");
-            } else if(!Objects.equals(gameService.exploreForest(userId), "Ничего не произошло")) {
+            if(!Objects.equals(gameService.exploreForest(userId), "Ничего не произошло")) {
                 response.put("message", player.getExplorationLog().getLast());
                 response.put("stamina", player.getStamina());
                 response.put("inCombat", player.isInCombat());
@@ -71,6 +68,8 @@ public class GameController {
                     response.put("enemyHp", player.getEnemyHp());
                     response.put("enemyMaxHp", player.getEnemyMaxHp());
                 }
+            } else {
+                response.put("message", "Ничего не произошло");
             }
 
             return ResponseEntity.ok(response);

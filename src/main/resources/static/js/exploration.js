@@ -3,17 +3,17 @@ function exploreForest() {
     actionsDiv.style.opacity = '0';
     actionsDiv.style.transition = 'opacity 0.3s';
 
-    fetch(`/api/game/explore?userId=${userId}`, {
+    fetch(`/api/game/player?userId=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     })
         .then(response => response.json())
-        .then(data => {
-            if (!data || typeof data.stamina === 'undefined') throw new Error('Некорректный ответ сервера');
-            const stamina = Number(data.stamina);
+        .then(player => {
+            if (!player || typeof player.stamina === 'undefined') throw new Error('Некорректный ответ сервера');
+            const stamina = Number(player.stamina);
             if (isNaN(stamina)) throw new Error('Ошибка данных выносливости');
 
-            if (data.stamina <= 1) {
+            if (stamina <= 1) {
                 actionsDiv.style.opacity = '1';
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
                 document.getElementById('actions').innerHTML =
@@ -32,7 +32,7 @@ function exploreForest() {
             actionsDiv.replaceWith(progressContainer);
             const progressFill = document.querySelector('.progress-fill');
 
-            const travelTime = calculateTravelTime(data.stamina);
+            const travelTime = calculateTravelTime(stamina);
             let startTime = Date.now();
 
             const animationFrame = () => {
@@ -81,13 +81,6 @@ function fetchExplore() {
 }
 
 function updateExplorationEvent(data) {
-    const defaultData = {
-        message: "forest:forest.png:Вы продолжаете свой путь через лес",
-        chance: 0,
-        inCombat: false
-    };
-    data = { ...defaultData, ...data };
-
     const parts = data.message.split(/:(.+)/);
     const type = parts[0] || "forest";
     const image = (parts[1] || "forest.png").trim();

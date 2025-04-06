@@ -50,7 +50,6 @@ public class GameService {
 
         switch (currentEvent) {
             case "monster" -> {
-                player.addToExplorationLog("Вы встретили монстра!");
                 player.setEnemyName("Гоблин");
                 player.setEnemyHp(50);
                 player.setEnemyMaxHp(50);

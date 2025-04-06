@@ -17,7 +17,7 @@ public class GameService {
         this.playerService = playerService;
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     // Проверка, находится ли игрок в бою
     public boolean isInCombat(Player player) {
@@ -37,8 +37,6 @@ public class GameService {
     // Метод для исследования леса
     public String exploreForest(Long userId) {
         Player player = playerService.getPlayer(userId);
-        // Очищаем предыдущие сообщения
-        player.clearExplorationLog();
         player.clearBattleLog();
 
         if (player.isInCombat()) {
@@ -136,7 +134,7 @@ public class GameService {
 
         // Атака монстра
         int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
-        player.setHp(player.getHp() - (enemyDamage > 0 ? enemyDamage : 0));
+        player.setHp(player.getHp() - (Math.max(enemyDamage, 0)));
         player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
 
         if (player.getHp() <= 0) {
@@ -167,7 +165,7 @@ public class GameService {
             player.addToBattleLog("Попытка бегства не удалась, вы пропустили ход.\n");
             // Атака монстра
             int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
-            player.setHp(player.getHp() - (enemyDamage > 0 ? enemyDamage : 0));
+            player.setHp(player.getHp() - (Math.max(enemyDamage, 0)));
             player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
 
             if (player.getHp() <= 0) {

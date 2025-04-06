@@ -3,14 +3,14 @@ function exploreForest() {
     actionsDiv.style.opacity = '0';
     actionsDiv.style.transition = 'opacity 0.3s';
 
-    fetch(`/api/game/player?userId=${userId}`, {
+    fetch(`/api/game/explore?userId=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     })
         .then(response => response.json())
-        .then(player => {
-            if (!player || typeof player.stamina === 'undefined') throw new Error('Некорректный ответ сервера');
-            const stamina = Number(player.stamina);
+        .then(data => {
+            if (!data || typeof data.stamina === 'undefined') throw new Error('Некорректный ответ сервера');
+            const stamina = Number(data.stamina);
             if (isNaN(stamina)) throw new Error('Ошибка данных выносливости');
 
             if (stamina <= 1) {
@@ -45,7 +45,8 @@ function exploreForest() {
                 } else {
                     setTimeout(() => {
                         progressContainer.remove();
-                        fetchExplore();
+                        // Передаем данные из первого запроса напрямую
+                        processExplorationResult(data);
                     }, 300);
                 }
             };
@@ -54,30 +55,23 @@ function exploreForest() {
         .catch(handleExplorationError);
 }
 
-function fetchExplore() {
-    const progressContainer = document.querySelector('.progress-container');
-    fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (progressContainer) progressContainer.remove();
-            updateStats();
+// Функция для обработки результата исследования
+function processExplorationResult(data) {
+    updateStats();
 
-            if (data.message.includes("forest")) {
-                document.getElementById('exploration-log').innerHTML += `
-                    <p>${data.message.split(':')[2] || "Вы продолжаете путь"}</p>
-                `;
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-                `;
-            } else {
-                updateExplorationEvent(data);
-            }
-            if (data.inCombat) enterCombat(data);
-        })
-        .catch(error => {
-            if (progressContainer) progressContainer.remove();
-            handleExplorationError(error);
-        });
+    // Проверяем, является ли сообщение дефолтным или ошибочным
+    if (data.message === "Ничего не произошло" || data.message === "Вы не можете исследовать лес во время боя!") {
+        document.getElementById('exploration-log').innerHTML += `
+            <p>${data.message}</p>
+        `;
+        document.getElementById('actions').innerHTML = `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+        `;
+    } else {
+        updateExplorationEvent(data);
+    }
+
+    if (data.inCombat) enterCombat(data);
 }
 
 function updateExplorationEvent(data) {
@@ -122,6 +116,10 @@ function updateActions(type) {
         abandoned_camp: () => `
             <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
             <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
+        `,
+        boss: () => `
+            <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
+            <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
         `
     };
 

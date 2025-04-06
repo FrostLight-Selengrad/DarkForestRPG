@@ -56,23 +56,19 @@ public class GameController {
             }
 
             Map<String, Object> response = new HashMap<>();
-            // Вызываем генерацию события
-            String exploreResult = gameService.exploreForest(userId);
+            gameService.exploreForest(userId);
 
-            if(exploreResult.equals("Ничего не произошло")) {
-                response.put("message", exploreResult);
-            } else if (exploreResult.equals("Вы не можете исследовать лес во время боя!")) {
-                response.put("message", exploreResult);
-            } else {
-                response.put("message", player.getExplorationLog().getLast());
-            }
-
+            response.put("message", player.getExplorationLog().getLast()); // Всегда последнее сообщение
             response.put("stamina", player.getStamina());
             response.put("inCombat", player.isInCombat());
+            if (player.isInTrap()) {
+                response.put("chance", player.getTrapEscapeChance());
+            }
             if (player.isInCombat()) {
                 response.put("enemyName", player.getEnemyName());
                 response.put("enemyHp", player.getEnemyHp());
                 response.put("enemyMaxHp", player.getEnemyMaxHp());
+                response.put("level", player.getForestLevel()); // Уровень для босса или монстра
             }
 
             return ResponseEntity.ok(response);

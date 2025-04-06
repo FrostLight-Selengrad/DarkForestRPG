@@ -92,7 +92,7 @@ public class GameService {
                 } else {
                     int damage = 10 + 5*player.getForestLevel();
                     player.setHp(player.getHp() - damage);
-                    player.addToExplorationLog("trap:event_trap.png:Вы упали в ловушку! Урон: " + damage);
+                    player.addToExplorationLog("trap:event_trap.png:Вы упали в ловушку! Урон - " + damage);
                     return "Вы упали в ловушку! Урон: " + damage;
                 }
             }
@@ -105,7 +105,8 @@ public class GameService {
                 player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
-                player.addToBattleLog("boss:boss.png:Вы встретили " + player.getEnemyName() + "!");
+                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
+                player.addToExplorationLog("boss:boss.png:Вы встретили босса!"); // Исправлено
                 return "Вы встретили босса!";
             }
         }

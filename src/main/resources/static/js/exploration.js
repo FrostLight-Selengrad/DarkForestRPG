@@ -167,7 +167,12 @@ function fightMonster() {
             if (data.error) {
                 logExplorationEvent(data.error);
             } else {
-                enterCombat(data);
+                try {
+                    enterCombat(data);
+                } catch (e) {
+                    console.error('Ошибка в enterCombat:', e);
+                    throw e; // Передаем ошибку в .catch
+                }
             }
         })
         .catch(error => {

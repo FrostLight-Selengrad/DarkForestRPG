@@ -2,6 +2,11 @@ function enterCombat(enemyData) {
     const exploration = document.getElementById('exploration-interface');
     const battle = document.getElementById('battle-interface');
 
+    if (!exploration || !battle) {
+        console.error("Не найдены элементы интерфейса:", { exploration, battle });
+        return;
+    }
+
     exploration.classList.add('hide-to-left');
     setTimeout(() => {
         exploration.style.display = 'none';
@@ -10,14 +15,13 @@ function enterCombat(enemyData) {
     }, 500);
 
     let enemyImage = "goblin.png";
-    if (enemyData.name.includes("Мимик")) enemyImage = "mimic.png";
-    if (enemyData.name.includes("Босс")) enemyImage = "boss.png";
+    if (enemyData.enemyName.includes("Мимик")) enemyImage = "mimic.png";
+    if (enemyData.enemyName.includes("Босс")) enemyImage = "boss.png";
     document.getElementById('enemy-image').src = `images/${enemyImage}`;
 
-    document.getElementById('battle-interface').style.display = 'block';
-    document.getElementById('enemy-combat-name').textContent = enemyData.name;
-    document.getElementById('enemy-level').textContent = "Уровень " + enemyData.level;
-    document.getElementById('enemy-combat-hp').textContent = `${enemyData.hp}/${enemyData.maxHp}`;
+    document.getElementById('enemy-combat-name').textContent = enemyData.enemyName;
+    document.getElementById('enemy-level').textContent = "Уровень " + (enemyData.level || 1); // Уровень может отсутствовать
+    document.getElementById('enemy-combat-hp').textContent = `${enemyData.enemyHp}/${enemyData.enemyHp}`;
     updateBattleLog();
 }
 

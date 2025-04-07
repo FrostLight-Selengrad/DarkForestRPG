@@ -7,6 +7,33 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
+function initializeGame() {
+    fetch(`/api/game/player?userId=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            updateStats();
+            if (data.inCamp) {
+                document.getElementById('camp-log').innerHTML = '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
+                document.getElementById('camp-interface').style.display = 'block';
+                document.getElementById('exploration-interface').style.display = 'none';
+                document.getElementById('battle-interface').style.display = 'none';
+                updateActions('camp');
+            } else if (data.inCombat) {
+                document.getElementById('camp-interface').style.display = 'none';
+                document.getElementById('exploration-interface').style.display = 'none';
+                document.getElementById('battle-interface').style.display = 'block';
+                enterCombat(data);
+            } else {
+                document.getElementById('camp-interface').style.display = 'none';
+                document.getElementById('exploration-interface').style.display = 'block';
+                document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('exploration-log').innerHTML = '<p>Вы в лесу, готовы продолжить путь.</p>';
+                updateActions('forest');
+            }
+        })
+        .catch(error => console.error('Ошибка при инициализации игры:', error));
+}
+
 function updateStats() {
     fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
@@ -50,14 +77,6 @@ function logExplorationEvent(message) {
     const logDiv = document.getElementById('exploration-log');
     logDiv.innerHTML += `<p>${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
-}
-
-function initializeGame() {
-    updateStats();
-    document.getElementById('camp-log').innerHTML =
-        '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
-    document.getElementById('exploration-interface').style.display = 'none';
-    document.getElementById('battle-interface').style.display = 'none';
 }
 
 function preloadImages() {

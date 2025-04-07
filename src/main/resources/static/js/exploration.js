@@ -13,10 +13,22 @@ function exploreForest() {
             const stamina = Number(data.stamina);
             if (isNaN(stamina)) throw new Error('Ошибка данных выносливости');
 
+            if (stamina <= 15) {
+                actionsDiv.style.display = 'block';
+                logExplorationEvent("Выносливость героя на исходе! Возможно стоит вернуться в лагерь или использовать зелье выносливости.");
+                actionsDiv.innerHTML = `
+                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+                    <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
+                `;
+                return;
+            }
+
             if (stamina <= 1) {
                 logExplorationEvent("Герой устал и нуждается в отдыхе!");
-                document.getElementById('actions').innerHTML =
-                    `<button onclick="returnToCamp()">Вернуться в лагерь</button>`;
+                document.getElementById('actions').innerHTML = `
+                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+                    <button onclick="returnToCamp()">Вернуться в лагерь</button>
+                `;
                 actionsDiv.style.display = 'block'; // Показываем actionsDiv
                 return;
             }
@@ -32,8 +44,6 @@ function exploreForest() {
                     <div class="progress-fill"></div>
                 </div>
             `;
-            //progressContainer.style.opacity = '0';
-            //progressContainer.style.transition = 'opacity 0.3s';
             actionsDiv.parentNode.insertBefore(progressContainer, actionsDiv.nextSibling);
 
             const progressFill = document.querySelector('.progress-fill');
@@ -104,7 +114,7 @@ function updateExplorationEvent(data) {
     updateActions(type);
 }
 
-function updateActions(type) {
+function updateActions(type, message, data) {
     const actionMap = {
         chest: () => `
             <button onclick="openChest()" class="action-btn">Открыть сундук</button>
@@ -112,9 +122,11 @@ function updateActions(type) {
         `,
         trap: () => message.includes("попали") ? `
             <button onclick="escapeTrap()" class="action-btn danger">
-                Попытаться выбраться (%)
+                Попытаться выбраться (${data.chance || 60}%)
             </button>
-        ` : null,
+        ` : `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+        `,
         monster: () => `
             <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
             <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
@@ -130,14 +142,15 @@ function updateActions(type) {
     };
 
     const actionsDiv = document.getElementById('actions');
-    const actionsHTML = actionMap[type]?.(); // Получаем HTML-код или undefined
-    if (actionsHTML) {
-        actionsDiv.innerHTML = actionsHTML; // Записываем кнопки для события
-    } else {
+    if (type === 'forest') {
         actionsDiv.innerHTML = `
             <button onclick="exploreForest()" class="action-btn">Продолжить</button>
             <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
-        `; // Если нет действий, добавляем "Продолжить"
+        `;
+    } else {
+        actionsDiv.innerHTML = actionMap[type]?.() || `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+        `;
     }
 }
 
@@ -186,7 +199,12 @@ function fightMonster() {
 function tryFleeBeforeCombat() {
     fetch(`/api/game/flee-before-combat?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
-        .then(data => updateExplorationEvent(data))
+        .then(data => {
+            if (data.message === "Вы успешно сбежали!") {
+                updateStats(); // Обновляем состояние, чтобы сбросить inCombat
+            }
+            updateExplorationEvent(data);
+        })
         .catch(handleExplorationError);
 }
 

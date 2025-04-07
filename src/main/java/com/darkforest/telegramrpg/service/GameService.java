@@ -128,7 +128,6 @@ public class GameService {
             return "Духи не могут сражаться!";
         }
 
-
         int damage = player.getPhysicalAttack();
         player.setEnemyHp(player.getEnemyHp() - damage);
         player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы применили Атаку и нанесли " + damage + " урона\n");

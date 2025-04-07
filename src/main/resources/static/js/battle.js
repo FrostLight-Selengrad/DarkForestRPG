@@ -36,6 +36,11 @@ function enterCombat(enemyData) {
     enemyHp.textContent = `${enemyData.enemyHp}/${enemyData.enemyMaxHp || enemyData.enemyHp}`;
 
     updateBattleLog();
+    // Привязка событий после отображения интерфейса
+    document.querySelector('.battle-action-grid .action-btn[onclick="attack()"]').onclick = attack;
+    document.querySelector('.battle-action-grid .action-btn[onclick="tryFlee()"]').onclick = tryFlee;
+    document.querySelector('.battle-action-grid .action-btn[onclick="openAbilities()"]').onclick = openAbilities;
+    document.querySelector('.battle-action-grid .action-btn[onclick="openPotionsModal()"]').onclick = openPotionsModal;
 }
 
 function updateBattleLog() {
@@ -84,6 +89,20 @@ function tryFlee() {
             checkCombatStatus();
         })
         .catch(handleExplorationError);
+}
+
+function openAbilities() {
+    console.log('Открытие меню способностей');
+    const abilitiesModal = document.createElement('div');
+    abilitiesModal.innerHTML = `
+        <div class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">×</span>
+                <p>Способности пока не доступны</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(abilitiesModal);
 }
 
 function checkCombatStatus() {

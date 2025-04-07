@@ -178,7 +178,10 @@ public class GameService {
 
         if (random.nextDouble() < 0.1) { // 10% шанс на успех
             player.addToBattleLog("Вы успешно сбежали!\n");
-            player.setInCombat(false);
+            player.setInCombat(false);      // Сбрасываем состояние боя
+            player.setEnemyName(null);      // Очищаем имя врага
+            player.setEnemyHp(0);           // Очищаем здоровье врага
+            player.setEnemyMaxHp(0);        // Очищаем максимальное здоровье врага
             return String.join("\n", player.getBattleLog());
         } else {
             player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
@@ -277,6 +280,10 @@ public class GameService {
         double fleeChance = noticed ? 0.25 : 0.5;
         if (random.nextDouble() < fleeChance) {
             player.addToExplorationLog("Вы успешно сбежали!");
+            player.setInCombat(false);      // Сбрасываем состояние боя
+            player.setEnemyName(null);      // Очищаем имя врага
+            player.setEnemyHp(0);           // Очищаем здоровье врага
+            player.setEnemyMaxHp(0);        // Очищаем максимальное здоровье врага
             return Map.of("message", "Вы успешно сбежали!");
         } else {
             player.setInCombat(true);

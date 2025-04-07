@@ -2,22 +2,36 @@ function leaveCamp() {
     fetch(`/api/game/leave-camp?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                updateStats();
-                const logDiv = document.getElementById('exploration-log');
-                logDiv.innerHTML = '<p>Вы покинули лагерь и отправились в лес.</p>';
-
-                document.getElementById('battle-interface').style.display = 'none';
+            if (data.message) {
+                console.log(data.message); // Логируем для отладки
+                // Скрываем интерфейс лагеря
                 document.getElementById('camp-interface').style.display = 'none';
+                // Показываем интерфейс леса
                 document.getElementById('exploration-interface').style.display = 'block';
-            } else {
-                alert("Не удалось выйти из лагеря!");
+                // Обновляем кнопки для леса
+                updateActions('forest');
             }
         })
         .catch(error => console.error('Ошибка при выходе из лагеря:', error));
 }
 
+function updateActions(location) {
+    const actionsDiv = document.getElementById('actions');
+    actionsDiv.innerHTML = ''; // Очищаем текущие кнопки
+    if (location === 'forest') {
+        actionsDiv.innerHTML = `
+            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+            <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
+        `;
+    } else if (location === 'camp') {
+        actionsDiv.innerHTML = `
+            <button onclick="leaveCamp()" class="action-btn">Выйти из лагеря</button>
+        `;
+    }
+}
+
 function takeRest() {
-    // Реализация отдыха в лагере (добавьте, если нужно)
+    // Реализация отдыха в лагере
     console.log("Отдых в лагере...");
+    alert('Отдых в лагере в доработке');
 }

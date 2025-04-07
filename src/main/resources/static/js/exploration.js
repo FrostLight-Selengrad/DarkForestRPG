@@ -71,6 +71,7 @@ function processExplorationResult(data) {
         `;
         document.getElementById('actions').innerHTML = `
             <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+            <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
         `;
     } else {
         updateExplorationEvent(data);
@@ -135,6 +136,7 @@ function updateActions(type) {
     } else {
         actionsDiv.innerHTML = `
             <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+            <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
         `; // Если нет действий, добавляем "Продолжить"
     }
 }

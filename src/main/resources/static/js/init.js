@@ -42,12 +42,13 @@ function updateStats() {
                 document.getElementById('player-stats').innerHTML = player.error;
             } else {
                 document.getElementById('player-stats').innerHTML = `
-                    <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel}</p>
+                    <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel} | Золото: ${player.resources}</p>
                     <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                 `;
                 if (player.inCamp)
                     document.getElementById('player-camp-stats').innerHTML = `
                         <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
+                        <p>Золото: ${player.resources}</p>
                     `;
             }
         })

@@ -167,6 +167,20 @@ public class GameController {
         return gameService.restAtCamp(userId);
     }
 
+    @PostMapping("/open-chest")
+    public ResponseEntity<Map<String, Object>> openChest(@RequestParam Long userId) {
+        try {
+            Player player = playerService.getPlayer(userId);
+            if (player == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Игрок не найден"));
+            }
+            Map<String, Object> result = gameService.openChest(userId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     private String getHealthColor(int hp, int maxHp) {
         double percentage = (double) hp / maxHp * 100;
         if (percentage > 80) return "green";

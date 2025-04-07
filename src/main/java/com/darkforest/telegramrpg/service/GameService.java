@@ -4,6 +4,7 @@ import com.darkforest.telegramrpg.model.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -15,6 +16,98 @@ public class GameService {
     @Autowired
     public GameService(PlayerService playerService) {
         this.playerService = playerService;
+    }
+
+    // Список предметов с весами
+    private static final Map<String, Integer> LOOT_WEIGHTS = new HashMap<>() {{
+        put("weak_elixir_health", 50);
+        put("elixir_health", 30);
+        put("strong_elixir_health", 15);
+        put("charmed_elixir_health", 5);
+        put("weak_elixir_stamina", 20);
+        put("elixir_stamina", 10);
+        put("strong_elixir_stamina", 5);
+        put("charmed_elixir_stamina", 2);
+    }};
+
+    private static final int TOTAL_WEIGHT = LOOT_WEIGHTS.values().stream().mapToInt(Integer::intValue).sum();
+
+    // Метод открытия сундука
+    public Map<String, Object> openChest(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        Map<String, Object> response = new HashMap<>();
+
+        // 20% шанс, что сундук — Мимик
+        if (random.nextDouble() < 0.2) {
+            player.setEnemyName("Мимик");
+            player.setEnemyHp(70);
+            player.setEnemyMaxHp(70);
+            player.setEnemyAttack(20);
+            player.setEnemyInitiative(8);
+            player.setInCombat(true);
+            player.clearBattleLog();
+            player.setBattleTurn(1);
+            player.addToBattleLog("Сундук оказался Мимиком! Бой начался!");
+            player.addToExplorationLog("monster:mimic.png:Сундук оказался Мимиком!");
+
+            response.put("inCombat", true);
+            response.put("enemyName", player.getEnemyName());
+            response.put("enemyHp", player.getEnemyHp());
+            response.put("enemyMaxHp", player.getEnemyMaxHp());
+            response.put("message", "Сундук оказался Мимиком!");
+            playerService.savePlayer(userId, player);
+            return response;
+        }
+
+        // Выпадение предмета
+        String lootItem = getRandomLoot();
+        int currentCount = player.getInventory().getOrDefault(lootItem, 0);
+        player.getInventory().put(lootItem, currentCount + 1);
+
+        // Выпадение золота
+        int goldAmount = 5 * player.getForestLevel() + random.nextInt(10); // Базовое значение + случайный бонус
+        player.setResources(player.getResources() + goldAmount);
+
+        // Сообщение для пользователя
+        String itemMessage = getItemMessage(lootItem);
+        String message = String.format("chest:%s.png:Вы нашли %s и %d золота!", lootItem, itemMessage, goldAmount);
+        player.addToExplorationLog(message);
+
+        response.put("message", message);
+        response.put("item", lootItem);
+        response.put("gold", goldAmount);
+        response.put("inCombat", false);
+        playerService.savePlayer(userId, player);
+        return response;
+    }
+
+    // Выбор случайного предмета на основе весов
+    private String getRandomLoot() {
+        int roll = random.nextInt(TOTAL_WEIGHT);
+        int cumulativeWeight = 0;
+
+        for (Map.Entry<String, Integer> entry : LOOT_WEIGHTS.entrySet()) {
+            cumulativeWeight += entry.getValue();
+            if (roll < cumulativeWeight) {
+                return entry.getKey();
+            }
+        }
+        return "weak_elixir_health"; // Запасной вариант, если что-то пойдёт не так
+    }
+
+    // Получение текстового описания предмета
+    private String getItemMessage(String item) {
+        return switch (item) {
+            case "weak_elixir_health" -> "слабый эликсир здоровья";
+            case "elixir_health" -> "эликсир здоровья";
+            case "strong_elixir_health" -> "сильный эликсир здоровья";
+            case "charmed_elixir_health" -> "зачарованный эликсир здоровья";
+            case "weak_elixir_stamina" -> "слабый эликсир выносливости";
+            case "elixir_stamina" -> "эликсир выносливости";
+            case "strong_elixir_stamina" -> "сильный эликсир выносливости";
+            case "charmed_elixir_stamina" -> "зачарованный эликсир выносливости";
+            default -> "неизвестный предмет";
+        };
     }
 
     private final Random random = new Random();

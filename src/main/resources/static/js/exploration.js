@@ -150,6 +150,7 @@ function updateActions(type, message, data) {
     } else {
         actionsDiv.innerHTML = actionMap[type]?.() || `
             <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+            <button onclick="returnToCamp()" class="action-btn">Где я?</button>
         `;
     }
 }
@@ -225,12 +226,23 @@ function restAtCamp() {
 }
 
 function openChest() {
+    console.log('Открытие сундука');
     fetch(`/api/game/open-chest?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            updateStats();
-            updateExplorationEvent(data);
-            if (data.inCombat) enterCombat(data);
+        .then(response => {
+            console.log('Ответ от /api/game/open-chest:', response.status);
+            return response.json();
         })
-        .catch(handleExplorationError);
+        .then(data => {
+            console.log('Данные сундука:', data);
+            if (data.inCombat) {
+                enterCombat(data);
+            } else {
+                updateStats(); // Обновляем инвентарь и золото
+                updateExplorationEvent(data);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка в openChest:', error);
+            handleExplorationError(error);
+        });
 }

@@ -28,7 +28,7 @@ function usePotion(potionType) {
         .then(data => {
             if (data.success) {
                 document.getElementById('battle-log').innerHTML += `<p class="log-entry">Вы применили эликсир: +${data.heal} HP</p>`;
-                updateCombatHealth();
+                updateCombatHealth('heal');
             }
             closePotionsModal();
         })

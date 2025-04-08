@@ -101,16 +101,12 @@ function updateExplorationEvent(data) {
     const image = parts[1] || "forest.png";
     const message = parts.slice(2).join(':') || "Вы продолжаете путь";
 
-    // Убеждаемся, что имя файла заканчивается на .png
+    // Заменяем плейсхолдер на маленькую иконку
+    messageText = messageText.replace(/<(.+?)\.png>/g, '<img src="images/$1.png" class="small-icon" alt="$1">');
+
     const safeImage = image.endsWith('.png') ? image : `${image}.png`;
-
-    // Обновляем интерфейс
-    document.getElementById('exploration-log').innerHTML = `
-            <p>${message}</p>
-    `;
     document.getElementById('forest-image').src = `images/${safeImage}`;
-    document.getElementById('exploration-interface').style.display = 'block';
-
+    document.getElementById('exploration-log').innerHTML = `<p>${messageText}</p>`;
     updateActions(type);
 }
 
@@ -226,23 +222,16 @@ function restAtCamp() {
 }
 
 function openChest() {
-    console.log('Открытие сундука');
     fetch(`/api/game/open-chest?userId=${userId}`, { method: 'POST' })
-        .then(response => {
-            console.log('Ответ от /api/game/open-chest:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Данные сундука:', data);
+            updateStats();
+            updateExplorationEvent(data);
             if (data.inCombat) {
                 enterCombat(data);
             } else {
-                updateStats(); // Обновляем инвентарь и золото
-                updateExplorationEvent(data);
+                updateActions('forest'); // Переключаем кнопки на лесные
             }
         })
-        .catch(error => {
-            console.error('Ошибка в openChest:', error);
-            handleExplorationError(error);
-        });
+        .catch(handleExplorationError);
 }

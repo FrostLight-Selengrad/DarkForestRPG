@@ -24,20 +24,20 @@ function takeRest() {
 }
 
 function returnToCamp() {
-    fetch(`/api/game/player?userId=${userId}`)
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-container';
+    progressContainer.innerHTML = `
+        <p>Возвращение в лагерь...</p>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    `;
+    document.getElementById('actions').replaceWith(progressContainer);
+
+    fetch(`/api/game/return-to-camp?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            const stamina = data.stamina;
-            const travelTime = calculateTravelTime(stamina); // Функция из exploration.js
-            const progressContainer = document.createElement('div');
-            progressContainer.className = 'progress-container';
-            progressContainer.innerHTML = `
-                <p>Возвращение в лагерь...</p>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-            `;
-            document.getElementById('actions').replaceWith(progressContainer);
+            const travelTime = data.time * 1000; // Переводим секунды в миллисекунды
             let startTime = Date.now();
             const animationFrame = () => {
                 const elapsed = Date.now() - startTime;
@@ -46,20 +46,18 @@ function returnToCamp() {
                 if (progress < 1) {
                     requestAnimationFrame(animationFrame);
                 } else {
-                    setTimeout(() => {
-                        progressContainer.remove();
-                        fetch(`/api/game/return-to-camp?userId=${userId}`, { method: 'POST' })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById('exploration-interface').style.display = 'none';
-                                    document.getElementById('camp-interface').style.display = 'block';
-                                    updateActions('camp');
-                                }
-                            });
-                    }, 300);
+                    progressContainer.remove();
+                    document.getElementById('exploration-interface').style.display = 'none';
+                    document.getElementById('camp-interface').style.display = 'block';
+                    document.getElementById('camp-log').innerHTML = `<p>${data.message}</p>`;
+                    updateActions('camp');
                 }
             };
             requestAnimationFrame(animationFrame);
+        })
+        .catch(error => {
+            console.error('Ошибка при возвращении в лагерь:', error);
+            progressContainer.remove();
+            logExplorationEvent("Ошибка при возвращении в лагерь!");
         });
 }

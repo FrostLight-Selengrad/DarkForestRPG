@@ -57,28 +57,29 @@ public class GameService {
             response.put("message", "Сундук оказался Мимиком!");
             playerService.savePlayer(userId, player);
             return response;
+        } else {
+            String lootItem = getRandomLoot();
+            int currentCount = player.getInventory().getOrDefault(lootItem, 0);
+            player.getInventory().put(lootItem, currentCount + 1);
+            int goldAmount = 5 * player.getForestLevel() + random.nextInt(10);
+            player.setResources(player.getResources() + goldAmount);
+
+            String itemName = capitalize(getItemMessage(lootItem));
+            String message = String.format("chest:event_chest.png:Вы нашли <%s.png> %s и %d золота!", lootItem, itemName, goldAmount);
+            player.addToExplorationLog(message);
+
+            response.put("message", message);
+            response.put("item", lootItem);
+            response.put("gold", goldAmount);
+            response.put("inCombat", false);
         }
-
-        // Выпадение предмета
-        String lootItem = getRandomLoot();
-        int currentCount = player.getInventory().getOrDefault(lootItem, 0);
-        player.getInventory().put(lootItem, currentCount + 1);
-
-        // Выпадение золота
-        int goldAmount = 5 * player.getForestLevel() + random.nextInt(10); // Базовое значение + случайный бонус
-        player.setResources(player.getResources() + goldAmount);
-
-        // Сообщение для пользователя
-        String itemMessage = getItemMessage(lootItem);
-        String message = String.format("chest:%s.png:Вы нашли %s и %d золота!", lootItem, itemMessage, goldAmount);
-        player.addToExplorationLog(message);
-
-        response.put("message", message);
-        response.put("item", lootItem);
-        response.put("gold", goldAmount);
-        response.put("inCombat", false);
         playerService.savePlayer(userId, player);
         return response;
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     // Выбор случайного предмета на основе весов
@@ -154,23 +155,9 @@ public class GameService {
                 return "Начался бой с " + player.getEnemyName();
             }
             case "chest" -> {
-                /* if (random.nextDouble() < 0.2) {
-                    player.setEnemyName("Мимик");
-                    player.setEnemyHp(70);
-                    player.setEnemyMaxHp(70);
-                    player.setEnemyAttack(20);
-                    player.setEnemyInitiative(8);
-                    player.setInCombat(true);
-                    player.clearBattleLog();
-                    player.setBattleTurn(1);
-                    player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-                    player.addToExplorationLog("monster:mimic.png:Сундук оказался мимиком!");
-                    return "Сундук оказался мимиком!";
-                } else {*/
                     player.addToExplorationLog("chest:event_chest.png:Вы нашли сундук!");
                     player.setPhysicalAttack(player.getPhysicalAttack() + 5);
                     return "Найден сундук!";
-                //}
             }
             case "trap" -> {
                 player.setInTrap(true);
@@ -205,6 +192,8 @@ public class GameService {
         }
         return "Ничего не произошло";
     }
+    @Autowired
+    private DamageService damageService;
 
     // Метод для атаки
     public String attack(Long userId) {
@@ -221,9 +210,9 @@ public class GameService {
             return "Духи не могут сражаться!";
         }
 
-        int damage = player.getPhysicalAttack();
+        int damage = damageService.calculatePhysicalDamage(player.getPhysicalAttack(), player.getToughness());
         player.setEnemyHp(player.getEnemyHp() - damage);
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы применили Атаку и нанесли " + damage + " урона\n");
+        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы нанесли " + damage + " урона\n");
         player.setBattleTurn(player.getBattleTurn() + 1);
 
         if (player.getEnemyHp() <= 0) {
@@ -235,10 +224,9 @@ public class GameService {
             return result;
         }
 
-        // Атака монстра
-        int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
-        player.setHp(player.getHp() - (Math.max(enemyDamage, 0)));
-        player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
+        int enemyDamage = damageService.calculatePhysicalDamage(player.getEnemyAttack(), player.getToughness());
+        player.setHp(player.getHp() - enemyDamage);
+        player.addToBattleLog(player.getEnemyName() + " нанес " + enemyDamage + " урона\n");
 
         if (player.getHp() <= 0) {
             player.addToBattleLog("Вы проиграли...\n");

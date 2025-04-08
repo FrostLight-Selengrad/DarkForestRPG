@@ -72,7 +72,7 @@ function attack() {
     fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            updateCombatHealth();
+            updateCombatHealth('damage');
             updateBattleLog();
             checkCombatStatus();
         })
@@ -110,19 +110,11 @@ function checkCombatStatus() {
         .then(response => response.json())
         .then(player => {
             if (!player.inCombat) {
-                fetch(`/api/game/post-combat?userId=${userId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('battle-interface').style.display = 'none';
-                        document.getElementById('exploration-interface').style.display = 'block';
-                        updateExplorationEvent(data);
-                    })
-                    .catch(error => {
-                        console.error('Ошибка получения данных:', error);
-                        document.getElementById('battle-interface').style.display = 'none';
-                        document.getElementById('exploration-interface').style.display = 'block';
-                        logExplorationEvent("Бой завершен! Продолжаем путь...");
-                    });
+                document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('exploration-interface').style.display = 'block';
+                document.getElementById('exploration-log').innerHTML = '<p>Бой завершен! Продолжаем путь...</p>';
+                document.getElementById('forest-image').src = 'images/forest_v1.png';
+                updateActions('forest');
             }
         })
         .catch(handleExplorationError);

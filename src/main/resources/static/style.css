@@ -342,3 +342,16 @@ button:hover {
     display: none !important;
     opacity: 0 !important;
 }
+
+.small-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.damage { animation: damageAnim 0.5s; }
+.heal { animation: healAnim 0.5s; }
+.damage-icon, .heal-icon { width: 20px; height: 20px; vertical-align: middle; }
+@keyframes damageAnim { 0% { color: red; } 100% { color: #4CAF50; } }
+@keyframes healAnim { 0% { color: green; } 100% { color: #4CAF50; } }

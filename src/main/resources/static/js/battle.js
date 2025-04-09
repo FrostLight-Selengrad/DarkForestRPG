@@ -1,63 +1,55 @@
 function enterCombat(enemyData) {
-    console.log('Запуск enterCombat с данными:', enemyData);
+    console.log('[Combat] Starting combat with:', enemyData);
+
+    // Добавьте проверку ключевых данных
+    if (!enemyData || !enemyData.enemyName) {
+        console.error('Invalid enemy data:', enemyData);
+        logExplorationEvent("Ошибка: данные противника не получены");
+        return;
+    }
+
+    // Исправьте имена полей согласно API
+    const combatData = {
+        name: enemyData.enemyName || enemyData.name,
+        hp: enemyData.enemyHp || enemyData.hp,
+        maxHp: enemyData.enemyMaxHp || enemyData.maxHp,
+        level: enemyData.level || 1
+    };
+
     const exploration = document.getElementById('exploration-interface');
     const battle = document.getElementById('battle-interface');
-    if (!exploration || !battle) {
-        console.error('Отсутствуют основные интерфейсы:', { exploration, battle });
-        logExplorationEvent("Ошибка: интерфейс боя недоступен.");
-        return;
-    }
+
+    // Принудительно скрываем exploration
+    exploration.style.display = 'none';
+    exploration.classList.remove('hide-to-left');
+
+    // Показываем battle интерфейс
+    battle.style.display = 'block';
+    battle.classList.remove('show-from-right');
+
+    // Обновляем данные врага
     const enemyImage = document.getElementById('enemy-image');
-    const enemyName = document.getElementById('enemy-combat-name');
-    const enemyLevel = document.getElementById('enemy-level');
-    const enemyHp = document.getElementById('enemy-combat-hp');
-    if (!enemyImage || !enemyName || !enemyLevel || !enemyHp) {
-        console.error('Отсутствуют элементы врага:', { enemyImage, enemyName, enemyLevel, enemyHp });
-        logExplorationEvent("Ошибка: данные врага не отображаются.");
-        return;
-    }
+    enemyImage.src = `images/${
+        combatData.name.includes("Мимик") ? "mimic.png" :
+            combatData.name.includes("Босс") ? "boss.png" :
+                "goblin.png"
+    }`;
 
-    if (!exploration || !battle || !enemyImage || !enemyName || !enemyLevel || !enemyHp) {
-        console.error('Отсутствуют элементы DOM:', {
-            exploration, battle, enemyImage, enemyName, enemyLevel, enemyHp
-        });
-        throw new Error('Не найдены необходимые элементы интерфейса');
-    }
-    console.log('Проверяем DOM элементы:', { exploration, battle });
-    exploration.classList.add('hide-to-left');
-    setTimeout(() => {
-        try {
-            exploration.style.display = 'none';
-            battle.style.display = 'block';
-            battle.classList.add('show-from-right');
-            console.log('Проверяем DOM элементы:', { exploration, battle });
-        } catch (e) {
-            console.error('Ошибка в setTimeout:', e);
-            throw e;
-        }
-    }, 500);
+    document.getElementById('enemy-combat-name').textContent = combatData.name;
+    document.getElementById('enemy-level').textContent = `Уровень ${combatData.level}`;
+    document.getElementById('enemy-combat-hp').textContent =
+        `${combatData.hp}/${combatData.maxHp}`;
 
-    let image = "goblin.png";
-    if (enemyData.enemyName.includes("Мимик")) image = "mimic.png";
-    if (enemyData.enemyName.includes("Босс")) image = "boss.png";
-    enemyImage.src = `images/${image}`;
-    enemyName.textContent = enemyData.enemyName;
-    enemyLevel.textContent = "Уровень " + (enemyData.level || 1);
-    enemyHp.textContent = `${enemyData.enemyHp}/${enemyData.enemyMaxHp || enemyData.enemyHp}`;
-
+    // Принудительное обновление лога
     updateBattleLog();
-    // Привязка событий после отображения интерфейса
-    document.querySelector('.battle-action-grid .action-btn[onclick="attack()"]').onclick = attack;
-    document.querySelector('.battle-action-grid .action-btn[onclick="tryFlee()"]').onclick = tryFlee;
-    document.querySelector('.battle-action-grid .action-btn[onclick="openAbilities()"]').onclick = openAbilities;
-    document.querySelector('.battle-action-grid .action-btn[onclick="openPotionsModal()"]').onclick = openPotionsModal;
+    console.log('[Combat] Interface updated');
 }
 
 function updateBattleLog() {
     const battleLog = document.getElementById('battle-log');
     const turn = document.getElementById('turn');
     if (!battleLog || !turn) {
-        console.error('Отсутствуют элементы battle-log или turn:', { battleLog, turn });
+        console.error('Отсутствуют элементы battle-log или turn:', {battleLog, turn});
         return;
     }
 
@@ -79,7 +71,7 @@ function updateBattleLog() {
 }
 
 function attack() {
-    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/battle/attack?userId=${userId}`, {method: 'POST'})
         .then(response => response.json())
         .then(data => {
             updateCombatHealth('damage');
@@ -90,7 +82,7 @@ function attack() {
 }
 
 function tryFlee() {
-    fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/battle/flee?userId=${userId}`, {method: 'POST'})
         .then(response => response.json())
         .then(data => {
             updateCombatHealth();
@@ -105,13 +97,13 @@ function openAbilities() {
     console.log('Открытие меню способностей');
     const abilitiesModal = document.createElement('div');
     abilitiesModal.innerHTML = `
-        <div class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="this.parentElement.parentElement.remove()">×</span>
-                <p>Способности пока не доступны</p>
+            <div class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">×</span>
+                    <p>Способности пока не доступны</p>
+                </div>
             </div>
-        </div>
-    `;
+        `;
     document.body.appendChild(abilitiesModal);
 }
 

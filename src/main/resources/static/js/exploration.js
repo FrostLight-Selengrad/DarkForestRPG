@@ -163,32 +163,30 @@ function escapeTrap() {
 }
 
 function fightMonster() {
-    console.log('Отправка запроса fightMonster с userId:', userId);
+    console.log('[Fight] Initiating monster fight...');
     fetch(`/api/game/fight-monster?userId=${userId}`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
     })
         .then(response => {
-            console.log('Статус ответа:', response.status);
-            if (!response.ok) {
-                throw new Error(`Ошибка HTTP: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            console.log('Полученные данные:', data);
-            if (data.error) {
-                logExplorationEvent(data.error);
+            console.log('[Fight] Response data:', data);
+            if (data.inCombat) {
+                enterCombat({
+                    enemyName: data.enemyName,
+                    enemyHp: data.enemyHp,
+                    enemyMaxHp: data.enemyMaxHp,
+                    level: data.enemyLevel
+                });
             } else {
-                try {
-                    enterCombat(data);
-                } catch (e) {
-                    console.error('Ошибка в enterCombat:', e);
-                    throw e; // Передаем ошибку в .catch
-                }
+                console.warn('Unexpected combat state:', data);
             }
         })
         .catch(error => {
-            console.error('Ошибка при запросе fightMonster:', error.message);
+            console.error('[Fight] Combat error:', error);
             handleExplorationError(error);
         });
 }

@@ -63,6 +63,7 @@ function updateBattleLog() {
             document.getElementById('camp-interface').style.display = 'none';
             document.getElementById('exploration-interface').style.display = 'none';
             document.getElementById('battle-interface').style.display = 'block';
+            updateStats()
 
             battleLog.innerHTML = data.log.replace(/\n/g, '<br>');
             battleLog.scrollTop = battleLog.scrollHeight;

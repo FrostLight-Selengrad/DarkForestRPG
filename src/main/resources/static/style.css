@@ -355,3 +355,18 @@ button:hover {
 .damage-icon, .heal-icon { width: 20px; height: 20px; vertical-align: middle; }
 @keyframes damageAnim { 0% { color: red; } 100% { color: #4CAF50; } }
 @keyframes healAnim { 0% { color: green; } 100% { color: #4CAF50; } }
+
+.animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

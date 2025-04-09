@@ -93,23 +93,32 @@ function processExplorationResult(data) {
 }
 
 function updateExplorationEvent(data) {
-    // Разбиваем строку message по символу ':'
-    const parts = data.message.split(':');
-    if (parts.length < 3) {
-        console.error("Некорректный формат сообщения:", data.message);
-        return;
-    }
-    const type = parts[0] || "forest";
-    const image = parts[1] || "forest.png";
-    const message = parts.slice(2).join(':') || "Вы продолжаете путь";
+    // Очищаем предыдущее содержимое лога
+    const logDiv = document.getElementById('exploration-log');
+    logDiv.innerHTML = '';
 
-    // Заменяем плейсхолдер на маленькую иконку
-    messageText = messageText.replace(/<(.+?)\.png>/g, '<img src="images/$1.png" class="small-icon" alt="$1">');
+    // Разбиваем сообщение с защитой от ошибок
+    const [type = "forest", image = "forest.png", ...messageParts] =
+        (data.message || "").split(/:(.+)/);
+    const message = messageParts.join(':').trim() || "Событие не распознано";
 
+    // Обновляем изображение
     const safeImage = image.endsWith('.png') ? image : `${image}.png`;
     document.getElementById('forest-image').src = `images/${safeImage}`;
-    document.getElementById('exploration-log').innerHTML = `<p>${messageText}</p>`;
-    updateActions(type);
+
+    // Добавляем новую запись в лог с анимацией
+    const eventHTML = `
+        <div class="event-card animate-slide-in">
+            <img src="images/${safeImage}" 
+                 onerror="this.src='images/forest.png'"
+                 class="event-image">
+            <p>${message}</p>
+        </div>
+    `;
+    logDiv.insertAdjacentHTML('afterbegin', eventHTML);
+
+    // Обновляем кнопки действий
+    updateActions(type, message, data);
 }
 
 function updateActions(type, message, data) {
@@ -118,12 +127,11 @@ function updateActions(type, message, data) {
             <button onclick="openChest()" class="action-btn">Открыть сундук</button>
             <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
         `,
-        trap: () => message.includes("попали") ? `
-            <button onclick="escapeTrap()" class="action-btn danger">
-                Попытаться выбраться (${data.chance || 60}%)
+        trap: () => `
+            <button onclick="exploreForest()" class="action-btn">
+                ${message.includes("успешно") ? "Продолжить путь" : "Попробовать снова"}
             </button>
-        ` : `
-            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
+            <button onclick="returnToCamp()" class="action-btn">В лагерь</button>
         `,
         monster: () => `
             <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
@@ -151,6 +159,8 @@ function updateActions(type, message, data) {
             <button onclick="returnToCamp()" class="action-btn">Где я?</button>
         `;
     }
+    document.getElementById('actions').innerHTML =
+        actionMap[type]?.() || defaultActions;
 }
 
 function calculateTravelTime(stamina) {
@@ -158,9 +168,21 @@ function calculateTravelTime(stamina) {
 }
 
 function escapeTrap() {
-    fetch(`/api/game/escape-trap?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => updateExplorationEvent(data))
+    fetch(`/api/game/escape-trap?userId=${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            // Принудительно обновляем весь интерфейс
+            document.getElementById('exploration-interface').style.display = 'block';
+            document.getElementById('battle-interface').style.display = 'none';
+            updateStats();
+            updateExplorationEvent(data);
+        })
         .catch(handleExplorationError);
 }
 

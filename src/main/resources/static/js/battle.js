@@ -31,7 +31,6 @@ function enterCombat(enemyData) {
 
     // Показываем battle интерфейс
     battle.style.display = 'block';
-    battle.classList.remove('show-from-right');
 
     // Обновляем данные врага
     const enemyImage = document.getElementById('enemy-image');

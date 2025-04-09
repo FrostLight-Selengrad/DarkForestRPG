@@ -60,6 +60,10 @@ function updateBattleLog() {
                 battleLog.innerHTML = data.error;
                 return;
             }
+            document.getElementById('camp-interface').style.display = 'none';
+            document.getElementById('exploration-interface').style.display = 'none';
+            document.getElementById('battle-interface').style.display = 'block';
+
             battleLog.innerHTML = data.log.replace(/\n/g, '<br>');
             battleLog.scrollTop = battleLog.scrollHeight;
             turn.innerText = `Текущий ход: ${data.turn}`;

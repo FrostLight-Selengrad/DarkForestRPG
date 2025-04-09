@@ -1,7 +1,9 @@
 function exploreForest() {
     const actionsDiv = document.getElementById('actions');
     const button = document.querySelector('#actions .action-btn');
-    if (button) button.remove; // Удаляем кнопку, если она есть
+    if (button) {
+        button.remove;
+    } // Удаляем кнопку, если она есть
 
     fetch(`/api/game/explore?userId=${userId}`, {
         method: 'POST',

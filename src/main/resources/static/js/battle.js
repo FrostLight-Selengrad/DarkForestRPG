@@ -1,12 +1,21 @@
 function enterCombat(enemyData) {
     console.log('Запуск enterCombat с данными:', enemyData);
-
     const exploration = document.getElementById('exploration-interface');
     const battle = document.getElementById('battle-interface');
+    if (!exploration || !battle) {
+        console.error('Отсутствуют основные интерфейсы:', { exploration, battle });
+        logExplorationEvent("Ошибка: интерфейс боя недоступен.");
+        return;
+    }
     const enemyImage = document.getElementById('enemy-image');
     const enemyName = document.getElementById('enemy-combat-name');
     const enemyLevel = document.getElementById('enemy-level');
     const enemyHp = document.getElementById('enemy-combat-hp');
+    if (!enemyImage || !enemyName || !enemyLevel || !enemyHp) {
+        console.error('Отсутствуют элементы врага:', { enemyImage, enemyName, enemyLevel, enemyHp });
+        logExplorationEvent("Ошибка: данные врага не отображаются.");
+        return;
+    }
 
     if (!exploration || !battle || !enemyImage || !enemyName || !enemyLevel || !enemyHp) {
         console.error('Отсутствуют элементы DOM:', {
@@ -14,13 +23,14 @@ function enterCombat(enemyData) {
         });
         throw new Error('Не найдены необходимые элементы интерфейса');
     }
-
+    console.log('Проверяем DOM элементы:', { exploration, battle });
     exploration.classList.add('hide-to-left');
     setTimeout(() => {
         try {
             exploration.style.display = 'none';
             battle.style.display = 'block';
             battle.classList.add('show-from-right');
+            console.log('Проверяем DOM элементы:', { exploration, battle });
         } catch (e) {
             console.error('Ошибка в setTimeout:', e);
             throw e;

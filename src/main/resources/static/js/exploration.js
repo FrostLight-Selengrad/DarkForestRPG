@@ -228,6 +228,7 @@ function openChest() {
             updateStats();
             updateExplorationEvent(data);
             if (data.inCombat) {
+                console.log('Начинаем бой, данные:', data);
                 enterCombat(data);
             } else {
                 updateActions('forest'); // Переключаем кнопки на лесные

@@ -1,6 +1,12 @@
 function enterCombat(enemyData) {
     console.log('[Combat] Starting combat with:', enemyData);
 
+    console.log('Battle elements:', {
+        interface: document.getElementById('battle-interface'),
+        image: document.getElementById('enemy-image'),
+        name: document.getElementById('enemy-combat-name')
+    });
+
     // Добавьте проверку ключевых данных
     if (!enemyData || !enemyData.enemyName) {
         console.error('Invalid enemy data:', enemyData);
@@ -39,9 +45,14 @@ function enterCombat(enemyData) {
     document.getElementById('enemy-level').textContent = `Уровень ${combatData.level}`;
     document.getElementById('enemy-combat-hp').textContent =
         `${combatData.hp}/${combatData.maxHp}`;
-
     // Принудительное обновление лога
     updateBattleLog();
+    console.log('Battle elements:', {
+        interface: document.getElementById('battle-interface'),
+        image: document.getElementById('enemy-image'),
+        name: document.getElementById('enemy-combat-name')
+    });
+    updateStats()
     console.log('[Combat] Interface updated');
 }
 
@@ -60,10 +71,6 @@ function updateBattleLog() {
                 battleLog.innerHTML = data.error;
                 return;
             }
-            document.getElementById('camp-interface').style.display = 'none';
-            document.getElementById('exploration-interface').style.display = 'none';
-            document.getElementById('battle-interface').style.display = 'block';
-            updateStats()
 
             battleLog.innerHTML = data.log.replace(/\n/g, '<br>');
             battleLog.scrollTop = battleLog.scrollHeight;

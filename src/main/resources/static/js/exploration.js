@@ -96,6 +96,7 @@ function updateExplorationEvent(data) {
         (data.message || "").split(/:(.+)/);
     // Обновляем основное изображение
     const imageDiv = document.getElementById('exploration-image');
+    const message = messageParts.join(':').trim() || "Событие не распознано";
 
     if (type !== 'forest') {
         //document.getElementById('forest-image').style.display = 'none';
@@ -103,7 +104,6 @@ function updateExplorationEvent(data) {
         const eventImage = image.endsWith('.png') ? image : `${image}.png`;
         imageDiv.src = `images/${eventImage}`;
 
-        const message = messageParts.join(':').trim() || "Событие не распознано";
         document.getElementById('exploration-log').innerHTML += `
             <p>${message}</p>
         `;

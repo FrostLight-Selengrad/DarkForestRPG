@@ -89,22 +89,24 @@ function processExplorationResult(data) {
 
 function updateExplorationEvent(data) {
     // Очищаем предыдущее содержимое лога
-    const logDiv = document.getElementById('exploration-log');
-    logDiv.innerHTML = '';
+    document.getElementById('exploration-log').innerHTML = '';
 
     // Разбиваем сообщение с защитой от ошибок
     const [type = "forest", image = "forest.png", ...messageParts] =
         (data.message || "").split(/:(.+)/);
-    const message = messageParts.join(':').trim() || "Событие не распознано";
-
     // Обновляем основное изображение
     const imageDiv = document.getElementById('exploration-image');
+
     if (type !== 'forest') {
-        document.getElementById('forest-image').style.display = 'none';
+        //document.getElementById('forest-image').style.display = 'none';
 
         const eventImage = image.endsWith('.png') ? image : `${image}.png`;
         imageDiv.src = `images/${eventImage}`;
-        logDiv.insertAdjacentHTML('afterbegin', '<p>${message}</p>');
+
+        const message = messageParts.join(':').trim() || "Событие не распознано";
+        document.getElementById('exploration-log').innerHTML += `
+            <p>${message}</p>
+        `;
     } else {
         document.getElementById('forest-image').style.display = 'block';
     }

@@ -58,11 +58,28 @@ function enterCombat(enemyData) {
 
 function checkCombatStatus() {
     fetch(`/api/game/player?userId=${userId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json();
+        })
         .then(player => {
             if (!player.inCombat) {
+                // Полная очистка данных боя
+                resetCombatInterface();
                 setActiveInterface('exploration');
             }
+        })
+        .catch(error => {
+            console.error('Ошибка проверки боя:', error);
+            logExplorationEvent("Ошибка связи с сервером");
         });
+}
+
+function resetCombatInterface() {
+    document.getElementById('enemy-combat-name').textContent = '';
+    document.getElementById('enemy-combat-hp').textContent = '0/0';
+    document.getElementById('enemy-image').src = 'images/placeholder.png';
+    document.getElementById('battle-log').innerHTML = '';
 }
 
 function updateBattleLog() {

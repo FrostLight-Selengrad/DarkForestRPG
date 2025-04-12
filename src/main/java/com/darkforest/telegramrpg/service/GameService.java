@@ -166,7 +166,7 @@ public class GameService {
 
                 // 50% шанс избежать
                 if (random.nextBoolean()) {
-                    player.addToExplorationLog("trap:event_trap_escape.png:Вы успешно избежали ловушку!");
+                    player.addToExplorationLog("trap_missed:event_trap_escape.png:Вы успешно избежали ловушку!");
                     player.setInTrap(false);
                     return "Вы ловко уклонились от ловушки!";
                 } else {
@@ -340,17 +340,6 @@ public class GameService {
         player.setInCamp(false);
         playerService.savePlayer(userId, player);
         return Map.of("success", true);
-    }
-
-    // Начало боя с монстром
-    public Map<String, Object> fightMonster(Long userId) {
-        Player player = playerService.getPlayer(userId);
-        player.setInCombat(true);
-        player.clearBattleLog();
-        player.addToBattleLog("Бой начался с " + player.getEnemyName() + "!");
-        //player.setStamina(player.getStamina() - (player.getEnemyName().contains("Босс") ? 5 : player.getEnemyName().contains("Элитный") ? 3 : 2));
-        return Map.of("inCombat", player.isInCombat(), "enemyName", player.getEnemyName(), "enemyHp",
-                player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
     }
 
     // Побег до начала боя

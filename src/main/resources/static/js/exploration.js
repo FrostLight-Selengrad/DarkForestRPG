@@ -45,6 +45,9 @@ function updateActions(type) {
             showActions(['open-chest', 'continue']);
             break;
         case 'trap':
+            showActions(['escape-trap']);
+            break;
+        case 'trap_missed':
             showActions(['continue', 'return-camp']);
             break;
         case 'monster':

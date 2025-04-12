@@ -56,19 +56,20 @@ public class GameController {
             }
 
             Map<String, Object> response = new HashMap<>();
-            gameService.exploreForest(userId);
 
             response.put("message", player.getExplorationLog().getLast()); // Всегда последнее сообщение
             response.put("stamina", player.getStamina());
             response.put("inCombat", player.isInCombat());
             if (player.isInTrap()) {
+                response.put("inTrap", player.isInTrap());
                 response.put("chance", player.getTrapEscapeChance());
-            }
-            if (player.isInCombat()) {
+            } else if (player.isInCombat()) {
                 response.put("enemyName", player.getEnemyName());
                 response.put("enemyHp", player.getEnemyHp());
                 response.put("enemyMaxHp", player.getEnemyMaxHp());
                 response.put("level", player.getForestLevel()); // Уровень для босса или монстра
+            } else {
+                gameService.exploreForest(userId);
             }
 
             return ResponseEntity.ok(response);
@@ -125,17 +126,17 @@ public class GameController {
     public ResponseEntity<Map<String, Object>> fightMonster(@RequestParam Long userId) {
         try {
             Player player = playerService.getPlayer(userId);
-            System.out.println("Player: " + player + ", inCombat: " + player.isInCombat());
             if (player == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Игрок не найден"));
             }
-            if (!player.isInCombat()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Вы не в бою"));
-            }
+            player.setInCombat(true);
+            player.addToBattleLog("Вы решительно ринулись в бой!");
+            playerService.savePlayer(userId, player);
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Бой начался!");
             response.put("enemyName", player.getEnemyName());
             response.put("enemyHp", player.getEnemyHp());
+            response.put("enemyMaxHp", player.getEnemyMaxHp());
+            response.put("level", player.getForestLevel());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));

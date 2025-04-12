@@ -56,6 +56,31 @@ function enterCombat(enemyData) {
     console.log('[Combat] Interface updated');
 }
 
+function fightMonster() {
+    console.log('[Fight] Initiating monster fight...');
+    fetch(`/api/game/fight-monster?userId=${userId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('[Fight] Response data:', data);
+            enterCombat({
+                enemyName: data.enemyName,
+                enemyHp: data.enemyHp,
+                enemyMaxHp: data.enemyMaxHp,
+                level: data.level
+            });
+        })
+        .catch(error => {
+            console.error('[Fight] Combat error:', error);
+            handleExplorationError(error);
+        });
+}
+
 function checkCombatStatus() {
     fetch(`/api/game/player?userId=${userId}`)
         .then(response => {

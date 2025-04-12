@@ -147,7 +147,6 @@ public class GameService {
                 player.setEnemyMaxHp(50);
                 player.setEnemyAttack(15);
                 player.setEnemyInitiative(5);
-                player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
                 player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");

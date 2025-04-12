@@ -140,35 +140,6 @@ function escapeTrap() {
         .catch(handleExplorationError);
 }
 
-function fightMonster() {
-    console.log('[Fight] Initiating monster fight...');
-    fetch(`/api/game/fight-monster?userId=${userId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('[Fight] Response data:', data);
-            if (data.inCombat) {
-                enterCombat({
-                    enemyName: data.enemyName,
-                    enemyHp: data.enemyHp,
-                    enemyMaxHp: data.enemyMaxHp,
-                    level: data.enemyLevel
-                });
-            } else {
-                console.warn('Unexpected combat state:', data);
-            }
-        })
-        .catch(error => {
-            console.error('[Fight] Combat error:', error);
-            handleExplorationError(error);
-        });
-}
-
 function tryFleeBeforeCombat() {
     fetch(`/api/game/flee-before-combat?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())

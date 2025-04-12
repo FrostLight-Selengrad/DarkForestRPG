@@ -175,6 +175,10 @@ public class GameController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Игрок не найден"));
             }
             Map<String, Object> result = gameService.openChest(userId);
+            // Явное указание типа врага
+            if ((Boolean)result.get("inCombat")) {
+                result.put("enemyType", "mimic");
+            }
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));

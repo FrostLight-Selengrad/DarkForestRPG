@@ -97,23 +97,20 @@ function updateExplorationEvent(data) {
         (data.message || "").split(/:(.+)/);
     const message = messageParts.join(':').trim() || "Событие не распознано";
 
-    // Обновляем изображение
-    const safeImage = image.endsWith('.png') ? image : `${image}.png`;
-    document.getElementById('forest-image').src = `images/${safeImage}`;
+    // Обновляем основное изображение
+    const imageDiv = document.getElementById('exploration-image');
+    if (type !== 'forest') {
+        document.getElementById('forest-image').style.display = 'none';
 
-    // Добавляем новую запись в лог с анимацией
-    const eventHTML = `
-        <div class="event-card animate-slide-in">
-            <img src="images/${safeImage}" 
-                 onerror="this.src='images/forest.png'"
-                 class="event-image">
-            <p>${message}</p>
-        </div>
-    `;
-    logDiv.insertAdjacentHTML('afterbegin', eventHTML);
+        const eventImage = image.endsWith('.png') ? image : `${image}.png`;
+        imageDiv.src = `images/${eventImage}`;
+        logDiv.insertAdjacentHTML('afterbegin', '<p>${message}</p>');
+    } else {
+        document.getElementById('forest-image').style.display = 'block';
+    }
 
     // Обновляем кнопки действий
-    updateActions(type, message, data);
+    updateActions(type);
 }
 
 function calculateTravelTime(stamina) {

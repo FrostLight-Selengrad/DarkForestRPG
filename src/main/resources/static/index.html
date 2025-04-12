@@ -20,7 +20,9 @@
     <!-- Интерфейс путешествия (изначально скрыт) -->
     <div id="exploration-interface" style="display: none;">
         <div id="player-stats"></div>
-        <img id="forest-image" src="images/forest_v1.png" class="enemy-img">
+        <div id="exploration-image">
+            <img id="forest-image" src="images/forest_v2.png" class="enemy-img">
+        </div>
         <div id="exploration-log"></div>
 
         <!-- Контейнеры прогресса -->
@@ -57,7 +59,7 @@
                 <div class="combat-hp" id="player-combat-hp">100/100</div>
             </div>
             <div class="combat-health-enemy">
-                <span id="enemy-combat-name">Гоблин</span>
+                <span id="enemy-combat-name">Гоблин</span><br/>
                 <span class="enemy-level" id="enemy-level">Уровень 1</span>
                 <div class="combat-hp" id="enemy-combat-hp">50/50</div>
             </div>
@@ -79,14 +81,14 @@
         </div>
     </div>
 </div>
-<button id="character-btn" onclick="toggleMenu()">
+<button id="character-btn" onclick="toggleMenu()" width="30">
     <img src="images/character-icon.png" width="30">
 </button>
-<div id="character-menu" class="dropdown-menu">
-    <button class="menu-item"><img src="images/backpack-icon.png"></button>
-    <button class="menu-item"><img src="images/talents-icon.png"></button>
-    <button class="menu-item"><img src="images/skills-icon.png"></button>
-    <button class="menu-item"><img src="images/settings-icon.png"></button>
+<div id="character-menu" class="dropdown-menu" width="30">
+    <button class="menu-item" width="30"><img src="images/backpack-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/talents-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/skills-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/settings-icon.png"></button>
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>

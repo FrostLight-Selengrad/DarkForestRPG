@@ -1,55 +1,15 @@
 function exploreForest() {
-    const actionsDiv = document.getElementById('actions');
-    const button = document.querySelector('#actions .action-btn');
-    if (button) {
-        button.remove;
-    } // Удаляем кнопку, если она есть
+    // Скрываем все кнопки
+    hideAllActions();
 
-    fetch(`/api/game/explore?userId=${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
+    fetch(`/api/game/explore?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            if (!data || typeof data.stamina === 'undefined') throw new Error('Некорректный ответ сервера');
-            const stamina = Number(data.stamina);
-            if (isNaN(stamina)) throw new Error('Ошибка данных выносливости');
+            // Показываем прогресс бар
+            document.getElementById('exploration-progress').style.display = 'block';
 
-            if (stamina <= 15) {
-                actionsDiv.style.display = 'block';
-                logExplorationEvent("Выносливость героя на исходе! Возможно стоит вернуться в лагерь или использовать зелье выносливости.");
-                actionsDiv.innerHTML = `
-                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-                    <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
-                `;
-                return;
-            }
-
-            if (stamina <= 1) {
-                logExplorationEvent("Герой устал и нуждается в отдыхе!");
-                document.getElementById('actions').innerHTML = `
-                    <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-                    <button onclick="returnToCamp()">Вернуться в лагерь</button>
-                `;
-                actionsDiv.style.display = 'block'; // Показываем actionsDiv
-                return;
-            }
-
-            actionsDiv.style.display = 'none'; // Скрываем actionsDiv вместо удаления
-
-            // Создаем progressContainer и добавляем его после actionsDiv
-            const progressContainer = document.createElement('div');
-            progressContainer.className = 'progress-container';
-            progressContainer.innerHTML = `
-                <p>Исследование леса...</p>
-                <div class="progress-bar" id="travel-progress">
-                    <div class="progress-fill"></div>
-                </div>
-            `;
-            actionsDiv.parentNode.insertBefore(progressContainer, actionsDiv.nextSibling);
-
-            const progressFill = document.querySelector('.progress-fill');
-            const travelTime = calculateTravelTime(stamina);
+            const progressFill = document.querySelector('#exploration-progress .progress-fill');
+            const travelTime = calculateTravelTime(data.stamina);
             let startTime = Date.now();
 
             const animationFrame = () => {
@@ -60,16 +20,48 @@ function exploreForest() {
                 if (progress < 1) {
                     requestAnimationFrame(animationFrame);
                 } else {
-                    setTimeout(() => {
-                        progressContainer.remove(); // Удаляем progressContainer
-                        actionsDiv.style.display = 'block'; // Показываем actionsDiv
-                        processExplorationResult(data); // Обрабатываем результат
-                    }, 300);
+                    // Скрываем прогресс бар
+                    document.getElementById('exploration-progress').style.display = 'none';
+                    processExplorationResult(data);
                 }
             };
             requestAnimationFrame(animationFrame);
         })
         .catch(handleExplorationError);
+}
+
+function updateActions(type) {
+    // Скрываем все кнопки
+    hideAllActions();
+
+    switch(type) {
+        case 'forest':
+            showActions(['continue', 'return-camp']);
+            break;
+        case 'chest':
+            showActions(['open-chest', 'continue']);
+            break;
+        case 'trap':
+            showActions(['continue', 'return-camp']);
+            break;
+        case 'monster':
+            showActions(['fight', 'flee']);
+            break;
+        case 'abandoned_camp':
+            showActions(['rest-camp', 'continue']);
+            break;
+    }
+}
+
+function hideAllActions() {
+    const actions = document.getElementById('actions').children;
+    for(let btn of actions) btn.style.display = 'none';
+}
+
+function showActions(actions) {
+    actions.forEach(action => {
+        document.getElementById(`action-${action}`).style.display = 'block';
+    });
 }
 
 // Функция для обработки результата исследования
@@ -121,50 +113,8 @@ function updateExplorationEvent(data) {
     updateActions(type, message, data);
 }
 
-function updateActions(type, message, data) {
-    const actionMap = {
-        chest: () => `
-            <button onclick="openChest()" class="action-btn">Открыть сундук</button>
-            <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
-        `,
-        trap: () => `
-            <button onclick="exploreForest()" class="action-btn">
-                ${message.includes("успешно") ? "Продолжить путь" : "Попробовать снова"}
-            </button>
-            <button onclick="returnToCamp()" class="action-btn">В лагерь</button>
-        `,
-        monster: () => `
-            <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
-            <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
-        `,
-        abandoned_camp: () => `
-            <button onclick="restAtCamp()" class="action-btn">Разжечь костер</button>
-            <button onclick="exploreForest()" class="action-btn">Пройти мимо</button>
-        `,
-        boss: () => `
-            <button onclick="fightMonster()" class="action-btn">Вступить в бой</button>
-            <button onclick="tryFleeBeforeCombat()" class="action-btn">Убежать</button>
-        `
-    };
-
-    const actionsDiv = document.getElementById('actions');
-    if (type === 'forest') {
-        actionsDiv.innerHTML = `
-            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-            <button onclick="returnToCamp()" class="action-btn">Вернуться в лагерь</button>
-        `;
-    } else {
-        actionsDiv.innerHTML = actionMap[type]?.() || `
-            <button onclick="exploreForest()" class="action-btn">Продолжить</button>
-            <button onclick="returnToCamp()" class="action-btn">Где я?</button>
-        `;
-    }
-    document.getElementById('actions').innerHTML =
-        actionMap[type]?.() || defaultActions;
-}
-
 function calculateTravelTime(stamina) {
-    return 5000 + Math.floor((100 - stamina) / 8) * 1000;
+    return 1000 + Math.floor((100 - stamina) / 4) * 500;
 }
 
 function escapeTrap() {

@@ -7,6 +7,19 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
+function setActiveInterface(interfaceName) {
+    const interfaces = ['camp', 'exploration', 'battle'];
+
+    interfaces.forEach(name => {
+        document.getElementById(`${name}-interface`).style.display =
+            name === interfaceName ? 'block' : 'none';
+    });
+
+    // Обновляем кнопки для текущего интерфейса
+    if(interfaceName === 'exploration') updateActions('forest');
+    if(interfaceName === 'camp') updateCampActions();
+}
+
 function initializeGame() {
     fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())

@@ -1,58 +1,16 @@
+// battle.js
 function enterCombat(enemyData) {
-    console.log('[Combat] Starting combat with:', enemyData);
+    setActiveInterface('battle');
+    // Остальная логика боя без изменений
+}
 
-    console.log('Battle elements:', {
-        interface: document.getElementById('battle-interface'),
-        image: document.getElementById('enemy-image'),
-        name: document.getElementById('enemy-combat-name')
-    });
-
-    // Добавьте проверку ключевых данных
-    if (!enemyData || !enemyData.enemyName) {
-        console.error('Invalid enemy data:', enemyData);
-        logExplorationEvent("Ошибка: данные противника не получены");
-        return;
-    }
-
-    // Исправьте имена полей согласно API
-    const combatData = {
-        name: enemyData.enemyName || enemyData.name,
-        hp: enemyData.enemyHp || enemyData.hp,
-        maxHp: enemyData.enemyMaxHp || enemyData.maxHp,
-        level: enemyData.level || 1
-    };
-
-    const exploration = document.getElementById('exploration-interface');
-    const battle = document.getElementById('battle-interface');
-
-    // Принудительно скрываем exploration
-    exploration.style.display = 'none';
-    exploration.classList.remove('hide-to-left');
-
-    // Показываем battle интерфейс
-    battle.style.display = 'block';
-
-    // Обновляем данные врага
-    const enemyImage = document.getElementById('enemy-image');
-    enemyImage.src = `images/${
-        combatData.name.includes("Мимик") ? "mimic.png" :
-            combatData.name.includes("Босс") ? "boss.png" :
-                "goblin.png"
-    }`;
-
-    document.getElementById('enemy-combat-name').textContent = combatData.name;
-    document.getElementById('enemy-level').textContent = `Уровень ${combatData.level}`;
-    document.getElementById('enemy-combat-hp').textContent =
-        `${combatData.hp}/${combatData.maxHp}`;
-    // Принудительное обновление лога
-    updateBattleLog();
-    console.log('Battle elements:', {
-        interface: document.getElementById('battle-interface'),
-        image: document.getElementById('enemy-image'),
-        name: document.getElementById('enemy-combat-name')
-    });
-    updateStats()
-    console.log('[Combat] Interface updated');
+function checkCombatStatus() {
+    fetch(`/api/game/player?userId=${userId}`)
+        .then(player => {
+            if (!player.inCombat) {
+                setActiveInterface('exploration');
+            }
+        });
 }
 
 function updateBattleLog() {
@@ -116,21 +74,6 @@ function openAbilities() {
             </div>
         `;
     document.body.appendChild(abilitiesModal);
-}
-
-function checkCombatStatus() {
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(player => {
-            if (!player.inCombat) {
-                document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'block';
-                document.getElementById('exploration-log').innerHTML = '<p>Бой завершен! Продолжаем путь...</p>';
-                document.getElementById('forest-image').src = 'images/forest_v1.png';
-                updateActions('forest');
-            }
-        })
-        .catch(handleExplorationError);
 }
 
 function updateCombatHealth() {

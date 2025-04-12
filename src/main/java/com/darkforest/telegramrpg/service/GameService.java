@@ -150,7 +150,15 @@ public class GameService {
                 player.clearBattleLog();
                 player.setBattleTurn(1);
                 player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-                player.addToExplorationLog("monster:goblin.png:Вы встретили монстра!");
+                // 50% шанс избежать
+                if (random.nextBoolean()) {
+                    player.addToExplorationLog("monster:goblin.png:Пробираясь через гущу леса вы заметили противника." +
+                            "Монстр занят своими делами и скорее всего вас еще не заметил.");
+                } else {
+                    player.addToExplorationLog("monster:goblin.png:Вы обратили внимание на чью-то тень в лесу. " +
+                            "Пытаясь рассмотреть его получше вы наступили на ветку и похоже " +
+                            "он теперь смотрит в вашу стороны");
+                }
                 return "Начался бой с " + player.getEnemyName();
             }
             case "chest" -> {
@@ -184,8 +192,9 @@ public class GameService {
                 player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
-                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-                player.addToExplorationLog("boss:boss.png:Вы встретили босса!"); // Исправлено
+                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!Он полон решимости не пустить героя " +
+                                "дальше и уже готов к битве");
+                player.addToExplorationLog("boss:boss.png:Вы встретили босса!");
                 return "Вы встретили босса!";
             }
         }
@@ -356,9 +365,13 @@ public class GameService {
         } else {
             player.setInCombat(true);
             player.clearBattleLog();
-            player.addToBattleLog("Побег не удался! Бой начался!");
-            return Map.of("inCombat", player.isInCombat(), "enemyName", player.getEnemyName(), "enemyHp",
-                    player.getEnemyHp(), "enemyMaxHp", player.getEnemyMaxHp());
+            player.addToBattleLog(player.getEnemyName() + " заметил вас, пробирающегося сквозь кусты, битвы не избежать!");
+            return Map.of(
+                    "enemyName", player.getEnemyName(),
+                    "enemyHp", player.getEnemyHp(),
+                    "enemyMaxHp", player.getEnemyMaxHp(),
+                    "level", player.getForestLevel()
+            );
         }
     }
 

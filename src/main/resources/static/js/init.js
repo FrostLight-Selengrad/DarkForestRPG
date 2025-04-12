@@ -58,11 +58,12 @@ function updateStats() {
                     <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel} | Золото: ${player.resources}</p>
                     <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                 `;
-                if (player.inCamp)
-                    document.getElementById('player-camp-stats').innerHTML = `
+                if (player.inCamp) {
+                document.getElementById('player-camp-stats').innerHTML = `
                         <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                         <p>Золото: ${player.resources}</p>
                     `;
+                }
             }
         })
         .catch(handleExplorationError);

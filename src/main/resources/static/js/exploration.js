@@ -144,10 +144,15 @@ function tryFleeBeforeCombat() {
     fetch(`/api/game/flee-before-combat?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            if (data.message === "Вы успешно сбежали!") {
-                updateStats(); // Обновляем состояние, чтобы сбросить inCombat
+            if (data.message.contains("сбежали")) {
+                updateStats(); // Обновляем состояние
+                document.getElementById('exploration-log').innerHTML = `
+                        <p>${data.message}</p>
+                        <p>Теперь вы можете продолжить путешестви</p>
+                    `;
+            } else {
+                enterCombat(data);
             }
-            updateExplorationEvent(data);
         })
         .catch(handleExplorationError);
 }

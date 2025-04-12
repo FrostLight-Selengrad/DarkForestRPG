@@ -57,7 +57,6 @@ public class GameController {
 
             Map<String, Object> response = new HashMap<>();
 
-            response.put("message", player.getExplorationLog().getLast()); // Всегда последнее сообщение
             response.put("stamina", player.getStamina());
             response.put("inCombat", player.isInCombat());
             if (player.isInTrap()) {
@@ -71,6 +70,7 @@ public class GameController {
             } else {
                 gameService.exploreForest(userId);
             }
+            response.put("message", player.getExplorationLog().getLast()); // Всегда последнее сообщение
 
             return ResponseEntity.ok(response);
 

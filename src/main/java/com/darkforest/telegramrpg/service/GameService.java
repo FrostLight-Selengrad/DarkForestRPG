@@ -219,7 +219,7 @@ public class GameService {
 
         int damage = damageService.calculatePhysicalDamage(player.getPhysicalAttack(), player.getToughness());
         player.setEnemyHp(player.getEnemyHp() - damage);
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы нанесли " + damage + " урона\n");
+        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы нанесли " + damage + " урона");
         player.setBattleTurn(player.getBattleTurn() + 1);
 
         if (player.getEnemyHp() <= 0) {

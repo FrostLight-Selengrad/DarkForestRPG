@@ -37,7 +37,7 @@ function enterCombat(enemyData) {
     const enemyImage = document.getElementById('enemy-image');
     enemyImage.src = `images/${
         combatData.name.includes("Мимик") ? "mimic.png" :
-            combatData.name.includes("Босс") ? "boss.png" :
+            combatData.name.includes("Хранитель прохода") ? "boss.png" :
                 "goblin.png"
     }`;
 
@@ -180,15 +180,15 @@ function updateCombatHealth() {
     fetch(`/api/game/player?userId=${userId}`)
         .then(response => response.json())
         .then(player => {
-            playerHpElement.style.color = '#ff5555';
-            setTimeout(() => playerHpElement.style.color = '#4CAF50', 500);
-            playerHpElement.textContent = `${player.hp}/${player.maxHp}`;
-
             if (player.inCombat) {
                 enemyHpElement.style.color = '#ff5555';
-                setTimeout(() => enemyHpElement.style.color = '#4CAF50', 500);
+                setTimeout(() => enemyHpElement.style.color = '#4CAF50', 300);
                 enemyHpElement.textContent = `${player.enemyHp}/${player.enemyMaxHp}`;
             }
+
+            setTimeout(() => playerHpElement.style.color = '#ff5555', 300);
+            setTimeout(() => playerHpElement.style.color = '#4CAF50', 300);
+            playerHpElement.textContent = `${player.hp}/${player.maxHp}`;
         })
         .catch(handleExplorationError);
 }

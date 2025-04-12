@@ -54,7 +54,6 @@ public class GameController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Игрок не найден"));
             }
-
             Map<String, Object> response = new HashMap<>();
 
             response.put("stamina", player.getStamina());

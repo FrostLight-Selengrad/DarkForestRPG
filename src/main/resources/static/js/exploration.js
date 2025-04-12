@@ -56,6 +56,9 @@ function updateActions(type) {
         case 'abandoned_camp':
             showActions(['rest-camp', 'continue']);
             break;
+        case 'boss':
+            showActions(['fight']);
+            break;
     }
 }
 

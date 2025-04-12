@@ -11,11 +11,12 @@ import java.util.Random;
 @Service
 public class GameService {
     private final PlayerService playerService; // Добавляем зависимость
-
+    private final DamageService damageService;
     // Конструктор для внедрения зависимости
     @Autowired
-    public GameService(PlayerService playerService) {
+    public GameService(PlayerService playerService, DamageService damageService) {
         this.playerService = playerService;
+        this.damageService = damageService;
     }
 
     // Список предметов с весами
@@ -192,16 +193,15 @@ public class GameService {
                 player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
-                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!Он полон решимости не пустить героя " +
-                                "дальше и уже готов к битве");
-                player.addToExplorationLog("boss:boss.png:Вы встретили босса!");
+                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "! Он полон решимости не пустить " +
+                        "героя дальше и уже готов к битве");
+                player.addToExplorationLog("Вы встретили " + player.getEnemyName() + "! Он полон решимости не пустить " +
+                        "героя дальше и уже готов к битве");
                 return "Вы встретили босса!";
             }
         }
         return "Ничего не произошло";
     }
-    @Autowired
-    private DamageService damageService;
 
     // Метод для атаки
     public String attack(Long userId) {
@@ -270,7 +270,6 @@ public class GameService {
             player.setEnemyName(null);      // Очищаем имя врага
             player.setEnemyHp(0);           // Очищаем здоровье врага
             player.setEnemyMaxHp(0);        // Очищаем максимальное здоровье врага
-            return String.join("\n", player.getBattleLog());
         } else {
             player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
             // Атака монстра
@@ -286,8 +285,8 @@ public class GameService {
                 return result;
             }
 
-            return String.join("\n", player.getBattleLog());
         }
+        return String.join("\n", player.getBattleLog());
     }
 
     // Метод для сброса прогресса

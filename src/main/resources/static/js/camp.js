@@ -23,11 +23,15 @@ function takeRest() {
     alert('Отдых в лагере в доработке');
 }
 
+// camp.js
 function returnToCamp() {
     // Показываем прогресс бар
     document.getElementById('return-camp-progress').style.display = 'block';
 
-    fetch(`/api/game/return-to-camp?userId=${userId}`)
+    fetch(`/api/game/return-to-camp?userId=${userId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
         .then(data => {
             const progressFill = document.querySelector('#return-camp-progress .progress-fill');
 
@@ -49,5 +53,5 @@ function returnToCamp() {
         })
         .catch(error => {
             document.getElementById('return-camp-progress').style.display = 'none';
-        });
+            });
 }

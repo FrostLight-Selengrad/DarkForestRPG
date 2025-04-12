@@ -47,7 +47,7 @@ public class GameController {
 
     @PostMapping("/explore")
     public ResponseEntity<Map<String, Object>> exploreForest(
-            @RequestParam("userId") Long userId) { // Явное указание параметра
+            @RequestParam("userId") Long userId) {
         try {
             Player player = playerService.getPlayer(userId);
             if (player == null) {

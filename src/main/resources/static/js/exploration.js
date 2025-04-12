@@ -2,7 +2,10 @@ function exploreForest() {
     // Скрываем все кнопки
     hideAllActions();
 
-    fetch(`/api/game/explore?userId=${userId}`)
+    fetch(`/api/game/explore?userId=${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
         .then(response => response.json())
         .then(data => {
             // Показываем прогресс бар

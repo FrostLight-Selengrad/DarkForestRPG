@@ -88,30 +88,34 @@ function processExplorationResult(data) {
 }
 
 function updateExplorationEvent(data) {
-    // Очищаем предыдущее содержимое лога
-    document.getElementById('exploration-log').innerHTML = '';
+    const logDiv = document.getElementById('exploration-log');
+    logDiv.innerHTML = '';
 
-    // Разбиваем сообщение с защитой от ошибок
-    const [type = "forest", image = "forest.png", ...messageParts] =
-        (data.message || "").split(/:(.+)/);
-    // Обновляем основное изображение
-    const imageDiv = document.getElementById('exploration-image');
+    // Разбиваем сообщение на части
+    const parts = (data.message || "").split(':');
+    const [type = "forest", image = "", ...messageParts] = parts;
     const message = messageParts.join(':').trim() || "Событие не распознано";
 
+    // Обновляем изображение
+    const imageElement = document.getElementById('forest-image');
     if (type !== 'forest') {
-        //document.getElementById('forest-image').style.display = 'none';
-
-        const eventImage = image.endsWith('.png') ? image : `${image}.png`;
-        imageDiv.src = `images/${eventImage}`;
-
-        document.getElementById('exploration-log').innerHTML += `
-            <p>${message}</p>
-        `;
+        const safeImage = image.endsWith('.png') ? image : `${image}.png`;
+        imageElement.src = `images/${safeImage}`;
     } else {
-        document.getElementById('forest-image').style.display = 'block';
+        imageElement.src = 'images/forest.png';
     }
 
-    // Обновляем кнопки действий
+    // Создаем карточку события
+    const eventHTML = `
+        <div class="event-card animate-slide-in">
+            <img src="${imageElement.src}" 
+                 onerror="this.src='images/forest.png'"
+                 class="event-image">
+            <p>${message}</p>
+        </div>
+    `;
+    logDiv.insertAdjacentHTML('afterbegin', eventHTML);
+
     updateActions(type);
 }
 

@@ -144,10 +144,13 @@ function escapeTrap() {
 }
 
 function tryFleeBeforeCombat() {
-    fetch(`/api/game/flee-before-combat?userId=${userId}`, { method: 'POST' })
+    fetch(`/api/game/flee-before-combat?userId=${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
         .then(response => response.json())
         .then(data => {
-            if (data.message.contains("сбежали")) {
+            if (data.message.contains("сбежал")) {
                 updateStats(); // Обновляем состояние
                 document.getElementById('exploration-log').innerHTML = `
                         <p>${data.message}</p>

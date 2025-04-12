@@ -153,7 +153,7 @@ public class GameService {
                 player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
                 // 50% шанс избежать
                 if (random.nextBoolean()) {
-                    player.addToExplorationLog("monster:goblin.png:Пробираясь через гущу леса вы заметили противника." +
+                    player.addToExplorationLog("monster:goblin.png:Пробираясь через гущу леса вы заметили противника. " +
                             "Монстр занят своими делами и скорее всего вас еще не заметил.");
                 } else {
                     player.addToExplorationLog("monster:goblin.png:Вы обратили внимание на чью-то тень в лесу. " +
@@ -185,17 +185,16 @@ public class GameService {
                 }
             }
             case "boss" -> {
-                player.setEnemyName("Босс");
+                player.setEnemyName("Хранителя прохода");
                 player.setEnemyHp(100);
                 player.setEnemyMaxHp(100);
                 player.setEnemyAttack(25);
                 player.setEnemyInitiative(15);
-                player.setInCombat(true);
                 player.clearBattleLog();
                 player.setBattleTurn(1);
                 player.addToBattleLog("Вы встретили " + player.getEnemyName() + "! Он полон решимости не пустить " +
                         "героя дальше и уже готов к битве");
-                player.addToExplorationLog("Вы встретили " + player.getEnemyName() + "! Он полон решимости не пустить " +
+                player.addToExplorationLog("boss:boss.png:Вы встретили " + player.getEnemyName() + "! Он полон решимости не пустить " +
                         "героя дальше и уже готов к битве");
                 return "Вы встретили босса!";
             }
@@ -378,7 +377,7 @@ public class GameService {
         Player player = playerService.getPlayer(userId);
         int time = 5 + (100 - player.getStamina()) / 5; // 5-25 сек
         String message = player.getStamina() > 80 ? "Герой бодро возвращается в лагерь" :
-                player.getStamina() > 20 ? "Герой неспеша ковыляет в лагерь" :
+                player.getStamina() > 20 ? "Герой не спеша ковыляет в лагерь" :
                         "Герой из последних сил возвращается в лагерь. Это займет больше времени";
         player.setInCamp(true);
         playerService.savePlayer(userId, player);

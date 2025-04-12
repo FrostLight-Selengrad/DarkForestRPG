@@ -91,10 +91,10 @@ function updateExplorationEvent(data) {
     const logDiv = document.getElementById('exploration-log');
     logDiv.innerHTML = '';
 
-    // Разбиваем сообщение на части
+    // Разбиваем сообщение на части с учетом возможных двоеточий в тексте
     const parts = (data.message || "").split(':');
-    const [type = "forest", image = "", ...messageParts] = parts;
-    const message = messageParts.join(':').trim() || "Событие не распознано";
+    const [type = "forest", image = "forest.png", ...messageParts] = parts;
+    const message = messageParts.join(':').trim() || "Событие не распознано"; // Собираем оставшиеся части
 
     // Обновляем изображение
     const imageElement = document.getElementById('forest-image');
@@ -102,20 +102,15 @@ function updateExplorationEvent(data) {
         const safeImage = image.endsWith('.png') ? image : `${image}.png`;
         imageElement.src = `images/${safeImage}`;
     } else {
-        imageElement.src = 'images/forest.png';
+        imageElement.src = 'images/forest_v2.png';
     }
 
-    // Создаем карточку события
-    const eventHTML = `
-        <div class="event-card animate-slide-in">
-            <img src="${imageElement.src}" 
-                 onerror="this.src='images/forest.png'"
-                 class="event-image">
+    // Добавляем текст события в лог
+    logDiv.innerHTML = `
             <p>${message}</p>
-        </div>
     `;
-    logDiv.insertAdjacentHTML('afterbegin', eventHTML);
 
+    // Обновляем действия
     updateActions(type);
 }
 

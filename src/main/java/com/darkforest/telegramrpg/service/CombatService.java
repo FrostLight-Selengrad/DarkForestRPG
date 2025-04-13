@@ -55,7 +55,7 @@ public class CombatService {
             String battleLog = String.join("\n", player.getBattleLog());
             response.put("battleLog", battleLog);
             response.put("inCombat", false);
-            response.put("explorationMessage", "Вы успешно сбежали из боя!");
+            response.put("explorationMessage", "Вы ловко сбежали из боя, новые приключения снова ждут вас!");
             return response;
         } else {
             player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
@@ -110,7 +110,7 @@ public class CombatService {
             player.setInCombat(false);
             player.clearBattleLog();
             response.put("battleLog", battleLog);
-            response.put("explorationMessage", player.getEnemyName() + " повержен! Забрав найденные ценности вы можете продолжить свой путь");
+            response.put("explorationMessage", player.getEnemyName() + " повержен! Забрав все его ценности вы можете продолжить свой путь.");
             response.put("inCombat", player.isInCombat());
             return response;
         }

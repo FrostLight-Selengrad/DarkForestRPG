@@ -90,7 +90,7 @@ function handleExplorationError(error) {
 
 function logExplorationEvent(message) {
     const logDiv = document.getElementById('exploration-log');
-    logDiv.innerHTML += `<p>${message}</p>`;
+    logDiv.innerHTML = `<p>${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 

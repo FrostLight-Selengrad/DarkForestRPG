@@ -253,17 +253,21 @@ public class GameService {
         if (player.getEnemyHp() <= 0) {
             player.setInCombat(false);
             player.clearBattleLog();
+            player.addToExplorationLog("forest:forest_v3.png:Враг уже побежден!");
             return "Враг уже побежден!";
         }
         if (player.getHp() <= 0) {
             player.setInCombat(false);
             player.clearBattleLog();
+            player.addToExplorationLog("forest:forest_v3 .png:Духам незачем убегать!");
             return "Духам незачем убегать!";
         }
         player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
         player.setBattleTurn(player.getBattleTurn() + 1);
 
         if (random.nextDouble() < 0.1) { // 10% шанс на успех
+            player.addToExplorationLog("forest:forest_v2.png:Вы успешно сбежали с поля боя! " +
+                    " еще долго рычал в вашу стороны, но опасность уже позади.");
             player.addToBattleLog("Вы успешно сбежали!\n");
             player.setInCombat(false);      // Сбрасываем состояние боя
             player.setEnemyName(null);      // Очищаем имя врага
@@ -319,7 +323,7 @@ public class GameService {
             player.setInTrap(false);
             player.setTrapEscapeChance(60); // Сброс при успехе
             player.setTrapAttempts(0);
-            return "trap:Вы успешно выбрались!";
+            return "trap_missed:event_trap_escape.png:Вы успешно выбрались из ловушки и можете продолжить путешествие!";
         } else {
             int damage = 10;
             player.setHp(player.getHp() - damage);
@@ -327,7 +331,7 @@ public class GameService {
             // Увеличиваем шанс на 6% с каждой попыткой
             player.setTrapEscapeChance(currentChance + 6);
 
-            return "trap:Попытка не удалась! Урон: " + damage + ". Новый шанс: " + player.getTrapEscapeChance() + "%";
+            return "trap:event_trap.png:Попытка не удалась! Получено " + damage + " урона.\nНовый шанс " + player.getTrapEscapeChance() + "%";
         }
     }
 
@@ -354,7 +358,8 @@ public class GameService {
         boolean noticed = player.getExplorationLog().getLast().contains("заметил");
         double fleeChance = noticed ? 0.25 : 0.5;
         if (random.nextDouble() < fleeChance) {
-            player.addToExplorationLog("Вы успешно сбежали!");
+            player.addToExplorationLog("forest:forest_v1.png:Вы успешно избежали боя с опасным соперником..." +
+                    " а может просто решили поберечь свои силы.");
             player.setInCombat(false);      // Сбрасываем состояние боя
             player.setEnemyName(null);      // Очищаем имя врага
             player.setEnemyHp(0);           // Очищаем здоровье врага
@@ -363,6 +368,7 @@ public class GameService {
         } else {
             player.setInCombat(true);
             player.clearBattleLog();
+            player.addToExplorationLog("monster:goblin.png:Вы успешно сбежали!");
             player.addToBattleLog(player.getEnemyName() + " заметил вас, пробирающегося сквозь кусты, битвы не избежать!");
             return Map.of(
                     "enemyName", player.getEnemyName(),

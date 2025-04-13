@@ -150,17 +150,19 @@ function tryFleeBeforeCombat() {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.message.contains("сбежал")) {
-                updateStats(); // Обновляем состояние
-                document.getElementById('exploration-log').innerHTML = `
-                        <p>${data.message}</p>
-                        <p>Теперь вы можете продолжить путешестви</p>
-                    `;
+            if (data.message) {
+                // Успешный побег
+                document.getElementById('exploration-log').innerHTML = `<p>${data.message}</p>`;
+                document.getElementById('forest-image').src = 'images/forest_v1.png';
+                updateActions('forest')
             } else {
                 enterCombat(data);
             }
         })
-        .catch(handleExplorationError);
+        .catch(error => {
+            console.error('Ошибка при попытке сбежать до боя:', error);
+            document.getElementById('exploration-log').innerHTML = '<p>Сервер не отвечает!</p>';
+        });
 }
 
 function restAtCamp() {

@@ -134,26 +134,42 @@ function updateBattleLog() {
 }
 
 function attack() {
-    fetch(`/api/battle/attack?userId=${userId}`, {method: 'POST'})
+    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            updateCombatHealth('damage');
-            updateBattleLog();
-            checkCombatStatus();
+            updateBattleLog(data.battleLog);
+            if (!data.inCombat) {
+                document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('exploration-interface').style.display = 'block';
+                logExplorationEvent(data.explorationMessage);
+                document.getElementById('forest-image').src = 'images/forest_v1.png';
+                updateActions('forest');
+            } else {
+                updateCombatHealth();
+            }
         })
         .catch(handleExplorationError);
 }
 
 function tryFlee() {
-    fetch(`/api/battle/flee?userId=${userId}`, {method: 'POST'})
+    fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
-            updateCombatHealth();
-            updateStats();
-            updateBattleLog();
-            checkCombatStatus();
+            updateBattleLog(data.battleLog);
+            if (!data.inCombat) {
+                document.getElementById('battle-interface').style.display = 'none';
+                document.getElementById('exploration-interface').style.display = 'block';
+                logExplorationEvent(data.explorationMessage); // Используем explorationMessage
+                document.getElementById('forest-image').src = 'images/forest_v1.png'; // Устанавливаем картинку леса
+                updateActions('forest'); // Обновляем кнопки
+            } else {
+                updateCombatHealth();
+            }
         })
-        .catch(handleExplorationError);
+        .catch(error => {
+            console.error('Ошибка при попытке сбежать:', error);
+            handleExplorationError(error);
+        });
 }
 
 function openAbilities() {

@@ -10,13 +10,14 @@ import java.util.Random;
 
 @Service
 public class GameService {
-    private final PlayerService playerService; // Добавляем зависимость
-    private final DamageService damageService;
+    private final PlayerService playerService;
+    private final Random random = new Random();
+    private final CombatService combatService;
     // Конструктор для внедрения зависимости
     @Autowired
-    public GameService(PlayerService playerService, DamageService damageService) {
+    public GameService(PlayerService playerService, CombatService combatService) {
         this.playerService = playerService;
-        this.damageService = damageService;
+        this.combatService = combatService;
     }
 
     // Список предметов с весами
@@ -112,8 +113,6 @@ public class GameService {
         };
     }
 
-    private final Random random = new Random();
-
     // Проверка, находится ли игрок в бою
     public boolean isInCombat(Player player) {
         return player.isInCombat();
@@ -203,93 +202,15 @@ public class GameService {
     }
 
     // Метод для атаки
-    public String attack(Long userId) {
+    public Map<String, Object> attack(Long userId) {
         Player player = playerService.getPlayer(userId);
-        if (!player.isInCombat()) return "Вы не в бою!";
-        if (player.getEnemyHp() <= 0) {
-            player.setInCombat(false);
-            player.clearBattleLog();
-            return "Враг уже побежден!";
-        }
-        if (player.getHp() <= 0) {
-            player.setInCombat(false);
-            player.clearBattleLog();
-            return "Духи не могут сражаться!";
-        }
-
-        int damage = damageService.calculatePhysicalDamage(player.getPhysicalAttack(), player.getToughness());
-        player.setEnemyHp(player.getEnemyHp() - damage);
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы нанесли " + damage + " урона");
-        player.setBattleTurn(player.getBattleTurn() + 1);
-
-        if (player.getEnemyHp() <= 0) {
-            player.addToBattleLog(player.getEnemyName() + " повержен!\n");
-            String result = String.join("\n", player.getBattleLog());
-            player.setInCombat(false);
-            dropRunes(player);
-            player.clearBattleLog();
-            return result;
-        }
-
-        int enemyDamage = damageService.calculatePhysicalDamage(player.getEnemyAttack(), player.getToughness());
-        player.setHp(player.getHp() - enemyDamage);
-        player.addToBattleLog(player.getEnemyName() + " нанес " + enemyDamage + " урона\n");
-
-        if (player.getHp() <= 0) {
-            player.addToBattleLog("Вы проиграли...\n");
-            String result = String.join("\n", player.getBattleLog());
-            resetProgress(player);
-            player.setInCombat(false);
-            player.clearBattleLog();
-            return result;
-        }
-        playerService.savePlayer(userId, player);
-        return String.join("\n", player.getBattleLog());
+        return combatService.handleAttack(player); // Предполагаемый метод, аналогичный flee
     }
 
-    // Метод для попытки бегства
-    public String tryFlee(Player player) {
-        if (!player.isInCombat()) return "Вы не в бою!";
-        if (player.getEnemyHp() <= 0) {
-            player.setInCombat(false);
-            player.clearBattleLog();
-            player.addToExplorationLog("forest:forest_v3.png:Враг уже побежден!");
-            return "Враг уже побежден!";
-        }
-        if (player.getHp() <= 0) {
-            player.setInCombat(false);
-            player.clearBattleLog();
-            player.addToExplorationLog("forest:forest_v3 .png:Духам незачем убегать!");
-            return "Духам незачем убегать!";
-        }
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
-        player.setBattleTurn(player.getBattleTurn() + 1);
-
-        if (random.nextDouble() < 0.1) { // 10% шанс на успех
-            player.addToExplorationLog("forest:forest_v2.png:Вы успешно сбежали с поля боя! " +
-                    " еще долго рычал в вашу стороны, но опасность уже позади.");
-            player.addToBattleLog("Вы успешно сбежали!\n");
-            player.setInCombat(false);      // Сбрасываем состояние боя
-            player.setEnemyName(null);      // Очищаем имя врага
-            player.setEnemyHp(0);           // Очищаем здоровье врага
-            player.setEnemyMaxHp(0);        // Очищаем максимальное здоровье врага
-        } else {
-            player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
-            // Атака монстра
-            int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
-            player.setHp(player.getHp() - (Math.max(enemyDamage, 0)));
-            player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
-
-            if (player.getHp() <= 0) {
-                player.addToBattleLog("Вы проиграли...\n");
-                String result = String.join("\n", player.getBattleLog());
-                resetProgress(player);
-                player.setInCombat(false);
-                return result;
-            }
-
-        }
-        return String.join("\n", player.getBattleLog());
+    // Метод для попытки убежать из боя
+    public Map<String, Object> tryFlee(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        return combatService.handleFleeAttempt(player);
     }
 
     // Метод для сброса прогресса

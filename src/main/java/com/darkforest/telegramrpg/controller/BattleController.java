@@ -35,23 +35,18 @@ public class BattleController {
 
     @PostMapping("/attack")
     public Map<String, Object> attack(@RequestParam Long userId) {
-        String message = gameService.attack(userId);
+        Map<String, Object> result = gameService.attack(userId);
         Player player = playerService.getPlayer(userId);
         playerService.savePlayer(userId, player); // Сохраняем изменения
-        return Map.of(
-                "message", message,
-                "inCombat", player.isInCombat()
-        );
+        return result;
     }
 
     @PostMapping("/flee")
     public Map<String, Object> tryFlee(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
-        String message = gameService.tryFlee(player);
-        return Map.of(
-                "message", message,
-                "inCombat", player.isInCombat()
-        );
+        Map<String, Object> result = gameService.tryFlee(userId);
+        playerService.savePlayer(userId, player);
+        return result;
     }
 
     @GetMapping("/health")

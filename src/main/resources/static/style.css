@@ -207,10 +207,20 @@ button:hover {
     font-size: 8px;
 }
 
-#character-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+#character-btn, .menu-item {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+
+#character-btn img, .menu-item img {
+    width: 100%;
+    height: 100%;
 }
 
 .dropdown-menu {
@@ -221,6 +231,16 @@ button:hover {
     background: #2c2c2c;
     padding: 10px;
     border-radius: 5px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.dropdown-menu.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .menu-item {
@@ -345,6 +365,10 @@ button:hover {
     display: none; /* Скрываем по умолчанию */
     opacity: 1 !important;
     transition: opacity 0.5s ease;
+}
+
+#exploration-interface, #battle-interface, #camp-interface {
+    padding-bottom: 50px;
 }
 
 /* Скрываем интерфейс при необходимости */

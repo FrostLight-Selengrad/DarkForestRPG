@@ -1,6 +1,6 @@
 function toggleMenu() {
-    const menu = document.getElementById('character-menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    var menu = document.getElementById('character-menu');
+    menu.classList.toggle('visible');
 }
 
 // Закрытие при клике вне меню

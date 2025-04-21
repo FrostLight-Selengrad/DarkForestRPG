@@ -7,6 +7,7 @@ function toggleMenu() {
 // Закрытие при клике вне меню
 document.addEventListener('click', (e) => {
     if (!e.target.closest('#character-btn, #character-menu')) {
-        document.getElementById('character-menu').style.display = 'none';
+        var menu = document.getElementById('character-menu');
+        menu.classList.remove('visible');
     }
 });

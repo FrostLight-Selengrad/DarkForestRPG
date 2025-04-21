@@ -207,7 +207,10 @@ button:hover {
     font-size: 8px;
 }
 
-#character-btn, .menu-item {
+#character-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     width: 30px;
     height: 30px;
     padding: 0;
@@ -215,11 +218,8 @@ button:hover {
     background: transparent;
     cursor: pointer;
     overflow: hidden;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    z-index: 1001;
 }
-
 
 #character-btn img, .menu-item img {
     width: 100%;
@@ -242,10 +242,18 @@ button:hover {
 }
 
 .dropdown-menu.visible {
+    display: block;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
-    display: block
+}
+
+@media screen and (max-width: 400px) {
+    .dropdown-menu {
+        right: 10px;
+        bottom: 60px;
+        padding: 5px;
+    }
 }
 
 .menu-item {

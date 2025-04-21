@@ -238,13 +238,14 @@ button:hover {
     transform: translateY(20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 1001;
 }
 
 .dropdown-menu.visible {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    display: block
 }
 
 .menu-item {

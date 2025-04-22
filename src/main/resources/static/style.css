@@ -257,8 +257,14 @@ button:hover {
 }
 
 .menu-item {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
     display: block;
-    margin: 5px;
 }
 
 @keyframes slideIn {

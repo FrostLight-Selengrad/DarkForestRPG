@@ -1,7 +1,10 @@
+/* Основные кнопки */
 button {
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition:
+            background-color 0.3s ease,
+            transform 0.1s ease;
 }
 
 button:hover {
@@ -9,9 +12,10 @@ button:hover {
     transform: scale(1.05);
 }
 
+/* Специальные кнопки */
 .action-btn {
-    padding: var(--spacing-md);
-    margin: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-xs);
     background-color: var(--color-primary);
     color: var(--color-text-main);
     font-size: 16px;
@@ -22,13 +26,41 @@ button:hover {
 
 .action-btn.danger {
     background: var(--color-danger);
+    border-color: #cc0000; /* Можно вынести в переменные */
 }
 
 .action-btn.combat {
     background: var(--color-warning);
+    border-color: #cc8800; /* Можно вынести в переменные */
 }
 
-.action-btn:hover {
-    transform: scale(1.05);
-    background: var(--color-bg-darkest);
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.menu-item {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+#character-btn {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1001;
+}
+
+#character-btn img,
+.menu-item img {
+    width: 100%;
+    height: 100%;
 }

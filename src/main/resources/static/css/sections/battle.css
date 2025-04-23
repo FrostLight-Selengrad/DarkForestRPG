@@ -29,3 +29,47 @@
     font-weight: bold;
     color: var(--color-highlight);
 }
+
+.enemy-img {
+    display: block;
+    width: 90%;
+    height: 80%;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 0 auto 8px;
+}
+
+.potion-item {
+    position: relative;
+    display: inline-block;
+    margin: var(--spacing-md);
+}
+
+.potion-count {
+    position: absolute;
+    bottom: var(--spacing-xs);
+    right: var(--spacing-xs);
+    color: var(--color-text-main);
+    font-weight: bold;
+    font-size: 8px;
+}
+
+.small-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: var(--spacing-xs);
+}
+
+.damage-icon,
+.heal-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.potions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}

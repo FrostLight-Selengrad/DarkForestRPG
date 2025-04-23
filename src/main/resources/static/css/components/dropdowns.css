@@ -1,3 +1,21 @@
+#character-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1001;
+}
+
+#character-btn img, .menu-item img {
+    width: 100%;
+    height: 100%;
+}
+
 .dropdown-menu {
     display: none;
     position: fixed;

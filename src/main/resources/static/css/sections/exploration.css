@@ -1,0 +1,25 @@
+#exploration-log {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background: var(--color-bg-darker);
+    border-radius: 8px;
+    margin: var(--spacing-md) 0;
+}
+
+.event-card {
+    background: var(--color-bg-darkest);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+    border-radius: 8px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.event-image {
+    display: block;
+    width: 90%;
+    height: 80%;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 0 auto var(--spacing-sm);
+}

@@ -1,10 +1,16 @@
 @import 'base/variables.css';
 @import 'base/typography.css';
+@import 'base/reset.css';
 @import 'layout/game-container.css';
+@import 'layout/interface.css';
 @import 'components/buttons.css';
 @import 'components/modals.css';
 @import 'components/dropdowns.css';
+@import 'components/progress.css';
+@import 'components/cards.css';
 @import 'sections/battle.css';
+@import 'sections/exploration.css';
+@import 'sections/camp.css';
 @import 'animations.css';
 
 /* Общие стили */
@@ -19,25 +25,4 @@
 
 #player-stats {
     margin-bottom: var(--spacing-lg);
-}
-
-#exploration-log {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: var(--spacing-md);
-    background: var(--color-bg-darker);
-    border-radius: 8px;
-    margin: var(--spacing-md) 0;
-}
-
-.progress-container {
-    padding: var(--spacing-lg);
-    background: var(--color-overlay);
-    border-radius: 8px;
-    margin: var(--spacing-md) 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
 }

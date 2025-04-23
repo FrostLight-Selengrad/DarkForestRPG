@@ -1,4 +1,25 @@
 #game-container {
-    max-width: 600px;
+    max-width: var(--max-container-width);
     margin: 0 auto;
+}
+
+#battle-interface {
+    background: var(--color-bg-dark);
+    padding: var(--spacing-lg);
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.combat-health-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: var(--spacing-lg) 0;
+}
+
+.combat-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: var(--spacing-lg) 0;
 }

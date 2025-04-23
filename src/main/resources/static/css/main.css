@@ -2,12 +2,12 @@
 @import 'base/typography.css';
 @import 'layout/game-container.css';
 @import 'components/buttons.css';
-@import 'sections/battle.css';
 @import 'components/modals.css';
 @import 'components/dropdowns.css';
+@import 'sections/battle.css';
 @import 'animations.css';
 
-/* Оставшиеся стили, которые не вошли в категории */
+/* Общие стили */
 .interface {
     transition: opacity 0.3s ease;
 }
@@ -18,14 +18,26 @@
 }
 
 #player-stats {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-lg);
 }
 
-.potion-count {
+#exploration-log {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background: var(--color-bg-darker);
+    border-radius: 8px;
+    margin: var(--spacing-md) 0;
+}
+
+.progress-container {
+    padding: var(--spacing-lg);
+    background: var(--color-overlay);
+    border-radius: 8px;
+    margin: var(--spacing-md) 0;
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    color: white;
-    font-weight: bold;
-    font-size: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
 }

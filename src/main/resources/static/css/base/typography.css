@@ -1,17 +1,20 @@
 body {
     font-family: Arial, sans-serif;
-    color: var(--color-text);
+    color: var(--color-text-main);
+    background-color: var(--color-bg-main);
     text-align: center;
     margin: 0;
-    padding: 10px;
-    background-color: var(--color-background);
+    padding: var(--spacing-md);
 }
 
 #player-stats p {
-    margin: 5px 0;
+    margin: var(--spacing-sm) 0;
     font-size: 16px;
 }
 
-#battle-log {
-    background-color: var(--color-darkest);
+.combat-hp {
+    font-size: 1.2em;
+    color: var(--color-primary);
+    margin-top: var(--spacing-sm);
+    transition: color 0.3s ease;
 }

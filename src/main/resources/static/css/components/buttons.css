@@ -10,33 +10,25 @@ button:hover {
 }
 
 .action-btn {
-    padding: 10px;
-    margin: 5px;
+    padding: var(--spacing-md);
+    margin: var(--spacing-sm);
     background-color: var(--color-primary);
-    color: white;
+    color: var(--color-text-main);
     font-size: 16px;
     width: 120px;
     border-radius: 5px;
-}
-
-.action-btn:active {
-    transform: scale(0.95);
+    transition: transform 0.2s;
 }
 
 .action-btn.danger {
     background: var(--color-danger);
-    border-color: #cc0000;
 }
 
 .action-btn.combat {
-    background: #ffaa00;
-    border-color: #cc8800;
+    background: var(--color-warning);
 }
 
-.menu-item {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    background: transparent;
-    overflow: hidden;
+.action-btn:hover {
+    transform: scale(1.05);
+    background: var(--color-bg-darkest);
 }

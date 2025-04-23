@@ -1,27 +1,31 @@
-#battle-interface {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 15px 0;
+#battle-log {
+    background-color: var(--color-bg-darkest);
+    padding: 8px;
+    margin: 8px 0;
+    height: 200px;
+    overflow-y: scroll;
+    text-align: left;
 }
 
-.combat-health-bars {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin: 20px 0;
+.scrollable-log {
+    height: 150px;
+    overflow-y: auto;
+    background: var(--color-bg-darker);
+    padding: var(--spacing-md);
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: left;
+    width: 94%;
+    margin: 0 auto;
 }
 
-.combat-hp {
-    font-size: 1.2em;
-    color: #4CAF50;
-    margin-top: 5px;
-    transition: color 0.3s ease;
+.log-entry {
+    margin: var(--spacing-sm) 0;
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
 }
 
-.battle-action-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 20px;
+.log-entry.highlight {
+    font-weight: bold;
+    color: var(--color-highlight);
 }

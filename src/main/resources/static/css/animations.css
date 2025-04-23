@@ -9,16 +9,6 @@
     100% { opacity: 0.8; }
 }
 
-@keyframes damageAnim {
-    0% { color: red; }
-    100% { color: var(--color-danger) !important; }
-}
-
-@keyframes healAnim {
-    0% { color: green; }
-    100% { color: var(--color-success) !important;; }
-}
-
 .event-card {
     animation: slideIn 0.3s ease-out;
 }
@@ -29,12 +19,10 @@
 
 .damage {
     color: var(--color-danger) !important;
+    animation: damageAnim 0.5s;
 }
 
 .heal {
     color: var(--color-success) !important;
-}
-
-.log-entry.highlight {
-    color: var(--color-text-highlight);
+    animation: healAnim 0.5s;
 }

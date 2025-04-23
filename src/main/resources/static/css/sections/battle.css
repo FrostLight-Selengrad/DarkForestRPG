@@ -7,6 +7,34 @@
     text-align: left;
 }
 
+.combat-health-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: var(--spacing-lg) 0;
+}
+
+.combat-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: var(--spacing-lg) 0;
+}
+
+#battle-interface {
+    background: var(--color-bg-dark);
+    padding: var(--spacing-lg);
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.combat-hp {
+    font-size: 1.2em;
+    color: var(--color-primary);
+    margin-top: var(--spacing-sm);
+    transition: color 0.3s ease;
+}
+
 .scrollable-log {
     height: 150px;
     overflow-y: auto;

@@ -42,18 +42,25 @@ button:hover {
     width: 30px;
     height: 30px;
     padding: 0;
+    border: 5px;
     background: transparent;
+    cursor: pointer;
     overflow: hidden;
+    transition: transform 0.2s ease; /* Анимация при наведении */
+}
+
+.menu-item:hover {
+    transform: scale(1.1);
 }
 
 #character-btn {
     position: fixed;
     bottom: var(--spacing-xl);
     right: var(--spacing-xl);
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     padding: 0;
-    border: none;
+    border: 5px;
     background: transparent;
     overflow: hidden;
     z-index: 1001;

@@ -17,7 +17,9 @@
 }
 
 .dropdown-menu {
-    display: none;
+    display: flex;
+    flex-direction: column; /* Добавляем вертикальное направление */
+    gap: 8px; /* Расстояние между элементами */
     position: fixed;
     bottom: 70px;
     right: 20px;
@@ -29,6 +31,16 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
     z-index: 1001;
+}
+
+/* Для мобильных устройств */
+@media screen and (max-width: 400px) {
+    .dropdown-menu {
+        right: 10px;
+        bottom: 60px;
+        padding: var(--spacing-sm);
+        gap: 6px; /* Уменьшаем расстояние на маленьких экранах */
+    }
 }
 
 .dropdown-menu.visible {

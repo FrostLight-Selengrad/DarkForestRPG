@@ -1,0 +1,27 @@
+#battle-interface {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.combat-health-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.combat-hp {
+    font-size: 1.2em;
+    color: #4CAF50;
+    margin-top: 5px;
+    transition: color 0.3s ease;
+}
+
+.battle-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}

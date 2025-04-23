@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    color: var(--color-text);
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+    background-color: var(--color-background);
+}
+
+#player-stats p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+#battle-log {
+    background-color: var(--color-darkest);
+}

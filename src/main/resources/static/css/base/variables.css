@@ -1,0 +1,30 @@
+:root {
+    /* Основные цвета */
+    --color-primary: #4CAF50;
+    --color-primary-hover: #45a049;
+    --color-danger: #ff4444;
+    --color-warning: #ffaa00;
+    --color-success: #44ff44;
+
+    /* Фоновые цвета */
+    --color-background: #1a1a1a;
+    --color-dark: #1e1e1e;
+    --color-darker: #2a2a2a;
+    --color-darkest: #333;
+    --color-overlay: rgba(0,0,0,0.5);
+
+    /* Текст */
+    --color-text: #fff;
+    --color-text-muted: #aaa;
+    --color-text-highlight: #ffcc00;
+
+    /* Элементы интерфейса */
+    --color-scrollbar: #444;
+    --color-border: #444;
+    --color-progress: linear-gradient(90deg, #4CAF50, #8BC34A);
+
+    /* Специфические элементы */
+    --color-modal-bg: #333;
+    --color-dropdown-bg: #2c2c2c;
+    --color-log-bg: #333;
+}

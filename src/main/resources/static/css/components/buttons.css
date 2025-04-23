@@ -1,0 +1,42 @@
+button {
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: var(--color-primary-hover);
+    transform: scale(1.05);
+}
+
+.action-btn {
+    padding: 10px;
+    margin: 5px;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 16px;
+    width: 120px;
+    border-radius: 5px;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn.danger {
+    background: var(--color-danger);
+    border-color: #cc0000;
+}
+
+.action-btn.combat {
+    background: #ffaa00;
+    border-color: #cc8800;
+}
+
+.menu-item {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}

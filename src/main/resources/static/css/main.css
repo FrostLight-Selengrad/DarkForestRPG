@@ -1,0 +1,31 @@
+@import 'base/variables.css';
+@import 'base/typography.css';
+@import 'layout/game-container.css';
+@import 'components/buttons.css';
+@import 'sections/battle.css';
+@import 'components/modals.css';
+@import 'components/dropdowns.css';
+@import 'animations.css';
+
+/* Оставшиеся стили, которые не вошли в категории */
+.interface {
+    transition: opacity 0.3s ease;
+}
+
+.interface.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#player-stats {
+    margin-bottom: 20px;
+}
+
+.potion-count {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: white;
+    font-weight: bold;
+    font-size: 8px;
+}

@@ -42,7 +42,7 @@ button:hover {
     width: 40px;
     height: 40px;
     padding: 0;
-    border: 2px;
+    border-radius: 3px;
     background: transparent;
     cursor: pointer;
     overflow: hidden;
@@ -61,7 +61,7 @@ button:hover {
     width: 40px;
     height: 40px;
     padding: 0;
-    border: 5px;
+    border-radius: 3px;
     background: transparent;
     overflow: hidden;
     z-index: 1001;

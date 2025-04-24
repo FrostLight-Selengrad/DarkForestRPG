@@ -1,11 +1,14 @@
 package com.darkforest.telegramrpg.service;
 
 import com.darkforest.telegramrpg.model.Player;
+import com.darkforest.telegramrpg.events.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -19,6 +22,14 @@ public class GameService {
         this.playerService = playerService;
         this.combatService = combatService;
     }
+
+    private final List<Event> events = Arrays.asList(
+            new MonsterEvent(),
+            new ChestEvent(),
+            new TrapEvent(),
+            new BossEvent(),
+            new HiddenCacheEvent()
+    );
 
     // Список предметов с весами
     private static final Map<String, Integer> LOOT_WEIGHTS = new HashMap<>() {{
@@ -128,8 +139,34 @@ public class GameService {
         return player.getEnemyName();
     }
 
-    // Метод для исследования леса
+    // Метод для выбора события на основе весов
+    private Event selectEvent() {
+        int totalWeight = events.stream().mapToInt(Event::getWeight).sum();
+        int randomWeight = random.nextInt(totalWeight);
+        int cumulativeWeight = 0;
+        for (Event event : events) {
+            cumulativeWeight += event.getWeight();
+            if (randomWeight < cumulativeWeight) {
+                return event;
+            }
+        }
+        return events.get(events.size() - 1); // Фолбэк на случай ошибки
+    }
+
+    // Метод исследования леса
     public String exploreForest(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        if (player.isInCombat()) {
+            return "Вы не можете исследовать лес во время боя!";
+        }
+        Event selectedEvent = selectEvent();
+        String message = selectedEvent.execute(player);
+        playerService.savePlayer(userId, player);
+        return message;
+    }
+
+    // Метод для исследования леса
+    /*public String exploreForest(Long userId) {
         Player player = playerService.getPlayer(userId);
         player.clearBattleLog();
 
@@ -199,7 +236,7 @@ public class GameService {
             }
         }
         return "Ничего не произошло";
-    }
+    }*/
 
     // Метод для атаки
     public Map<String, Object> attack(Long userId) {

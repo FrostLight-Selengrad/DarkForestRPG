@@ -12,6 +12,9 @@ public class MonsterEvent implements Event {
 
     @Override
     public String execute(Player player) {
+        player.setCurrentEventType("combat");
+        player.setEventData("enemyName", "Гоблин");
+        player.setEventData("enemyHp", 50);
         player.setEnemyName("Гоблин");
         player.setEnemyHp(50);
         player.setEnemyMaxHp(50);

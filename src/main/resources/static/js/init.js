@@ -20,31 +20,18 @@ function setActiveInterface(interfaceName) {
     if(interfaceName === 'camp') updateCampActions();
 }
 
-function initializeGame() {
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            updateStats();
-            if (data.inCamp) {
-                document.getElementById('camp-log').innerHTML = '<p>Вы попали в лагерь, где безмятежно болтают разбойники.</p>';
-                document.getElementById('camp-interface').style.display = 'block';
-                document.getElementById('exploration-interface').style.display = 'none';
-                document.getElementById('battle-interface').style.display = 'none';
-                updateActions('camp');
-            } else if (data.inCombat) {
-                document.getElementById('camp-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'none';
-                document.getElementById('battle-interface').style.display = 'block';
-                enterCombat(data);
-            } else {
-                document.getElementById('camp-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'block';
-                document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('exploration-log').innerHTML = '<p>Вы в лесу, готовы продолжить путь.</p>';
-                updateActions('forest');
-            }
-        })
-        .catch(error => console.error('Ошибка при инициализации игры:', error));
+async function initializeGame() {
+    let response = await fetch(`/api/game/player?userId=${userId}`);
+    let player = await response.json();
+    if (player.currentEventType === "combat") {
+        enterCombat(player);
+    } else if (player.currentEventType === "chest") {
+        showChestInterface(player);
+    } else if (player.currentEventType === "hidden_cache") {
+        showCacheInterface(player);
+    } else {
+        showExplorationInterface();
+    }
 }
 
 function updateStats() {

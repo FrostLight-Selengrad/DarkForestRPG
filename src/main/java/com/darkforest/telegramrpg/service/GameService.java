@@ -46,48 +46,20 @@ public class GameService {
     private static final int TOTAL_WEIGHT = LOOT_WEIGHTS.values().stream().mapToInt(Integer::intValue).sum();
 
     // Метод открытия сундука
-    public Map<String, Object> openChest(Long userId) {
+    public String openChest(Long userId) {
         Player player = playerService.getPlayer(userId);
-        Map<String, Object> response = new HashMap<>();
-
-        // 20% шанс, что сундук — Мимик
-        if (random.nextDouble() < 0.2) {
-            player.setEnemyName("Мимик");
-            player.setEnemyHp(70);
-            player.setEnemyMaxHp(70);
-            player.setEnemyAttack(20);
-            player.setEnemyInitiative(8);
-            player.setInCombat(true);
-            player.clearBattleLog();
-            player.setBattleTurn(1);
-            player.addToBattleLog("Сундук оказался Мимиком! Бой начался!");
-            player.addToExplorationLog("monster:mimic.png:Сундук оказался Мимиком!");
-
-            response.put("inCombat", true);
-            response.put("enemyName", player.getEnemyName());
-            response.put("enemyHp", player.getEnemyHp());
-            response.put("enemyMaxHp", player.getEnemyMaxHp());
-            response.put("message", "Сундук оказался Мимиком!");
-            playerService.savePlayer(userId, player);
-            return response;
-        } else {
-            String lootItem = getRandomLoot();
-            int currentCount = player.getInventory().getOrDefault(lootItem, 0);
-            player.getInventory().put(lootItem, currentCount + 1);
-            int goldAmount = 5 * player.getForestLevel() + random.nextInt(10);
-            player.setResources(player.getResources() + goldAmount);
-
-            String itemName = capitalize(getItemMessage(lootItem));
-            String message = String.format("chest:event_chest.png:Вы нашли <%s.png> %s и %d золота!", lootItem, itemName, goldAmount);
-            player.addToExplorationLog(message);
-
-            response.put("message", message);
-            response.put("item", lootItem);
-            response.put("gold", goldAmount);
-            response.put("inCombat", false);
-        }
+        ChestEvent chestEvent = new ChestEvent();
+        String message = chestEvent.openChest(player);
         playerService.savePlayer(userId, player);
-        return response;
+        return message;
+    }
+
+    public String collectCache(Long userId) {
+        Player player = playerService.getPlayer(userId);
+        HiddenCacheEvent cacheEvent = new HiddenCacheEvent();
+        String message = cacheEvent.collectCache(player);
+        playerService.savePlayer(userId, player);
+        return message;
     }
 
     private String capitalize(String str) {
@@ -164,79 +136,6 @@ public class GameService {
         playerService.savePlayer(userId, player);
         return message;
     }
-
-    // Метод для исследования леса
-    /*public String exploreForest(Long userId) {
-        Player player = playerService.getPlayer(userId);
-        player.clearBattleLog();
-
-        if (player.isInCombat()) {
-            return "Вы не можете исследовать лес во время боя!";
-        }
-
-        String[] events = {"monster", "chest", "trap", "boss"};
-        String currentEvent = events[random.nextInt(events.length)];
-
-        switch (currentEvent) {
-            case "monster" -> {
-                player.setEnemyName("Гоблин");
-                player.setEnemyHp(50);
-                player.setEnemyMaxHp(50);
-                player.setEnemyAttack(15);
-                player.setEnemyInitiative(5);
-                player.clearBattleLog();
-                player.setBattleTurn(1);
-                player.addToBattleLog("Вы встретили " + player.getEnemyName() + "!");
-                // 50% шанс избежать
-                if (random.nextBoolean()) {
-                    player.addToExplorationLog("monster:goblin.png:Пробираясь через гущу леса вы заметили противника. " +
-                            "Монстр занят своими делами и скорее всего вас еще не заметил.");
-                } else {
-                    player.addToExplorationLog("monster:goblin.png:Вы обратили внимание на чью-то тень в лесу. " +
-                            "Пытаясь рассмотреть его получше вы наступили на ветку и похоже " +
-                            "он теперь смотрит в вашу стороны");
-                }
-                return "Начался бой с " + player.getEnemyName();
-            }
-            case "chest" -> {
-                    player.addToExplorationLog("chest:event_chest.png:Вы нашли сундук!");
-                    player.setPhysicalAttack(player.getPhysicalAttack() + 5);
-                    return "Найден сундук!";
-            }
-            case "trap" -> {
-                player.setInTrap(true);
-                player.setTrapEscapeChance(60); // Сброс при новом попадании
-                player.setTrapAttempts(0);
-
-                // 50% шанс избежать
-                if (random.nextBoolean()) {
-                    player.addToExplorationLog("trap_missed:event_trap_escape.png:Вы успешно избежали ловушку!");
-                    player.setInTrap(false);
-                    return "Вы ловко уклонились от ловушки!";
-                } else {
-                    int damage = 10 + 5*player.getForestLevel();
-                    player.setHp(player.getHp() - damage);
-                    player.addToExplorationLog("trap:event_trap.png:Вы упали в ловушку! Урон - " + damage);
-                    return "Вы упали в ловушку! Урон: " + damage;
-                }
-            }
-            case "boss" -> {
-                player.setEnemyName("Хранитель прохода");
-                player.setEnemyHp(100);
-                player.setEnemyMaxHp(100);
-                player.setEnemyAttack(25);
-                player.setEnemyInitiative(15);
-                player.clearBattleLog();
-                player.setBattleTurn(1);
-                player.addToBattleLog(player.getEnemyName() + " преградил вам путь! Он полон решимости не пустить " +
-                        "героя дальше и уже готов к битве");
-                player.addToExplorationLog("boss:boss.png:" + player.getEnemyName() + " преградил вам путь! Он полон решимости не пустить " +
-                        "героя дальше и уже готов к битве");
-                return "Вы встретили босса!";
-            }
-        }
-        return "Ничего не произошло";
-    }*/
 
     // Метод для атаки
     public Map<String, Object> attack(Long userId) {

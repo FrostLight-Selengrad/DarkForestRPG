@@ -254,4 +254,35 @@ public class Player {
     public void setTrapAttempts(int attempts) { this.trapAttempts = attempts; }
     public boolean isInTrap() { return inTrap; }
     public void setInTrap(boolean inTrap) { this.inTrap = inTrap; }
+
+    private String currentEventType = "none";
+    private Map<String, Object> eventData = new HashMap<>();
+
+    public String getCurrentEventType() {
+        return currentEventType;
+    }
+
+    public void setCurrentEventType(String type) {
+        this.currentEventType = type;
+    }
+
+    public Map<String, Object> getEventData() {
+        return eventData;
+    }
+
+    public void setEventData(Map<String, Object> eventData) {
+        this.eventData = eventData;
+    }
+
+    public void addEventData(String key, Object value) {
+        eventData.put(key, value);
+    }
+
+    public Object getEventDataValue(String key) {
+        return eventData.get(key);
+    }
+
+    public void addGold(int gold) {
+        resources += gold;
+    }
 }

@@ -23,21 +23,21 @@ public class CombatService {
 
     public Map<String, Object> handleFleeAttempt(Player player) {
         Map<String, Object> response = new HashMap<>();
-        if (!player.isInCombat()) {
+        if (!"combat".equals(player.getCurrentEventType())) {
             response.put("message", "Вы не в бою!");
             response.put("inCombat", false);
             return response;
         }
         if (player.getEnemyHp() <= 0) {
             response.put("message", "Враг уже побежден!");
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("inCombat", false);
             return response;
         }
         if (player.getHp() <= 0) {
             response.put("message", "Духам незачем убегать!");
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("inCombat", false);
             return response;
@@ -48,7 +48,7 @@ public class CombatService {
 
         if (random.nextDouble() < 0.1) { // 10% шанс на успех
             player.addToBattleLog("Вы успешно сбежали!\n");
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.setEnemyName(null);
             player.setEnemyHp(0);
             player.setEnemyMaxHp(0);
@@ -67,7 +67,7 @@ public class CombatService {
                 player.addToBattleLog("Вы проиграли...\n");
                 String battleLog = String.join("\n", player.getBattleLog());
                 resetProgress(player);
-                player.setInCombat(false);
+                player.setCurrentEventType("none");
                 response.put("battleLog", battleLog);
                 response.put("inCombat", false);
                 response.put("explorationMessage", "Вы проиграли бой с " + player.getEnemyName() + ".");
@@ -83,19 +83,19 @@ public class CombatService {
 
     public Map<String, Object> handleAttack(Player player) {
         Map<String, Object> response = new HashMap<>();
-        if (!player.isInCombat()) return Map.of("message", "Вы не в бою!", "inCombat", player.isInCombat());
+        if (!"combat".equals(player.getCurrentEventType())) return Map.of("message", "Вы не в бою!", "inCombat", "combat".equals(player.getCurrentEventType()));
         if (player.getEnemyHp() <= 0) {
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("message", "Враг уже побежден и можно двигаться дальше");
-            response.put("inCombat", player.isInCombat());
+            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
             return response;
         }
         if (player.getHp() <= 0) {
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("message", "Вы восстанавливаетесь после критического урона");
-            response.put("inCombat", player.isInCombat());
+            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
             return response;
         }
 
@@ -107,11 +107,11 @@ public class CombatService {
         if (player.getEnemyHp() <= 0) {
             player.addToBattleLog(player.getEnemyName() + " повержен!\n");
             String battleLog = String.join("\n", player.getBattleLog());
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("battleLog", battleLog);
             response.put("explorationMessage", player.getEnemyName() + " повержен! Забрав все его ценности вы можете продолжить свой путь.");
-            response.put("inCombat", player.isInCombat());
+            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
             return response;
         }
 
@@ -123,11 +123,11 @@ public class CombatService {
             player.addToBattleLog("Вы проиграли...\n");
             String battleLog = String.join("\n", player.getBattleLog());
             resetProgress(player);
-            player.setInCombat(false);
+            player.setCurrentEventType("none");
             player.clearBattleLog();
             response.put("battleLog", battleLog);
             response.put("explorationMessage", "Вы проиграли бой с " + player.getEnemyName() + ".");
-            response.put("inCombat", player.isInCombat());
+            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
             return response;
         }
 
@@ -142,6 +142,6 @@ public class CombatService {
         player.setForestLevel(1);
         player.clearBattleLog();
         player.setBattleTurn(0);
-        player.setInCombat(false);
+        player.setCurrentEventType("none");
     }
 }

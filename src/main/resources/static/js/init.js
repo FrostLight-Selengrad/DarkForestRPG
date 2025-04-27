@@ -45,7 +45,7 @@ function updateStats() {
                     <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel} | Золото: ${player.resources}</p>
                     <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                 `;
-                if (player.inCamp) {
+                if ("base_camp".equals(player.getCurrentEventType())) {
                 document.getElementById('player-camp-stats').innerHTML = `
                         <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
                         <p>Золото: ${player.resources}</p>

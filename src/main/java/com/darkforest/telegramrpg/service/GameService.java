@@ -46,12 +46,14 @@ public class GameService {
     private static final int TOTAL_WEIGHT = LOOT_WEIGHTS.values().stream().mapToInt(Integer::intValue).sum();
 
     // Метод открытия сундука
-    public String openChest(Long userId) {
+    public Map<String, Object> openChest(Long userId) {
         Player player = playerService.getPlayer(userId);
         ChestEvent chestEvent = new ChestEvent();
+        Map<String, Object> result = new HashMap<>();
         String message = chestEvent.openChest(player);
+        result.put("message", message);
         playerService.savePlayer(userId, player);
-        return message;
+        return result;
     }
 
     public String collectCache(Long userId) {
@@ -96,11 +98,6 @@ public class GameService {
         };
     }
 
-    // Проверка, находится ли игрок в бою
-    public boolean isInCombat(Player player) {
-        return player.isInCombat();
-    }
-
     // Получение текущего здоровья противника
     public int getEnemyHp(Player player) {
         return player.getEnemyHp();
@@ -128,7 +125,7 @@ public class GameService {
     // Метод исследования леса
     public String exploreForest(Long userId) {
         Player player = playerService.getPlayer(userId);
-        if (player.isInCombat()) {
+        if ("combat".equals(player.getCurrentEventType())){
             return "Вы не можете исследовать лес во время боя!";
         }
         Event selectedEvent = selectEvent();
@@ -155,7 +152,7 @@ public class GameService {
         player.setForestLevel(1);        // Сбрасываем уровень леса
         player.clearBattleLog();         // Очищаем лог боя
         player.setBattleTurn(0);         // Сбрасываем номер хода
-        player.setInCombat(false);       // Завершаем бой
+        player.setCurrentEventType("none");       // Завершаем бой
     }
 
     // Метод для дропа рун
@@ -177,7 +174,7 @@ public class GameService {
         boolean success = new Random().nextInt(100) < currentChance;
 
         if (success) {
-            player.setInTrap(false);
+            player.setCurrentEventType("false");
             player.setTrapEscapeChance(60); // Сброс при успехе
             player.setTrapAttempts(0);
             return "trap_missed:event_trap_escape.png:Вы успешно выбрались из ловушки и можете продолжить путешествие!";
@@ -194,7 +191,7 @@ public class GameService {
 
     public Map<String, Object> rest(Long userId) {
         Player player = playerService.getPlayer(userId);
-        if (!player.isInCamp()) return Map.of("success", false, "message", "Вы не в лагере!");
+        if (!"base_camp".equals(player.getCurrentEventType())) return Map.of("success", false, "message", "Вы не в лагере!");
         if (player.getStamina() < player.getMaxStamina()) {
             player.setStamina(player.getStamina() + 1);
         }
@@ -204,7 +201,7 @@ public class GameService {
 
     public Map<String, Object> leaveCamp(Long userId) {
         Player player = playerService.getPlayer(userId);
-        player.setInCamp(false);
+        player.setCurrentEventType("none");
         playerService.savePlayer(userId, player);
         return Map.of("success", true);
     }
@@ -217,13 +214,13 @@ public class GameService {
         if (random.nextDouble() < fleeChance) {
             player.addToExplorationLog("forest:forest_v1.png:Вы успешно избежали боя с опасным соперником..." +
                     " а может просто решили поберечь свои силы.");
-            player.setInCombat(false);      // Сбрасываем состояние боя
+            player.setCurrentEventType("none");     // Сбрасываем состояние боя
             player.setEnemyName(null);      // Очищаем имя врага
             player.setEnemyHp(0);           // Очищаем здоровье врага
             player.setEnemyMaxHp(0);        // Очищаем максимальное здоровье врага
             return Map.of("message", "Вы успешно сбежали!");
         } else {
-            player.setInCombat(true);
+            player.setCurrentEventType("combat");
             player.clearBattleLog();
             player.addToExplorationLog("monster:goblin.png:Вы успешно сбежали!");
             player.addToBattleLog(player.getEnemyName() + " заметил вас, пробирающегося сквозь кусты, битвы не избежать!");
@@ -242,7 +239,7 @@ public class GameService {
         String message = player.getStamina() > 80 ? "Герой бодро возвращается в лагерь" :
                 player.getStamina() > 20 ? "Герой не спеша ковыляет в лагерь" :
                         "Герой из последних сил возвращается в лагерь. Это займет больше времени";
-        player.setInCamp(true);
+        player.setCurrentEventType("base_camp");
         playerService.savePlayer(userId, player);
         return Map.of("message", message, "time", time);
     }

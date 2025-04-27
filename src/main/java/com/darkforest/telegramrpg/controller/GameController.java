@@ -57,11 +57,11 @@ public class GameController {
             Map<String, Object> response = new HashMap<>();
 
             response.put("stamina", player.getStamina());
-            response.put("inCombat", player.isInCombat());
-            if (player.isInTrap()) {
-                response.put("inTrap", player.isInTrap());
+            response.put("inCombat", ("combat".equals(player.getCurrentEventType())));
+            if ("Trap".equals(player.getCurrentEventType())) {
+                response.put("inTrap", "Trap".equals(player.getCurrentEventType()));
                 response.put("chance", player.getTrapEscapeChance());
-            } else if (player.isInCombat()) {
+            } else if ("combat".equals(player.getCurrentEventType())) {
                 response.put("enemyName", player.getEnemyName());
                 response.put("enemyHp", player.getEnemyHp());
                 response.put("enemyMaxHp", player.getEnemyMaxHp());
@@ -102,7 +102,7 @@ public class GameController {
         response.put("playerHp", player.getHp());
         response.put("playerMaxHp", player.getMaxHp());
         response.put("playerColor", getHealthColor(player.getHp(), player.getMaxHp()));
-        if (player.isInCombat()) {
+        if ("combat".equals(player.getCurrentEventType())) {
             response.put("enemyHp", player.getEnemyHp());
             response.put("enemyMaxHp", player.getEnemyMaxHp());
             response.put("enemyName", player.getEnemyName());
@@ -128,7 +128,7 @@ public class GameController {
             if (player == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Игрок не найден"));
             }
-            player.setInCombat(true);
+            player.setCurrentEventType("combat");
             player.addToBattleLog("Вы решительно ринулись в бой!");
             playerService.savePlayer(userId, player);
             Map<String, Object> response = new HashMap<>();

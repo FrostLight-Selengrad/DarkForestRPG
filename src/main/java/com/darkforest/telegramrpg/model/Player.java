@@ -23,12 +23,10 @@ public class Player {
     private int magicPower = 0;
     private Map<String, Integer> inventory = new HashMap<>(Map.of("weak_elixir", 3)); // Пример: {"weak_health_potion": 3}
     private int forestLevel = 1;
-    private boolean InCamp = true;
 
     // Поля для ловушек
     private int trapEscapeChance = 60;
     private int trapAttempts = 0;
-    private boolean inTrap = false;
     // Лог для путешествия
     private List<String> explorationLog = new ArrayList<>();
     // Лог для боя
@@ -36,29 +34,11 @@ public class Player {
     private int battleTurn = 0;
 
     // Поля для состояния боя и информации о противнике
-    private boolean inCombat = false; // Состояние боя
     private String enemyName = "";   // Имя противника
     private int enemyHp = 0;         // Здоровье противника
     private int enemyMaxHp = 0;      // Максимальное здоровье противника
     private int enemyAttack = 0;     // Атака противника
     private int enemyInitiative = 0; // Инициатива противника
-
-    // Геттеры и сеттеры
-    public boolean isInCombat() {
-        return inCombat;
-    }
-
-    public void setInCombat(boolean inCombat) {
-        this.inCombat = inCombat;
-    }
-
-    public boolean isInCamp() {
-        return InCamp;
-    }
-
-    public void setInCamp(boolean InCamp) {
-        this.InCamp = InCamp;
-    }
 
     public String getEnemyName() {
         return enemyName;
@@ -252,8 +232,6 @@ public class Player {
     public void setTrapEscapeChance(int chance) { this.trapEscapeChance = Math.min(chance, 100); }
     public int getTrapAttempts() { return trapAttempts; }
     public void setTrapAttempts(int attempts) { this.trapAttempts = attempts; }
-    public boolean isInTrap() { return inTrap; }
-    public void setInTrap(boolean inTrap) { this.inTrap = inTrap; }
 
     private String currentEventType = "none";
     private Map<String, Object> eventData = new HashMap<>();

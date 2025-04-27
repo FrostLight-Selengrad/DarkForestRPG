@@ -14,14 +14,14 @@ public class TrapEvent implements Event {
 
     @Override
     public String execute(Player player) {
-        player.setInTrap(true);
+        player.setCurrentEventType("Trap");
         player.setTrapEscapeChance(60); // Сброс при новом попадании
         player.setTrapAttempts(0);
 
         // 50% шанс избежать
         if (random.nextBoolean()) {
             player.addToExplorationLog("trap_missed:event_trap_escape.png:Вы успешно избежали ловушку!");
-            player.setInTrap(false);
+            player.setCurrentEventType("None");
             return "Вы ловко уклонились от ловушки!";
         } else {
             int damage = 10 + 5 * player.getForestLevel();

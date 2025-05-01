@@ -153,7 +153,7 @@ public class Player {
     public int getTrapAttempts() { return trapAttempts; }
     public void setTrapAttempts(int attempts) { this.trapAttempts = attempts; }
 
-    private String currentLocation = "camp";
+    private String currentLocation = "base_camp";
     private String currentEventType = "none";
     private Map<String, Object> eventData = new HashMap<>();
 
@@ -200,6 +200,15 @@ public class Player {
         result.put("maxStamina", maxStamina);
         result.put("forestLevel", forestLevel);
         result.put("gold",resources);
+        return result;
+    }
+
+    // Возвращаем данные события
+    public Map<String, Object> getCurrentData() {
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentLocation", getCurrentLocation());
+        result.put("currentEventType", getCurrentEventType());
+        result.put("eventData", getEventData());
         return result;
     }
 }

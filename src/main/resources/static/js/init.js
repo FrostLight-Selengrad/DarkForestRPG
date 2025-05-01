@@ -21,9 +21,9 @@ function setActiveInterface(interfaceName) {
 }
 
 async function initializeGame() {
-    let response = await fetch(`/api/game/player?userId=${userId}`);
-    let player = await response.json();
-    if (player.currentEventType === "combat") {
+    let response = await fetch(`/api/game/initialize?userId=${userId}`);
+    let data = await response.json();
+    if (data.currentEventType === "combat") {
         enterCombat(player);
     } else if (player.currentEventType === "chest") {
         showChestInterface(player);

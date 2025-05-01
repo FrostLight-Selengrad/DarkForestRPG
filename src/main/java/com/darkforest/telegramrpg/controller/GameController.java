@@ -154,7 +154,20 @@ public class GameController {
 
     @PostMapping("/leave-camp")
     public Map<String, Object> leaveCamp(@RequestParam Long userId) {
-        return gameService.enterForest(userId);
+        Map<String, Object> response = gameService.enterForest(userId);
+        if (response.get("success").equals(true)) {
+            response.put("message", "Вы вошли в лес, впереди много опасностей... и наград!");
+        }
+        return response;
+    }
+
+    @PostMapping("/initialize")
+    public Map<String, Object> initialize(@RequestParam Long userId) {
+        Map<String, Object> response = gameService.enterForest(userId);
+        if (response.get("success").equals(true)) {
+            response.put("message", "Вы вошли в лес, впереди много опасностей... и наград!");
+        }
+        return response;
     }
 
     @PostMapping("/return-to-camp")

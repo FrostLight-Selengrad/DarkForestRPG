@@ -154,7 +154,7 @@ public class GameController {
 
     @PostMapping("/leave-camp")
     public Map<String, Object> leaveCamp(@RequestParam Long userId) {
-        return gameService.leaveCamp(userId);
+        return gameService.enterForest(userId);
     }
 
     @PostMapping("/return-to-camp")

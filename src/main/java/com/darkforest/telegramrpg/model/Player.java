@@ -8,6 +8,7 @@ import java.util.HashMap;
 public class Player {
     private int hp = 90;
     private int maxHp = 90;
+    private int defense = 0;
     private int stamina = 100;
     private int maxStamina = 100;
     private int toughness = 0;
@@ -23,6 +24,7 @@ public class Player {
     private int magicPower = 0;
     private Map<String, Integer> inventory = new HashMap<>(Map.of("weak_elixir", 3)); // Пример: {"weak_health_potion": 3}
     private int forestLevel = 1;
+
 
     // Поля для ловушек
     private int trapEscapeChance = 60;
@@ -117,88 +119,8 @@ public class Player {
         return toughness;
     }
 
-    public void setToughness(int toughness) {
-        this.toughness = toughness;
-    }
-
-    public int getMagicalResistance() {
-        return magicalResistance;
-    }
-
-    public void setMagicalResistance(int magicalResistance) {
-        this.magicalResistance = magicalResistance;
-    }
-
-    public int getInitiative() {
-        return initiative;
-    }
-
-    public void setInitiative(int initiative) {
-        this.initiative = initiative;
-    }
-
-    public int getHealthRegen() {
-        return healthRegen;
-    }
-
-    public void setHealthRegen(int healthRegen) {
-        this.healthRegen = healthRegen;
-    }
-
-    public int getResources() {
-        return resources;
-    }
-
-    public void setResources(int resources) {
-        this.resources = resources;
-    }
-
-    public int getResistance() {
-        return resistance;
-    }
-
-    public void setResistance(int resistance) {
-        this.resistance = resistance;
-    }
-
-    public int getChaosResistance() {
-        return chaosResistance;
-    }
-
-    public void setChaosResistance(int chaosResistance) {
-        this.chaosResistance = chaosResistance;
-    }
-
-    public int getRhetoric() {
-        return rhetoric;
-    }
-
-    public void setRhetoric(int rhetoric) {
-        this.rhetoric = rhetoric;
-    }
-
-    public int getToxicity() {
-        return toxicity;
-    }
-
-    public void setToxicity(int toxicity) {
-        this.toxicity = toxicity;
-    }
-
     public int getPhysicalAttack() {
         return physicalAttack;
-    }
-
-    public void setPhysicalAttack(int physicalAttack) {
-        this.physicalAttack = physicalAttack;
-    }
-
-    public int getMagicPower() {
-        return magicPower;
-    }
-
-    public void setMagicPower(int magicPower) {
-        this.magicPower = magicPower;
     }
 
     public int getForestLevel() {
@@ -218,8 +140,6 @@ public class Player {
         battleTurn = 0;
     }
 
-    public void clearExplorationLog() {explorationLog.clear();}
-
     public void addToBattleLog(String message) {battleLog.add(message);}
 
     public void addToExplorationLog(String message) {explorationLog.add(message);}
@@ -233,6 +153,7 @@ public class Player {
     public int getTrapAttempts() { return trapAttempts; }
     public void setTrapAttempts(int attempts) { this.trapAttempts = attempts; }
 
+    private String currentLocation = "camp";
     private String currentEventType = "none";
     private Map<String, Object> eventData = new HashMap<>();
 
@@ -248,10 +169,6 @@ public class Player {
         return eventData;
     }
 
-    public void setEventData(Map<String, Object> eventData) {
-        this.eventData = eventData;
-    }
-
     public void addEventData(String key, Object value) {
         eventData.put(key, value);
     }
@@ -262,5 +179,27 @@ public class Player {
 
     public void addGold(int gold) {
         resources += gold;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+
+    // Возвращаем данные для леса
+    public Map<String, Object> getForestData() {
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentLocation", getCurrentLocation());
+        result.put("hp", hp);
+        result.put("maxHp", maxHp);
+        result.put("stamina", stamina);
+        result.put("maxStamina", maxStamina);
+        result.put("forestLevel", forestLevel);
+        result.put("gold",resources);
+        return result;
     }
 }

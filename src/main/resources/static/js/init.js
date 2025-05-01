@@ -34,26 +34,21 @@ async function initializeGame() {
     }
 }
 
-function updateStats() {
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(player => {
-            if (player.error) {
-                document.getElementById('player-stats').innerHTML = player.error;
-            } else {
-                document.getElementById('player-stats').innerHTML = `
-                    <p>HP: ${player.hp}/${player.maxHp} | Уровень леса: ${player.forestLevel} | Золото: ${player.resources}</p>
-                    <p>Физ. атака: ${player.physicalAttack} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
-                `;
-                if ("base_camp".equals(player.getCurrentEventType())) {
-                document.getElementById('player-camp-stats').innerHTML = `
-                        <p>HP: ${player.hp}/${player.maxHp} | Выносливость: ${player.stamina}/${player.maxStamina}</p>
-                        <p>Золото: ${player.resources}</p>
-                    `;
-                }
-            }
-        })
-        .catch(handleExplorationError);
+function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold) {
+    switch (location) {
+        case "forest": document.getElementById('player-stats').innerHTML = `
+            <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
+            <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
+            `;
+            break;
+        case "base_camp": document.getElementById('player-camp-stats').innerHTML = `
+            <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
+            <p>Золото: ${resources}</p>
+        `;
+            break;
+        default:
+            break;
+    }
 }
 
 function handleExplorationError(error) {

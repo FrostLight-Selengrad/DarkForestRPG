@@ -199,11 +199,18 @@ public class GameService {
         return Map.of("success", true);
     }
 
-    public Map<String, Object> leaveCamp(Long userId) {
-        Player player = playerService.getPlayer(userId);
-        player.setCurrentEventType("none");
-        playerService.savePlayer(userId, player);
-        return Map.of("success", true);
+    public Map<String, Object> enterForest(Long userId) {
+        try {
+            Player player = playerService.getPlayer(userId);
+            player.setCurrentEventType("none");
+            player.setCurrentLocation("forest");
+            playerService.savePlayer(userId, player);
+            Map<String, Object> result = player.getForestData();
+            result.put("success", true);
+            return result;
+        } catch (Exception e) {
+            return Map.of("success", false, "error", e.getMessage());
+        }
     }
 
     // Побег до начала боя

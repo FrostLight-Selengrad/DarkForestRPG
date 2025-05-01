@@ -3,18 +3,14 @@ function leaveCamp() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                updateStats();
-                const logDiv = document.getElementById('exploration-log');
-                logDiv.innerHTML = '<p>Вы покинули лагерь и отправились в лес.</p>';
-                document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('camp-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'block';
-                updateActions('forest'); // Добавляем кнопки для леса
+                updateStats(data.location, data.hp, data.maxHp, data.stamina, data.maxStamina, data.forestLevel, data.gold);
+                updateActions(data.location); // Добавляем кнопки для леса
             } else {
-                alert("Не удалось выйти из лагеря!");
+                alert("Не удалось выйти из лагеря, попробуйте еще раз!");
+                console.error('Ошибка при выходе из лагеря: ', data.error)
             }
         })
-        .catch(error => console.error('Ошибка при выходе из лагеря:', error));
+        .catch(error => console.error('Ошибка при выходе из лагеря: ', error));
 }
 
 function takeRest() {

@@ -33,46 +33,6 @@ function exploreForest() {
         .catch(handleExplorationError);
 }
 
-function updateActions(type) {
-    // Скрываем все кнопки
-    hideAllActions();
-
-    switch(type) {
-        case 'forest':
-            showActions(['continue', 'return-camp']);
-            break;
-        case 'chest':
-            showActions(['open-chest', 'continue']);
-            break;
-        case 'trap':
-            showActions(['escape-trap']);
-            break;
-        case 'trap_missed':
-            showActions(['continue', 'return-camp']);
-            break;
-        case 'monster':
-            showActions(['fight', 'flee']);
-            break;
-        case 'abandoned_camp':
-            showActions(['rest-camp', 'continue']);
-            break;
-        case 'boss':
-            showActions(['fight']);
-            break;
-    }
-}
-
-function hideAllActions() {
-    const actions = document.getElementById('actions').children;
-    for(let btn of actions) btn.style.display = 'none';
-}
-
-function showActions(actions) {
-    actions.forEach(action => {
-        document.getElementById(`action-${action}`).style.display = 'block';
-    });
-}
-
 // Функция для обработки результата исследования
 function processExplorationResult(data) {
     updateStats();

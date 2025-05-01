@@ -51,6 +51,71 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
     }
 }
 
+function hideAllActions() {
+    const actions = document.getElementById('actions').children;
+    for(let btn of actions) btn.style.display = 'none';
+}
+
+function showActions(actions) {
+    actions.forEach(action => {
+        document.getElementById(`action-${action}`).style.display = 'block';
+    });
+}
+
+function updateActions(type) {
+    // Скрываем все кнопки
+    hideAllActions();
+
+    // Отображаем только кнопки, подходящие под события
+    switch(type) {
+        case 'forest':
+            showActions(['continue', 'return-camp']);
+            break;
+        case 'chest':
+            showActions(['open-chest', 'continue']);
+            break;
+        case 'trap':
+            showActions(['escape-trap']);
+            break;
+        case 'trap_missed':
+            showActions(['continue', 'return-camp']);
+            break;
+        case 'monster':
+            showActions(['fight', 'flee']);
+            break;
+        case 'abandoned_camp':
+            showActions(['rest-camp', 'continue']);
+            break;
+        case 'boss':
+            showActions(['fight']);
+            break;
+    }
+}
+
+function hideAllInterfaces() {
+    const interfaces = document.getElementsByClassName('interface');
+    for(let iface of interfaces) iface.style.display = 'none';
+}
+
+function updateInterface(location) {
+    hideAllInterfaces();
+
+    switch (location){
+        case 'forest':{
+            document.getElementById(`exploration-interface`).style.display = 'block';
+        } break;
+        case 'base_camp':{
+            document.getElementById(`camp-interface`).style.display = 'block';
+        } break;
+        case 'battle':{
+            document.getElementById(`battle-interface`).style.display = 'block';
+        } break;
+        default: {
+            console.error("Смена интерфейсов не удалась")
+        }
+    }
+}
+
 function handleExplorationError(error) {
     console.error('Ошибка:', error);
     const actionsDiv = document.getElementById('actions');

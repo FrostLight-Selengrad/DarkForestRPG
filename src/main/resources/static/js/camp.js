@@ -5,18 +5,12 @@ function leaveCamp() {
     })
             .then(response => response.json())
             .then(data => {
-                with (data){
-                if (success) {
-                    updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-                    updateActions(currentLocation); // Добавляем кнопки для леса
-                    updateInterface(currentLocation); // Отобразить интерфейс леса
-                    const exploration_log = document.getElementById('exploration-log')
-                    exploration_log.innerHTML += message;
+                if (data.success) {
+                    forestInitialize(data);
                 } else {
                     alert("Не удалось выйти из лагеря, попробуйте еще раз!");
-                    console.error('Ошибка при выходе из лагеря: ', error)
+                    console.error('Ошибка при выходе из лагеря: ', data.error)
                 }
-                    }
             })
             .catch(error => console.error('Ошибка при выходе из лагеря: ', error));
 }

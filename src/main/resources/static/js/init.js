@@ -20,17 +20,65 @@ function setActiveInterface(interfaceName) {
     if(interfaceName === 'camp') updateCampActions();
 }
 
+function calculateTravelTime(stamina) {
+    return 1000 + Math.floor((100 - stamina) / 4) * 500;
+}
+
+function startProgressBar(stamina, message){
+    document.getElementById('exploration-progress').style.display = 'block';
+
+    const progressFill = document.querySelector('#exploration-progress .progress-fill');
+    const travelTime = calculateTravelTime(stamina);
+    let startTime = Date.now();
+
+    const animationFrame = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / travelTime, 1);
+        progressFill.style.width = `${progress * 100}%`;
+
+        if (progress < 1) {
+            requestAnimationFrame(animationFrame);
+        } else {
+            // Скрываем прогресс бар
+            document.getElementById('exploration-progress').style.display = 'none';
+            processExplorationResult(message);
+        }
+    };
+    requestAnimationFrame(animationFrame);
+}
+
 async function initializeGame() {
     let response = await fetch(`/api/game/initialize?userId=${userId}`);
-    let data = await response.json();
-    if (data.currentEventType === "combat") {
-        enterCombat(player);
-    } else if (player.currentEventType === "chest") {
-        showChestInterface(player);
-    } else if (player.currentEventType === "hidden_cache") {
-        showCacheInterface(player);
-    } else {
-        showExplorationInterface();
+    let event = response.toLocaleString();
+    switch (event) {
+        case "combat":
+            enterCombat();
+            break;
+        default:{
+            fetch(`/api/game/leave-camp?userId=${userId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    forestInitialize(data);
+                } else {
+                    alert("Не удалось инициализировать игру, попробуйте еще раз!");
+                    console.error('Ошибка при загрузке данных: ', data.error)
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке данных: ', error));
+        } break;
+    }
+}
+
+function forestInitialize(data){
+    with (data) {
+        updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+        updateActions(currentLocation); // Добавляем кнопки для леса
+        updateInterface(currentLocation); // Отобразить интерфейс леса
+        document.getElementById('exploration-log').innerHTML = message;
     }
 }
 

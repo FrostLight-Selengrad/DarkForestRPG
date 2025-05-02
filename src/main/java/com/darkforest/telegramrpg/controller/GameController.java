@@ -25,6 +25,20 @@ public class GameController {
         return playerService.getPlayer(userId);
     }
 
+    @PostMapping("/leave-camp")
+    public Map<String, Object> leaveCamp(@RequestParam Long userId) {
+        Map<String, Object> response = gameService.enterForest(userId);
+        if (response.get("success").equals(true)) {
+            response.put("message", "Вы вошли в лес, впереди много опасностей... и наград!");
+        }
+        return response;
+    }
+
+    @PostMapping("/initialize")
+    public String initialize(@RequestParam Long userId) {
+        return playerService.getPlayer(userId).getCurrentEventType();
+    }
+
     @GetMapping("/exploration-event")
     public Map<String, Object> getExplorationEvent(@RequestParam Long userId) {
         Player player = playerService.getPlayer(userId);
@@ -49,46 +63,13 @@ public class GameController {
     public ResponseEntity<Map<String, Object>> exploreForest(
             @RequestParam("userId") Long userId) {
         try {
-            Player player = playerService.getPlayer(userId);
-            if (player == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Игрок не найден"));
-            }
-            Map<String, Object> response = new HashMap<>();
-
-            response.put("stamina", player.getStamina());
-            response.put("inCombat", ("combat".equals(player.getCurrentEventType())));
-            if ("Trap".equals(player.getCurrentEventType())) {
-                response.put("inTrap", "Trap".equals(player.getCurrentEventType()));
-                response.put("chance", player.getTrapEscapeChance());
-            } else if ("combat".equals(player.getCurrentEventType())) {
-                response.put("enemyName", player.getEnemyName());
-                response.put("enemyHp", player.getEnemyHp());
-                response.put("enemyMaxHp", player.getEnemyMaxHp());
-                response.put("level", player.getForestLevel()); // Уровень для босса или монстра
-            } else {
-                gameService.exploreForest(userId);
-            }
-            response.put("message", player.getExplorationLog().getLast()); // Всегда последнее сообщение
-
+            gameService.exploreForest(userId);
+            Map<String, Object> response = playerService.getPlayer(userId).getCurrentData();
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", e.getMessage()));
         }
-    }
-
-    @GetMapping("/exploration-log")
-    public Map<String, Object> getExplorationLog(@RequestParam Long userId) {
-        Player player = playerService.getPlayer(userId);
-        if (player == null) {
-            return Map.of("error", "Player not found.");
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("log", String.join("\n", player.getExplorationLog()));
-        return response;
     }
 
     @GetMapping("/health")
@@ -150,24 +131,6 @@ public class GameController {
     @PostMapping("/rest")
     public Map<String, Object> rest(@RequestParam Long userId) {
         return gameService.rest(userId);
-    }
-
-    @PostMapping("/leave-camp")
-    public Map<String, Object> leaveCamp(@RequestParam Long userId) {
-        Map<String, Object> response = gameService.enterForest(userId);
-        if (response.get("success").equals(true)) {
-            response.put("message", "Вы вошли в лес, впереди много опасностей... и наград!");
-        }
-        return response;
-    }
-
-    @PostMapping("/initialize")
-    public Map<String, Object> initialize(@RequestParam Long userId) {
-        Map<String, Object> response = gameService.enterForest(userId);
-        if (response.get("success").equals(true)) {
-            response.put("message", "Вы вошли в лес, впереди много опасностей... и наград!");
-        }
-        return response;
     }
 
     @PostMapping("/return-to-camp")

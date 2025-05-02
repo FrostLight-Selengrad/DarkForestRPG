@@ -1,6 +1,4 @@
 function exploreForest() {
-    // Скрываем все кнопки
-    hideAllActions();
 
     fetch(`/api/game/explore?userId=${userId}`, {
         method: 'POST',
@@ -8,27 +6,10 @@ function exploreForest() {
     })
         .then(response => response.json())
         .then(data => {
+            // Скрываем все кнопки
+            hideAllActions();
             // Показываем прогресс бар
-            document.getElementById('exploration-progress').style.display = 'block';
-
-            const progressFill = document.querySelector('#exploration-progress .progress-fill');
-            const travelTime = calculateTravelTime(data.stamina);
-            let startTime = Date.now();
-
-            const animationFrame = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / travelTime, 1);
-                progressFill.style.width = `${progress * 100}%`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animationFrame);
-                } else {
-                    // Скрываем прогресс бар
-                    document.getElementById('exploration-progress').style.display = 'none';
-                    processExplorationResult(data);
-                }
-            };
-            requestAnimationFrame(animationFrame);
+            startProgressBar(data.stamina, data.message);
         })
         .catch(handleExplorationError);
 }
@@ -36,7 +17,6 @@ function exploreForest() {
 // Функция для обработки результата исследования
 function processExplorationResult(data) {
     updateStats();
-
     // Проверяем, является ли сообщение дефолтным или ошибочным
     if (data.message === "Ничего не произошло" || data.message === "Вы не можете исследовать лес во время боя!") {
         document.getElementById('exploration-log').innerHTML += `
@@ -49,14 +29,12 @@ function processExplorationResult(data) {
     } else {
         updateExplorationEvent(data);
     }
-
     if (data.inCombat) enterCombat(data);
 }
 
 function updateExplorationEvent(data) {
     const logDiv = document.getElementById('exploration-log');
     logDiv.innerHTML = '';
-
     // Разбиваем сообщение на части с учетом возможных двоеточий в тексте
     const parts = (data.message || "").split(':');
     const [type = "forest", image = "forest.png", ...messageParts] = parts;
@@ -75,13 +53,8 @@ function updateExplorationEvent(data) {
     logDiv.innerHTML = `
             <p>${message}</p>
     `;
-
     // Обновляем действия
     updateActions(type);
-}
-
-function calculateTravelTime(stamina) {
-    return 1000 + Math.floor((100 - stamina) / 4) * 500;
 }
 
 function escapeTrap() {

@@ -200,14 +200,17 @@ function hideAllActions() {
 }
 
 function showActions(actions) {
+    console.log("Actions to show:", actions);
     try {
         actions.forEach(action => {
+            console.log("Another action to show:", action);
             const actionElement = document.getElementById(`action-${action}`);
             if (!actionElement) {
                 console.error(`Element action-${action} not found`);
-                throw new Error(`Missing action-${action} element`);
+            } else {
+                console.log(`Element action-${action} was founded`);
+                actionElement.style.display = 'block';
             }
-            actionElement.style.display = 'block';
         });
     } catch (error) {
         console.error('Error in showActions:', error);

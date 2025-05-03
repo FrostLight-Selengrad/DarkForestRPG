@@ -95,7 +95,6 @@ async function leaveCamp() {
             console.error('Missing currentLocation in move data');
             throw new Error('Invalid move data: missing currentLocation');
         }
-        setActiveInterface('exploration-interface');
         forestInitialize(data);
     } catch (error) {
         console.error('Leave camp error:', error);
@@ -111,6 +110,8 @@ function forestInitialize(data) {
             updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
             console.log('Calling updateActions');
             updateActions(currentLocation);
+            console.log('Calling setActiveInterface');
+            setActiveInterface('exploration-interface');
             const logElement = document.getElementById('exploration-log');
             if (!logElement) {
                 console.error('Element exploration-log not found');
@@ -186,7 +187,7 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
 
 function hideAllActions() {
     try {
-        const actions = document.getElementById('action-btns');
+        const actions = document.getElementById('actions');
         if (!actions) {
             console.error('Element actions not found');
         }

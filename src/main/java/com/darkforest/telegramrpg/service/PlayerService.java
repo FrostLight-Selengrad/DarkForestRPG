@@ -1,6 +1,7 @@
 package com.darkforest.telegramrpg.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -12,6 +13,19 @@ import java.util.Map;
 @Service
 public class PlayerService {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    public void init() {
+        File playersDir = new File("players");
+        if (!playersDir.exists()) {
+            boolean created = playersDir.mkdir();
+            if (!created) {
+                System.err.println("Failed to create players directory");
+            } else {
+                System.out.println("Created players directory");
+            }
+        }
+    }
 
     public Map<String, Object> loadPlayerData(Long userId) {
         try {
@@ -40,8 +54,17 @@ public class PlayerService {
 
     public void savePlayerData(Long userId, Map<String, Object> playerData) {
         try {
+            File playersDir = new File("players");
+            if (!playersDir.exists()) {
+                boolean created = playersDir.mkdir();
+                if (!created) {
+                    throw new IOException("Failed to create players directory");
+                }
+            }
             objectMapper.writeValue(new File("players/" + userId + ".json"), playerData);
+            System.out.println("Saved player data for user " + userId + ": " + playerData);
         } catch (IOException e) {
+            System.err.println("Error saving player data for user " + userId + ": " + e.getMessage());
             throw new RuntimeException("Ошибка сохранения данных игрока", e);
         }
     }

@@ -1,58 +1,51 @@
-function leaveCamp() {
-    fetch(`/api/game/leave-camp?userId=${userId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    forestInitialize(data);
-                } else {
-                    alert("Не удалось выйти из лагеря, попробуйте еще раз!");
-                    console.error('Ошибка при выходе из лагеря: ', data.error)
-                }
-            })
-            .catch(error => console.error('Ошибка при выходе из лагеря: ', error));
+// camp.js - Управление лагерем
+async function loadCamp(userId) {
+    try {
+        const response = await fetch(`/api/player?userId=${userId}`);
+        if (!response.ok) throw new Error('Не удалось загрузить данные игрока');
+        const playerData = await response.json();
+        displayCampStats(playerData);
+    } catch (error) {
+        console.error('Ошибка загрузки лагеря:', error);
+        document.getElementById('camp-log').innerText = 'Ошибка: попробуйте позже';
+    }
+}
+
+function displayCampStats(playerData) {
+    const statsDiv = document.getElementById('player-camp-stats');
+    statsDiv.innerHTML = `
+        <p>Здоровье: ${playerData.health}/${playerData.maxHealth}</p>
+        <p>Выносливость: ${playerData.stamina}/${playerData.maxStamina}</p>
+    `;
+}
+
+async function leaveCamp() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id; // Получаем userId из Telegram
+    try {
+        const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось выйти в лес');
+        const locationData = await response.json();
+        switchInterface('exploration-interface');
+        displayExploration(locationData);
+    } catch (error) {
+        console.error('Ошибка выхода в лес:', error);
+        document.getElementById('camp-log').innerText = 'Ошибка: попробуйте позже';
+    }
 }
 
 function takeRest() {
-    // Реализация отдыха в лагере
-    console.log("Отдых в лагере...");
-    alert('Отдых в лагере в доработке');
+    // Заглушка для отдыха
+    document.getElementById('camp-log').innerText = 'Отдых пока не реализован';
 }
 
-// camp.js
-function returnToCamp() {
-
-    fetch(`/api/game/return-to-camp?userId=${userId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-        .then(data => {
-            // Показываем прогресс бар
-            const progressContainer = document.getElementById('return-camp-progress');
-            progressContainer.style.display = 'block';
-            hideAllActions();
-
-            const progressFill = document.querySelector('#return-camp-progress .progress-fill');
-
-            let startTime = Date.now();
-            const animationFrame = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / (data.time * 1000), 1);
-                progressFill.style.width = `${progress * 100}%`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animationFrame);
-                } else {
-                    document.getElementById('return-camp-progress').style.display = 'none';
-                    // Переключаем интерфейсы
-                    setActiveInterface('camp');
-                }
-            };
-            requestAnimationFrame(animationFrame);
-        })
-        .catch(error => {
-            document.getElementById('return-camp-progress').style.display = 'none';
-            });
+// Переключение интерфейсов
+function switchInterface(activeId) {
+    document.getElementById('camp-interface').style.display = 'none';
+    document.getElementById('exploration-interface').style.display = 'none';
+    document.getElementById('battle-interface').style.display = 'none';
+    document.getElementById(activeId).style.display = 'block';
 }
+
+// Загрузка лагеря при старте
+const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+loadCamp(userId);

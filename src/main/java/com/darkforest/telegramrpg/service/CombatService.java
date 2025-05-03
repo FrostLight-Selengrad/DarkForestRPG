@@ -1,147 +1,87 @@
 package com.darkforest.telegramrpg.service;
 
-import com.darkforest.telegramrpg.model.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Service
 public class CombatService {
-    private final DamageService damageService;
-    private final Random random = new Random();
     private final PlayerService playerService;
 
-    // Конструктор для внедрения зависимости
     @Autowired
-    public CombatService(PlayerService playerService, DamageService damageService) {
-        this.damageService = damageService;
+    public CombatService(PlayerService playerService) {
         this.playerService = playerService;
     }
 
-    public Map<String, Object> handleFleeAttempt(Player player) {
-        Map<String, Object> response = new HashMap<>();
-        if (!"combat".equals(player.getCurrentEventType())) {
-            response.put("message", "Вы не в бою!");
-            response.put("inCombat", false);
-            return response;
-        }
-        if (player.getEnemyHp() <= 0) {
-            response.put("message", "Враг уже побежден!");
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("inCombat", false);
-            return response;
-        }
-        if (player.getHp() <= 0) {
-            response.put("message", "Духам незачем убегать!");
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("inCombat", false);
-            return response;
-        }
+    // Начало боя
+    public Map<String, Object> startBattle(Long userId, String monsterType) {
+        Map<String, Object> playerData = playerService.loadPlayerData(userId);
+        Map<String, Object> enemyData = loadEnemyData(monsterType);
+        playerData.put("currentEventType", "combat");
+        playerData.put("eventData", Map.of("enemy", enemyData));
+        playerService.savePlayerData(userId, playerData);
+        return Map.of(
+                "message", "Бой с " + enemyData.get("name") + " начался!",
+                "enemyHp", enemyData.get("hp"),
+                "playerHp", playerData.get("hp")
+        );
+    }
 
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\n");
-        player.setBattleTurn(player.getBattleTurn() + 1);
+    // Обработка атаки
+    public Map<String, Object> performAttack(Long userId) {
+        Map<String, Object> playerData = playerService.loadPlayerData(userId);
+        String currentEventType = (String) playerData.get("currentEventType");
+        if (!"combat".equals(currentEventType)) {
+            return Map.of("message", "Вы не в бою!");
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> enemyData = (Map<String, Object>) ((Map<?, ?>) playerData.get("eventData")).get("enemy");
+        int playerAttack = (int) playerData.get("physicalAttack");
+        int enemyDefense = (int) enemyData.get("defense");
+        int damageToEnemy = calculatePhysicalDamage(playerAttack, enemyDefense);
+        int enemyHp = (int) enemyData.get("hp") - damageToEnemy;
+        enemyData.put("hp", enemyHp);
+        playerService.savePlayerData(userId, playerData);
+        return Map.of(
+                "message", "Вы нанесли " + damageToEnemy + " урона!",
+                "enemyHp", enemyHp,
+                "isOver", enemyHp <= 0
+        );
+    }
 
-        if (random.nextDouble() < 0.1) { // 10% шанс на успех
-            player.addToBattleLog("Вы успешно сбежали!\n");
-            player.setCurrentEventType("none");
-            player.setEnemyName(null);
-            player.setEnemyHp(0);
-            player.setEnemyMaxHp(0);
-            String battleLog = String.join("\n", player.getBattleLog());
-            response.put("battleLog", battleLog);
-            response.put("inCombat", false);
-            response.put("explorationMessage", "Вы ловко сбежали из боя, новые приключения снова ждут вас!");
-            return response;
+    // Обработка попытки побега
+    public Map<String, Object> tryFlee(Long userId) {
+        Map<String, Object> playerData = playerService.loadPlayerData(userId);
+        String currentEventType = (String) playerData.get("currentEventType");
+        if (!"combat".equals(currentEventType)) {
+            return Map.of("message", "Вы не в бою!");
+        }
+        boolean success = Math.random() < 0.5;
+        if (success) {
+            playerData.put("currentEventType", "none");
+            ((Map<?, ?>) playerData.get("eventData")).remove("enemy");
+            playerService.savePlayerData(userId, playerData);
+            return Map.of("message", "Вы успешно сбежали!");
         } else {
-            player.addToBattleLog("Попытка бегства не удалась, враг незамедлительно этим воспользовался\n");
-            int enemyDamage = player.getEnemyAttack() - player.getToughness() / 2;
-            player.setHp(player.getHp() - Math.max(enemyDamage, 0));
-            player.addToBattleLog(player.getEnemyName() + " применил Рассекающий удар и нанес Вам " + enemyDamage + " урона\n");
-
-            if (player.getHp() <= 0) {
-                player.addToBattleLog("Вы проиграли...\n");
-                String battleLog = String.join("\n", player.getBattleLog());
-                resetProgress(player);
-                player.setCurrentEventType("none");
-                response.put("battleLog", battleLog);
-                response.put("inCombat", false);
-                response.put("explorationMessage", "Вы проиграли бой с " + player.getEnemyName() + ".");
-                return response;
-            }
-
-            String battleLog = String.join("\n", player.getBattleLog());
-            response.put("battleLog", battleLog);
-            response.put("inCombat", true);
-            return response;
+            return Map.of("message", "Побег не удался!");
         }
     }
 
-    public Map<String, Object> handleAttack(Player player) {
-        Map<String, Object> response = new HashMap<>();
-        if (!"combat".equals(player.getCurrentEventType())) return Map.of("message", "Вы не в бою!", "inCombat", "combat".equals(player.getCurrentEventType()));
-        if (player.getEnemyHp() <= 0) {
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("message", "Враг уже побежден и можно двигаться дальше");
-            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
-            return response;
-        }
-        if (player.getHp() <= 0) {
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("message", "Вы восстанавливаетесь после критического урона");
-            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
-            return response;
-        }
-
-        int damage = damageService.calculatePhysicalDamage(player.getPhysicalAttack(), player.getToughness());
-        player.setEnemyHp(player.getEnemyHp() - damage);
-        player.addToBattleLog("Ход " + player.getBattleTurn() + ":\nВы нанесли " + damage + " урона");
-        player.setBattleTurn(player.getBattleTurn() + 1);
-
-        if (player.getEnemyHp() <= 0) {
-            player.addToBattleLog(player.getEnemyName() + " повержен!\n");
-            String battleLog = String.join("\n", player.getBattleLog());
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("battleLog", battleLog);
-            response.put("explorationMessage", player.getEnemyName() + " повержен! Забрав все его ценности вы можете продолжить свой путь.");
-            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
-            return response;
-        }
-
-        int enemyDamage = damageService.calculatePhysicalDamage(player.getEnemyAttack(), player.getToughness());
-        player.setHp(player.getHp() - enemyDamage);
-        player.addToBattleLog(player.getEnemyName() + " нанес " + enemyDamage + " урона\n");
-
-        if (player.getHp() <= 0) {
-            player.addToBattleLog("Вы проиграли...\n");
-            String battleLog = String.join("\n", player.getBattleLog());
-            resetProgress(player);
-            player.setCurrentEventType("none");
-            player.clearBattleLog();
-            response.put("battleLog", battleLog);
-            response.put("explorationMessage", "Вы проиграли бой с " + player.getEnemyName() + ".");
-            response.put("inCombat", "combat".equals(player.getCurrentEventType()));
-            return response;
-        }
-
-        String battleLog = String.join("\n", player.getBattleLog());
-        response.put("battleLog", battleLog);
-        response.put("inCombat", true);
-        return response;
+    // Расчет физического урона
+    private int calculatePhysicalDamage(int attack, int defense) {
+        double defenseReduction = defense / (defense + 50.0);
+        int damage = (int) (attack * (1 - defenseReduction) - defense);
+        return Math.max(1, damage);
     }
 
-    private void resetProgress(Player player) {
-        player.setHp(player.getMaxHp());
-        player.setForestLevel(1);
-        player.clearBattleLog();
-        player.setBattleTurn(0);
-        player.setCurrentEventType("none");
+    // Загрузка данных монстра (пример)
+    private Map<String, Object> loadEnemyData(String monsterType) {
+        return Map.of(
+                "name", monsterType,
+                "hp", 100,
+                "defense", 10,
+                "attack", 20
+        );
     }
 }

@@ -48,7 +48,10 @@ function startProgressBar(stamina, message){
 }
 
 async function initializeGame() {
-    let response = await fetch(`/api/game/initialize?userId=${userId}`);
+    let response = await fetch(`/api/game/initialize?userId=${userId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
     let event = response.toLocaleString();
     switch (event) {
         case "combat":

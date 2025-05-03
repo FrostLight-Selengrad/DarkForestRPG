@@ -1,210 +1,48 @@
-function enterCombat(enemyData) {
-    setActiveInterface('battle');
+// battle.js - Управление боем
+function displayBattle(battleData) {
+    document.getElementById('player-combat-hp').innerText = `${battleData.player.health}/${battleData.player.maxHealth}`;
+    document.getElementById('enemy-combat-hp').innerText = `${battleData.enemy.health}/${battleData.enemy.maxHealth}`;
+    document.getElementById('enemy-combat-name').innerText = battleData.enemy.name;
+    document.getElementById('enemy-level').innerText = `Уровень ${battleData.enemy.level}`;
+    document.getElementById('enemy-image').src = `/images/${battleData.enemy.image || 'goblin.png'}`;
+    document.getElementById('battle-log').innerText = 'Бой начался!';
+}
 
-    console.log('[Combat] Starting combat with:', enemyData);
-    console.log('Battle elements:', {
-        interface: document.getElementById('battle-interface'),
-        image: document.getElementById('enemy-image'),
-        name: document.getElementById('enemy-combat-name')
-    });
-
-    // Добавьте проверку ключевых данных
-    if (!enemyData || !enemyData.enemyName) {
-        console.error('Invalid enemy data:', enemyData);
-        logExplorationEvent("Ошибка: данные противника не получены");
-        return;
+async function attack() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось атаковать');
+        const battleData = await response.json();
+        displayBattle(battleData);
+        if (battleData.isOver) {
+            endBattle(battleData);
+        }
+    } catch (error) {
+        console.error('Ошибка атаки:', error);
+        document.getElementById('battle-log').innerText = 'Ошибка: попробуйте позже';
     }
-
-    // Исправьте имена полей согласно API
-    const combatData = {
-        name: enemyData.enemyName || enemyData.name,
-        hp: enemyData.enemyHp || enemyData.hp,
-        maxHp: enemyData.enemyMaxHp || enemyData.maxHp,
-        level: enemyData.level || 1
-    };
-
-    const exploration = document.getElementById('exploration-interface');
-    const battle = document.getElementById('battle-interface');
-
-    // Принудительно скрываем exploration
-    exploration.style.display = 'none';
-    exploration.classList.remove('hide-to-left');
-
-    // Показываем battle интерфейс
-    battle.style.display = 'block';
-
-    // Обновляем данные врага
-    const enemyImage = document.getElementById('enemy-image');
-    enemyImage.src = `images/${
-        combatData.name.includes("Мимик") ? "mimic.png" :
-            combatData.name.includes("Хранитель прохода") ? "boss.png" :
-                "goblin.png"
-    }`;
-
-    document.getElementById('enemy-combat-name').textContent = combatData.name;
-    document.getElementById('enemy-level').textContent = `Уровень ${combatData.level}`;
-    document.getElementById('enemy-combat-hp').textContent =
-        `${combatData.hp}/${combatData.maxHp}`;
-    // Принудительное обновление лога
-    updateBattleLog();
-    console.log('Battle elements:', {
-        interface: document.getElementById('battle-interface'),
-        image: document.getElementById('enemy-image'),
-        name: document.getElementById('enemy-combat-name')
-    });
-    updateStats()
-    console.log('[Combat] Interface updated');
 }
 
-function fightMonster() {
-    console.log('[Fight] Initiating monster fight...');
-    fetch(`/api/game/fight-monster?userId=${userId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('[Fight] Response data:', data);
-            enterCombat({
-                enemyName: data.enemyName,
-                enemyHp: data.enemyHp,
-                enemyMaxHp: data.enemyMaxHp,
-                level: data.level
-            });
-        })
-        .catch(error => {
-            console.error('[Fight] Combat error:', error);
-            handleExplorationError(error);
-        });
-}
-
-function checkCombatStatus() {
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network error');
-            return response.json();
-        })
-        .then(player => {
-            if (!player.inCombat) {
-                // Полная очистка данных боя
-                resetCombatInterface();
-                setActiveInterface('exploration');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка проверки боя:', error);
-            logExplorationEvent("Ошибка связи с сервером");
-        });
-}
-
-function resetCombatInterface() {
-    document.getElementById('enemy-combat-name').textContent = '';
-    document.getElementById('enemy-combat-hp').textContent = '0/0';
-    document.getElementById('enemy-image').src = 'images/placeholder.png';
-    document.getElementById('battle-log').innerHTML = '';
-}
-
-function updateBattleLog() {
-    const battleLog = document.getElementById('battle-log');
-    const turn = document.getElementById('turn');
-    if (!battleLog || !turn) {
-        console.error('Отсутствуют элементы battle-log или turn:', {battleLog, turn});
-        return;
+async function tryFlee() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось сбежать');
+        const result = await response.json();
+        document.getElementById('battle-log').innerText = result.message;
+        if (result.success) {
+            switchInterface('exploration-interface');
+            showActions(['action-continue', 'action-return-camp']);
+        }
+    } catch (error) {
+        console.error('Ошибка побега:', error);
+        document.getElementById('battle-log').innerText = 'Ошибка: попробуйте позже';
     }
-
-    fetch(`/api/battle/log?userId=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                battleLog.innerHTML = data.error;
-                return;
-            }
-
-            battleLog.innerHTML = data.log.replace(/\n/g, '<br>');
-            battleLog.scrollTop = battleLog.scrollHeight;
-            turn.innerText = `Текущий ход: ${data.turn}`;
-        })
-        .catch(error => {
-            console.error('Ошибка в updateBattleLog:', error);
-            handleExplorationError(error);
-        });
 }
 
-function attack() {
-    fetch(`/api/battle/attack?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            updateBattleLog(data.battleLog);
-            if (!data.inCombat) {
-                document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'block';
-                logExplorationEvent(data.explorationMessage);
-                document.getElementById('forest-image').src = 'images/forest_v1.png';
-                updateActions('forest');
-            } else {
-                updateCombatHealth();
-            }
-        })
-        .catch(handleExplorationError);
-}
-
-function tryFlee() {
-    fetch(`/api/battle/flee?userId=${userId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            updateBattleLog(data.battleLog);
-            if (!data.inCombat) {
-                document.getElementById('battle-interface').style.display = 'none';
-                document.getElementById('exploration-interface').style.display = 'block';
-                logExplorationEvent(data.explorationMessage); // Используем explorationMessage
-                document.getElementById('forest-image').src = 'images/forest_v1.png'; // Устанавливаем картинку леса
-                updateActions('forest'); // Обновляем кнопки
-            } else {
-                updateCombatHealth();
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка при попытке сбежать:', error);
-            handleExplorationError(error);
-        });
-}
-
-function openAbilities() {
-    console.log('Открытие меню способностей');
-    const abilitiesModal = document.createElement('div');
-    abilitiesModal.innerHTML = `
-            <div class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="this.parentElement.parentElement.remove()">×</span>
-                    <p>Способности пока не доступны</p>
-                </div>
-            </div>
-        `;
-    document.body.appendChild(abilitiesModal);
-}
-
-function updateCombatHealth() {
-    const playerHpElement = document.getElementById('player-combat-hp');
-    const enemyHpElement = document.getElementById('enemy-combat-hp');
-
-    playerHpElement.classList.add('damage');
-    setTimeout(() => playerHpElement.classList.remove('damage'), 300);
-
-    fetch(`/api/game/player?userId=${userId}`)
-        .then(response => response.json())
-        .then(player => {
-            if (player.inCombat) {
-                enemyHpElement.style.color = '#ff5555';
-                setTimeout(() => enemyHpElement.style.color = '#4CAF50', 300);
-                enemyHpElement.textContent = `${player.enemyHp}/${player.enemyMaxHp}`;
-            }
-
-            setTimeout(() => playerHpElement.style.color = '#ff5555', 300);
-            setTimeout(() => playerHpElement.style.color = '#4CAF50', 300);
-            playerHpElement.textContent = `${player.hp}/${player.maxHp}`;
-        })
-        .catch(handleExplorationError);
+function endBattle(battleData) {
+    document.getElementById('battle-log').innerText = battleData.message;
+    switchInterface('exploration-interface');
+    showActions(['action-continue', 'action-return-camp']);
 }

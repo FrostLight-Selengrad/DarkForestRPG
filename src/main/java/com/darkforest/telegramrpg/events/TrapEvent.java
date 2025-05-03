@@ -2,6 +2,9 @@ package com.darkforest.telegramrpg.events;
 
 import com.darkforest.telegramrpg.model.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class TrapEvent implements Event {
@@ -9,25 +12,37 @@ public class TrapEvent implements Event {
 
     @Override
     public int getWeight() {
-        return 10;
+        return 25;
     }
 
     @Override
-    public String execute(Player player) {
-        player.setCurrentEventType("Trap");
-        player.setTrapEscapeChance(60); // Сброс при новом попадании
-        player.setTrapAttempts(0);
+    public Map<String, Object> execute(Map<String, Object> playerData) {
+        // Генерируем случайный урон
+        int damage = 10 + random.nextInt(10);
 
-        // 50% шанс избежать
-        if (random.nextBoolean()) {
-            player.addToExplorationLog("trap_missed:event_trap_escape.png:Вы успешно избежали ловушку!");
-            player.setCurrentEventType("None");
-            return "Вы ловко уклонились от ловушки!";
-        } else {
-            int damage = 10 + 5 * player.getForestLevel();
-            player.setHp(player.getHp() - damage);
-            player.addToExplorationLog("trap:event_trap.png:Вы упали в ловушку! Урон - " + damage);
-            return "Вы упали в ловушку! Урон: " + damage;
-        }
+        // Получаем текущее здоровье игрока
+        int currentHp = (int) playerData.get("hp");
+
+        // Наносим урон
+        int newHp = Math.max(0, currentHp - damage);
+        playerData.put("hp", newHp);
+
+        // Формируем сообщение
+        String message = "trap:trap.png:Вы попали в ловушку и потеряли " + damage + " здоровья!";
+
+        // Добавляем сообщение в исследовательский лог
+        @SuppressWarnings("unchecked")
+        List<String> explorationLog = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
+        explorationLog.add(message);
+        playerData.put("explorationLog", explorationLog);
+
+        // Сбрасываем тип события
+        playerData.put("currentEventType", "none");
+
+        // Возвращаем результат
+        return Map.of(
+                "message", message,
+                "eventType", "none"
+        );
     }
 }

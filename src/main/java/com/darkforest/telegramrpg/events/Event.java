@@ -1,7 +1,9 @@
 package com.darkforest.telegramrpg.events;
+
 import com.darkforest.telegramrpg.model.Player;
+import java.util.Map;
 
 public interface Event {
     int getWeight();
-    String execute(Player player);
+    Map<String, Object> execute(Map<String, Object> playerData);
 }

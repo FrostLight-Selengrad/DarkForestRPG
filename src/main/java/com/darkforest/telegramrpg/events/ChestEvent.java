@@ -1,6 +1,9 @@
 package com.darkforest.telegramrpg.events;
 
 import com.darkforest.telegramrpg.model.Player;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class ChestEvent implements Event {
@@ -12,41 +15,64 @@ public class ChestEvent implements Event {
     }
 
     @Override
-    public String execute(Player player) {
-        player.setCurrentEventType("chest");
+    public Map<String, Object> execute(Map<String, Object> playerData) {
+        // Определяем, является ли сундук мимиком (вероятность 20%)
         boolean isMimic = random.nextDouble() < 0.2;
-        player.addEventData("isMimic", isMimic);
+        Map<String, Object> chestData = new HashMap<>();
+        chestData.put("isMimic", isMimic);
+
+        // Если это не мимик, добавляем золото на основе уровня леса
         if (!isMimic) {
-            int gold = 5 * player.getForestLevel() + random.nextInt(10);
-            player.addEventData("gold", gold);
+            int forestLevel = (int) playerData.get("forestLevel"); // Извлекаем уровень леса из мапы
+            int gold = 5 * forestLevel + random.nextInt(10);
+            chestData.put("gold", gold);
         }
+
+        // Сохраняем тип события и данные сундука в playerData
+        playerData.put("currentEventType", "chest");
+        playerData.put("chestData", chestData);
+
+        // Формируем сообщение и обновляем лог
         String message = "chest:event_chest.png:Вы нашли сундук!";
-        player.addToExplorationLog(message);
-        return message;
+        @SuppressWarnings("unchecked")
+        List<String> explorationLog = (List<String>) playerData.get("explorationLog"); // Извлекаем лог
+        explorationLog.add(message); // Добавляем сообщение в лог
+
+        // Возвращаем результат события
+        return Map.of("message", "Вы нашли сундук!");
     }
 
-    public String openChest(Player player) {
+    public Map<String, Object> openChest(Player player) {
         if (!"chest".equals(player.getCurrentEventType())) {
-            return "Сундук не найден!";
+            return Map.of("message", "Сундук не найден!");
         }
-        boolean isMimic = (boolean) player.getEventDataValue("isMimic");
+        Map<String, Object> chestData = (Map<String, Object>) player.getEventData().get("chestData");
+        boolean isMimic = (boolean) chestData.get("isMimic");
         if (isMimic) {
             player.setCurrentEventType("combat");
-            player.addEventData("enemyName", "Мимик");
-            player.addEventData("enemyHp", 70);
-            player.addEventData("enemyMaxHp", 70);
-            player.addEventData("enemyAttack", 20);
+            Map<String, Object> enemyData = new HashMap<>();
+            enemyData.put("name", "Мимик");
+            enemyData.put("hp", 70);
+            enemyData.put("maxHp", 70);
+            enemyData.put("attack", 20);
+            player.addEventData("enemy", enemyData);
             String message = "monster:mimic.png:Сундук оказался Мимиком!";
             player.addToExplorationLog(message);
-            return message;
+            return Map.of(
+                    "message", message,
+                    "eventType", "combat"
+            );
         } else {
-            int gold = (int) player.getEventDataValue("gold");
-            player.addGold(gold);
+            int gold = (int) chestData.get("gold");
+            player.setResources(player.getResources() + gold);
             player.setCurrentEventType("none");
             player.getEventData().clear();
             String message = "chest_open:chest_open.png:Вы открыли сундук и нашли " + gold + " золота!";
             player.addToExplorationLog(message);
-            return message;
+            return Map.of(
+                    "message", message,
+                    "eventType", "none"
+            );
         }
     }
 }

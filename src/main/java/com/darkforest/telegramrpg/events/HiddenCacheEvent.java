@@ -2,32 +2,44 @@ package com.darkforest.telegramrpg.events;
 
 import com.darkforest.telegramrpg.model.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 public class HiddenCacheEvent implements Event {
+    private final Random random = new Random();
+
     @Override
     public int getWeight() {
-        return 15;
+        return 20;
     }
 
     @Override
-    public String execute(Player player) {
-        player.setCurrentEventType("hidden_cache");
-        int reward = 100; // или случайное значение
-        player.addEventData("reward", reward);
-        String message = "hidden:cache.png:Вы нашли тайник с ценностями!";
-        player.addToExplorationLog(message);
-        return message;
-    }
+    public Map<String, Object> execute(Map<String, Object> playerData) {
+        // Генерируем случайное количество ресурсов
+        int resources = 10 + random.nextInt(20);
 
-    public String collectCache(Player player) {
-        if (!"hidden_cache".equals(player.getCurrentEventType())) {
-            return "Тайник не найден!";
-        }
-        int reward = (int) player.getEventDataValue("reward");
-        player.addGold(reward);
-        player.setCurrentEventType("none");
-        player.getEventData().clear();
-        String message = "hidden:cache.png:Вы собрали ценности из тайника и получили " + reward + " золота!";
-        player.addToExplorationLog(message);
-        return message;
+        // Обновляем ресурсы игрока
+        int currentResources = (int) playerData.getOrDefault("resources", 0);
+        playerData.put("resources", currentResources + resources);
+
+        // Формируем сообщение
+        String message = "cache:cache.png:Вы нашли скрытый кэш и получили " + resources + " ресурсов!";
+
+        // Добавляем сообщение в исследовательский лог
+        @SuppressWarnings("unchecked")
+        List<String> explorationLog = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
+        explorationLog.add(message);
+        playerData.put("explorationLog", explorationLog);
+
+        // Сбрасываем тип события
+        playerData.put("currentEventType", "none");
+
+        // Возвращаем результат
+        return Map.of(
+                "message", message,
+                "eventType", "none"
+        );
     }
 }

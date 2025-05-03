@@ -226,6 +226,7 @@ function updateActions(type) {
         switch (type) {
             case 'base_camp': break;
             case 'forest':
+                console.log('showActions called with continue and return-camp');
                 showActions(['continue', 'return-camp']);
                 break;
             case 'chest':

@@ -108,10 +108,10 @@ function forestInitialize(data) {
         with (data) {
             console.log('Calling updateStats');
             updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-            console.log('Calling updateActions');
-            updateActions(currentLocation);
             console.log('Calling setActiveInterface');
             setActiveInterface('exploration-interface');
+            console.log('Calling updateActions');
+            updateActions(currentLocation);
             const logElement = document.getElementById('exploration-log');
             if (!logElement) {
                 console.error('Element exploration-log not found');

@@ -131,8 +131,9 @@ function campInitialize(data) {
         with (data) {
             console.log('Calling updateStats');
             updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-            console.log('Calling updateActions');
+            console.log('Calling updateActions with:', currentLocation);
             updateActions(currentLocation);
+            console.log('Try to update log');
             const logElement = document.getElementById('camp-log');
             if (!logElement) {
                 console.error('Element camp-log not found');
@@ -185,10 +186,9 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
 
 function hideAllActions() {
     try {
-        const actions = document.getElementById('actions');
+        const actions = document.getElementById('action-btns');
         if (!actions) {
             console.error('Element actions not found');
-            throw new Error('Missing actions element');
         }
         for (let btn of actions.children) {
             btn.style.display = 'none';
@@ -217,9 +217,11 @@ function showActions(actions) {
 
 function updateActions(type) {
     try {
-        console.log('updateActions called with type:', type);
+        console.log('try to hideAllActions');
         hideAllActions();
+        console.log('updateActions called with type:', type);
         switch (type) {
+            case 'base_camp': break;
             case 'forest':
                 showActions(['continue', 'return-camp']);
                 break;

@@ -53,15 +53,12 @@ async function initializeGame() {
         }
         if (data.currentEventType === "combat") {
             console.log('Switching to battle interface');
-            setActiveInterface('battle-interface');
             updateBattleInterface(data);
         } else if (data.currentLocation === "forest") {
             console.log('Switching to exploration interface');
-            setActiveInterface('exploration-interface');
             forestInitialize(data);
         } else if (data.currentLocation === "base_camp") {
             console.log('Switching to camp interface');
-            setActiveInterface('camp-interface');
             campInitialize(data);
         } else {
             console.error('Unknown location:', data.currentLocation);
@@ -107,7 +104,7 @@ function forestInitialize(data) {
             console.log('Calling updateStats');
             updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
             console.log('Calling updateActions');
-            updateActions(currentLocation);
+            updateActions(currentEventType);
             console.log('Calling setActiveInterface');
             setActiveInterface('exploration-interface');
             const logElement = document.getElementById('exploration-log');
@@ -242,6 +239,9 @@ function updateActions(type) {
             case 'boss':
                 showActions(['fight']);
                 break;
+            default:
+                showActions(['continue', 'return-camp']);
+                break;
         }
     } catch (error) {
         console.error('Error in updateActions:', error);
@@ -303,6 +303,7 @@ function updateBattleInterface(data) {
             throw new Error('Missing enemy-combat-name element');
         }
         enemyNameElement.innerText = enemyData.name || 'Неизвестный враг';
+        setActiveInterface('battle-interface');
     } catch (error) {
         console.error('Error in updateBattleInterface:', error);
         throw error;

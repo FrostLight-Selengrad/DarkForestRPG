@@ -8,7 +8,12 @@ if (!userId) {
 }
 
 function startProgressBar(stamina, message) {
-    document.getElementById('exploration-progress').style.display = 'block';
+    const progressContainer = document.getElementById('exploration-progress');
+    if (!progressContainer) {
+        console.error('Element exploration-progress not found');
+        return;
+    }
+    progressContainer.style.display = 'block';
     const progressFill = document.querySelector('#exploration-progress .progress-fill');
     const travelTime = calculateTravelTime(stamina);
     let startTime = Date.now();
@@ -20,7 +25,7 @@ function startProgressBar(stamina, message) {
         if (progress < 1) {
             requestAnimationFrame(animationFrame);
         } else {
-            document.getElementById('exploration-progress').style.display = 'none';
+            progressContainer.style.display = 'none';
             processExplorationResult(message);
         }
     };
@@ -29,6 +34,7 @@ function startProgressBar(stamina, message) {
 
 async function initializeGame() {
     try {
+        console.log('Starting initializeGame for userId:', userId);
         const response = await fetch(`/api/game/player?userId=${userId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
@@ -41,13 +47,20 @@ async function initializeGame() {
         }
         const data = await response.json();
         console.log('Player data:', data);
+        if (!data.currentLocation) {
+            console.error('Missing currentLocation in player data');
+            throw new Error('Invalid player data: missing currentLocation');
+        }
         if (data.currentEventType === "combat") {
+            console.log('Switching to battle interface');
             setActiveInterface('battle-interface');
             updateBattleInterface(data);
         } else if (data.currentLocation === "forest") {
+            console.log('Switching to exploration interface');
             setActiveInterface('exploration-interface');
             forestInitialize(data);
         } else if (data.currentLocation === "base_camp") {
+            console.log('Switching to camp interface');
             setActiveInterface('camp-interface');
             campInitialize(data);
         } else {
@@ -62,6 +75,7 @@ async function initializeGame() {
 
 async function leaveCamp() {
     try {
+        console.log('Starting leaveCamp for userId:', userId);
         const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
@@ -74,6 +88,10 @@ async function leaveCamp() {
         }
         const data = await response.json();
         console.log('Move data:', data);
+        if (!data.currentLocation) {
+            console.error('Missing currentLocation in move data');
+            throw new Error('Invalid move data: missing currentLocation');
+        }
         setActiveInterface('exploration-interface');
         forestInitialize(data);
     } catch (error) {
@@ -83,100 +101,221 @@ async function leaveCamp() {
 }
 
 function forestInitialize(data) {
-    with (data) {
-        updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-        updateActions(currentLocation);
-        setActiveInterface('exploration-interface');
-        document.getElementById('exploration-log').innerHTML = message || 'Вы в лесу';
+    try {
+        console.log('forestInitialize called with data:', data);
+        with (data) {
+            console.log('Calling updateStats');
+            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+            console.log('Calling updateActions');
+            updateActions(currentLocation);
+            console.log('Calling setActiveInterface');
+            setActiveInterface('exploration-interface');
+            const logElement = document.getElementById('exploration-log');
+            if (!logElement) {
+                console.error('Element exploration-log not found');
+                throw new Error('Missing exploration-log element');
+            }
+            console.log('Updating exploration-log');
+            logElement.innerHTML = message || 'Вы в лесу';
+        }
+    } catch (error) {
+        console.error('Error in forestInitialize:', error);
+        throw error;
     }
 }
 
 function campInitialize(data) {
-    with (data) {
-        updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-        updateActions(currentLocation);
-        setActiveInterface('camp-interface');
-        document.getElementById('camp-log').innerHTML = message || 'Вы в лагере';
+    try {
+        console.log('campInitialize called with data:', data);
+        with (data) {
+            console.log('Calling updateStats');
+            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+            console.log('Calling updateActions');
+            updateActions(currentLocation);
+            console.log('Calling setActiveInterface');
+            setActiveInterface('camp-interface');
+            const logElement = document.getElementById('camp-log');
+            if (!logElement) {
+                console.error('Element camp-log not found');
+                throw new Error('Missing camp-log element');
+            }
+            console.log('Updating camp-log');
+            logElement.innerHTML = message || 'Вы в лагере';
+        }
+    } catch (error) {
+        console.error('Error in campInitialize:', error);
+        throw error;
     }
 }
 
 function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold) {
-    switch (location) {
-        case "forest":
-            document.getElementById('player-stats').innerHTML = `
-                <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
-                <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
-            `;
-            break;
-        case "base_camp":
-            document.getElementById('player-camp-stats').innerHTML = `
-                <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
-                <p>Золото: ${gold}</p>
-            `;
-            break;
-        default:
-            break;
+    try {
+        console.log('updateStats called with location:', location);
+        switch (location) {
+            case "forest":
+                const statsElement = document.getElementById('player-stats');
+                if (!statsElement) {
+                    console.error('Element player-stats not found');
+                    throw new Error('Missing player-stats element');
+                }
+                statsElement.innerHTML = `
+                    <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
+                    <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
+                `;
+                break;
+            case "base_camp":
+                const campStatsElement = document.getElementById('player-camp-stats');
+                if (!campStatsElement) {
+                    console.error('Element player-camp-stats not found');
+                    throw new Error('Missing player-camp-stats element');
+                }
+                campStatsElement.innerHTML = `
+                    <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
+                    <p>Золото: ${gold}</p>
+                `;
+                break;
+            default:
+                console.error('Invalid location for updateStats:', location);
+                break;
+        }
+    } catch (error) {
+        console.error('Error in updateStats:', error);
+        throw error;
     }
 }
 
 function hideAllActions() {
-    const actions = document.getElementById('actions').children;
-    for (let btn of actions) btn.style.display = 'none';
+    try {
+        const actions = document.getElementById('actions');
+        if (!actions) {
+            console.error('Element actions not found');
+            throw new Error('Missing actions element');
+        }
+        for (let btn of actions.children) {
+            btn.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error in hideAllActions:', error);
+        throw error;
+    }
 }
 
 function showActions(actions) {
-    actions.forEach(action => {
-        document.getElementById(`action-${action}`).style.display = 'block';
-    });
+    try {
+        actions.forEach(action => {
+            const actionElement = document.getElementById(`action-${action}`);
+            if (!actionElement) {
+                console.error(`Element action-${action} not found`);
+                throw new Error(`Missing action-${action} element`);
+            }
+            actionElement.style.display = 'block';
+        });
+    } catch (error) {
+        console.error('Error in showActions:', error);
+        throw error;
+    }
 }
 
 function updateActions(type) {
-    hideAllActions();
-    switch (type) {
-        case 'forest':
-            showActions(['continue', 'return-camp']);
-            break;
-        case 'chest':
-            showActions(['open-chest', 'continue']);
-            break;
-        case 'trap':
-            showActions(['escape-trap']);
-            break;
-        case 'trap_missed':
-            showActions(['continue', 'return-camp']);
-            break;
-        case 'monster':
-            showActions(['fight', 'flee']);
-            break;
-        case 'abandoned_camp':
-            showActions(['rest-camp', 'continue']);
-            break;
-        case 'boss':
-            showActions(['fight']);
-            break;
+    try {
+        console.log('updateActions called with type:', type);
+        hideAllActions();
+        switch (type) {
+            case 'forest':
+                showActions(['continue', 'return-camp']);
+                break;
+            case 'chest':
+                showActions(['open-chest', 'continue']);
+                break;
+            case 'trap':
+                showActions(['escape-trap']);
+                break;
+            case 'trap_missed':
+                showActions(['continue', 'return-camp']);
+                break;
+            case 'monster':
+                showActions(['fight', 'flee']);
+                break;
+            case 'abandoned_camp':
+                showActions(['rest-camp', 'continue']);
+                break;
+            case 'boss':
+                showActions(['fight']);
+                break;
+        }
+    } catch (error) {
+        console.error('Error in updateActions:', error);
+        throw error;
     }
 }
 
 function hideAllInterfaces() {
-    const interfaces = document.getElementsByClassName('interface');
-    for (let iface of interfaces) iface.style.display = 'none';
+    try {
+        const interfaces = document.getElementsByClassName('interface');
+        if (!interfaces.length) {
+            console.error('No elements with class interface found');
+            throw new Error('Missing interface elements');
+        }
+        for (let iface of interfaces) {
+            iface.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error in hideAllInterfaces:', error);
+        throw error;
+    }
 }
 
 function setActiveInterface(interfaceName) {
-    hideAllInterfaces();
-    document.getElementById(interfaceName).style.display = 'block';
+    try {
+        console.log('setActiveInterface called with:', interfaceName);
+        hideAllInterfaces();
+        const interfaceElement = document.getElementById(interfaceName);
+        if (!interfaceElement) {
+            console.error(`Element ${interfaceName} not found`);
+            throw new Error(`Missing ${interfaceName} element`);
+        }
+        interfaceElement.style.display = 'block';
+    } catch (error) {
+        console.error('Error in setActiveInterface:', error);
+        throw error;
+    }
 }
 
 function updateBattleInterface(data) {
-    document.getElementById('player-combat-hp').innerText = `${data.hp}/${data.maxHp}`;
-    const enemyData = data.eventData ? data.eventData.enemy : {};
-    document.getElementById('enemy-combat-hp').innerText = `${enemyData.hp || 0}/${enemyData.maxHp || 0}`;
-    document.getElementById('enemy-combat-name').innerText = enemyData.name || 'Неизвестный враг';
+    try {
+        console.log('updateBattleInterface called with data:', data);
+        const playerHpElement = document.getElementById('player-combat-hp');
+        if (!playerHpElement) {
+            console.error('Element player-combat-hp not found');
+            throw new Error('Missing player-combat-hp element');
+        }
+        playerHpElement.innerText = `${data.hp}/${data.maxHp}`;
+        const enemyData = data.eventData ? data.eventData.enemy : {};
+        const enemyHpElement = document.getElementById('enemy-combat-hp');
+        if (!enemyHpElement) {
+            console.error('Element enemy-combat-hp not found');
+            throw new Error('Missing enemy-combat-hp element');
+        }
+        enemyHpElement.innerText = `${enemyData.hp || 0}/${enemyData.maxHp || 0}`;
+        const enemyNameElement = document.getElementById('enemy-combat-name');
+        if (!enemyNameElement) {
+            console.error('Element enemy-combat-name not found');
+            throw new Error('Missing enemy-combat-name element');
+        }
+        enemyNameElement.innerText = enemyData.name || 'Неизвестный враг';
+    } catch (error) {
+        console.error('Error in updateBattleInterface:', error);
+        throw error;
+    }
 }
 
 function handleExplorationError(error) {
     console.error('Ошибка:', error);
     const actionsDiv = document.getElementById('actions');
+    if (!actionsDiv) {
+        console.error('Element actions not found');
+        return;
+    }
     actionsDiv.style.opacity = '1';
     if (error instanceof SyntaxError) {
         logExplorationEvent("Ошибка формата данных сервера!");
@@ -193,6 +332,10 @@ function handleExplorationError(error) {
 
 function logExplorationEvent(message) {
     const logDiv = document.getElementById('exploration-log');
+    if (!logDiv) {
+        console.error('Element exploration-log not found');
+        return;
+    }
     logDiv.innerHTML = `<p>${message}</p>`;
     logDiv.scrollTop = logDiv.scrollHeight;
 }
@@ -205,5 +348,8 @@ function preloadImages() {
 }
 
 // Инициализация
-initializeGame();
-preloadImages();
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded, starting initialization');
+    initializeGame();
+    preloadImages();
+});

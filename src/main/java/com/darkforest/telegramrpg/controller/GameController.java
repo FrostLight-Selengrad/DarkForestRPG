@@ -31,7 +31,7 @@ public class GameController {
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        playerData.put("gold", playerData.getOrDefault("resources", 0));
+        playerData.put("gold", playerData.getOrDefault("gold", 0));
         playerData.put("message", "Добро пожаловать в игру!");
         System.out.println("Returning player data: " + playerData);
         return playerData;
@@ -57,7 +57,7 @@ public class GameController {
         Map<String, Object> response = new HashMap<>(playerData);
         response.put("message", locationData.getOrDefault("message", "Вы переместились в " + location));
         response.put("image", locationData.getOrDefault("image", location + ".png"));
-        response.put("gold", playerData.getOrDefault("resources", 0));
+        response.put("gold", playerData.getOrDefault("gold", 0));
         System.out.println("Returning move response: " + response);
         return response;
     }

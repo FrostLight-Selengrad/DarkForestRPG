@@ -33,11 +33,14 @@ async function initializeGame() {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
+        console.log('Initialize response status:', response.status);
         if (!response.ok) {
-            throw new Error('Failed to load player data');
+            const errorText = await response.text();
+            console.error('Initialize error response:', errorText);
+            throw new Error('Failed to load player data: ' + errorText);
         }
         const data = await response.json();
-        console.log('Player data: ', data);
+        console.log('Player data:', data);
         if (data.currentEventType === "combat") {
             setActiveInterface('battle-interface');
             updateBattleInterface(data);
@@ -48,7 +51,7 @@ async function initializeGame() {
             setActiveInterface('camp-interface');
             campInitialize(data);
         } else {
-            console.error('Unknown location: ', data.currentLocation);
+            console.error('Unknown location:', data.currentLocation);
             alert('Неизвестная локация');
         }
     } catch (error) {
@@ -63,8 +66,11 @@ async function leaveCamp() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
+        console.log('Leave camp response status:', response.status);
         if (!response.ok) {
-            throw new Error('Failed to move to forest');
+            const errorText = await response.text();
+            console.error('Leave camp error response:', errorText);
+            throw new Error('Failed to move to forest: ' + errorText);
         }
         const data = await response.json();
         console.log('Move data:', data);
@@ -81,7 +87,7 @@ function forestInitialize(data) {
         updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
         updateActions(currentLocation);
         setActiveInterface('exploration-interface');
-        document.getElementById('exploration-log').innerHTML = message;
+        document.getElementById('exploration-log').innerHTML = message || 'Вы в лесу';
     }
 }
 

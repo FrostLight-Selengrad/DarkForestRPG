@@ -29,9 +29,11 @@ public class PlayerService {
 
     public Map<String, Object> loadPlayerData(Long userId) {
         try {
-            return objectMapper.readValue(new File("players/" + userId + ".json"), Map.class);
+            Map<String, Object> playerData = objectMapper.readValue(new File("players/" + userId + ".json"), Map.class);
+            System.out.println("Loaded player data for user " + userId + ": " + playerData);
+            return playerData;
         } catch (IOException e) {
-            // Создаем нового игрока с начальными значениями
+            System.out.println("Creating new player for user " + userId + ": " + e.getMessage());
             Map<String, Object> newPlayer = new HashMap<>();
             newPlayer.put("userId", userId);
             newPlayer.put("hp", 90);
@@ -46,7 +48,6 @@ public class PlayerService {
             newPlayer.put("battleLog", new ArrayList<>());
             newPlayer.put("explorationLog", new ArrayList<>());
             newPlayer.put("battleTurn", 0);
-            System.out.println("Creating new player for user " + userId + ": " + newPlayer);
             savePlayerData(userId, newPlayer);
             return newPlayer;
         }

@@ -7,9 +7,8 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
-function startProgressBar(stamina, message){
+function startProgressBar(stamina, message) {
     document.getElementById('exploration-progress').style.display = 'block';
-
     const progressFill = document.querySelector('#exploration-progress .progress-fill');
     const travelTime = calculateTravelTime(stamina);
     let startTime = Date.now();
@@ -18,11 +17,9 @@ function startProgressBar(stamina, message){
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / travelTime, 1);
         progressFill.style.width = `${progress * 100}%`;
-
         if (progress < 1) {
             requestAnimationFrame(animationFrame);
         } else {
-            // Скрываем прогресс бар
             document.getElementById('exploration-progress').style.display = 'none';
             processExplorationResult(message);
         }
@@ -31,54 +28,85 @@ function startProgressBar(stamina, message){
 }
 
 async function initializeGame() {
-    let response = await fetch(`/api/game/player?userId=${userId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-    let event = response.toLocaleString();
-    switch (event) {
-        case "combat":
-            enterCombat();
-            break;
-        default:{
-            fetch(`/api/game/leave-camp?userId=${userId}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'}
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    forestInitialize(data);
-                } else {
-                    alert("Не удалось инициализировать игру, попробуйте еще раз!");
-                    console.error('Ошибка при загрузке данных: ', data.error)
-                }
-            })
-            .catch(error => console.error('Ошибка при загрузке данных: ', error));
-        } break;
+    try {
+        const response = await fetch(`/api/game/player?userId=${userId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to load player data');
+        }
+        const data = await response.json();
+        console.log('Player data: ', data);
+        if (data.currentEventType === "combat") {
+            setActiveInterface('battle-interface');
+            updateBattleInterface(data);
+        } else if (data.currentLocation === "forest") {
+            setActiveInterface('exploration-interface');
+            forestInitialize(data);
+        } else if (data.currentLocation === "base_camp") {
+            setActiveInterface('camp-interface');
+            campInitialize(data);
+        } else {
+            console.error('Unknown location: ', data.currentLocation);
+            alert('Неизвестная локация');
+        }
+    } catch (error) {
+        console.error('Initialization error:', error);
+        alert('Не удалось загрузить данные игрока');
     }
 }
 
-function forestInitialize(data){
+async function leaveCamp() {
+    try {
+        const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to move to forest');
+        }
+        const data = await response.json();
+        console.log('Move data:', data);
+        setActiveInterface('exploration-interface');
+        forestInitialize(data);
+    } catch (error) {
+        console.error('Leave camp error:', error);
+        alert('Не удалось выйти в лес');
+    }
+}
+
+function forestInitialize(data) {
     with (data) {
         updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-        updateActions(currentLocation); // Добавляем кнопки для леса
-        updateInterface(currentLocation); // Отобразить интерфейс леса
+        updateActions(currentLocation);
+        setActiveInterface('exploration-interface');
         document.getElementById('exploration-log').innerHTML = message;
+    }
+}
+
+function campInitialize(data) {
+    with (data) {
+        updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+        updateActions(currentLocation);
+        setActiveInterface('camp-interface');
+        document.getElementById('camp-log').innerHTML = message || 'Вы в лагере';
     }
 }
 
 function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     switch (location) {
-        case "forest": document.getElementById('player-stats').innerHTML = `
-            <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
-            <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
+        case "forest":
+            document.getElementById('player-stats').innerHTML = `
+                <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
+                <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
             `;
             break;
-        case "base_camp": document.getElementById('player-camp-stats').innerHTML = `
-            <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
-            <p>Золото: ${gold}</p>
-        `;
+        case "base_camp":
+            document.getElementById('player-camp-stats').innerHTML = `
+                <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
+                <p>Золото: ${gold}</p>
+            `;
             break;
         default:
             break;
@@ -87,7 +115,7 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
 
 function hideAllActions() {
     const actions = document.getElementById('actions').children;
-    for(let btn of actions) btn.style.display = 'none';
+    for (let btn of actions) btn.style.display = 'none';
 }
 
 function showActions(actions) {
@@ -97,11 +125,8 @@ function showActions(actions) {
 }
 
 function updateActions(type) {
-    // Скрываем все кнопки
     hideAllActions();
-
-    // Отображаем только кнопки, подходящие под события
-    switch(type) {
+    switch (type) {
         case 'forest':
             showActions(['continue', 'return-camp']);
             break;
@@ -128,33 +153,25 @@ function updateActions(type) {
 
 function hideAllInterfaces() {
     const interfaces = document.getElementsByClassName('interface');
-    for(let iface of interfaces) iface.style.display = 'none';
+    for (let iface of interfaces) iface.style.display = 'none';
 }
 
-function updateInterface(location) {
+function setActiveInterface(interfaceName) {
     hideAllInterfaces();
+    document.getElementById(interfaceName).style.display = 'block';
+}
 
-    switch (location){
-        case 'forest':{
-            document.getElementById(`exploration-interface`).style.display = 'block';
-        } break;
-        case 'base_camp':{
-            document.getElementById(`camp-interface`).style.display = 'block';
-        } break;
-        case 'battle':{
-            document.getElementById(`battle-interface`).style.display = 'block';
-        } break;
-        default: {
-            console.error("Смена интерфейсов не удалась")
-        }
-    }
+function updateBattleInterface(data) {
+    document.getElementById('player-combat-hp').innerText = `${data.hp}/${data.maxHp}`;
+    const enemyData = data.eventData ? data.eventData.enemy : {};
+    document.getElementById('enemy-combat-hp').innerText = `${enemyData.hp || 0}/${enemyData.maxHp || 0}`;
+    document.getElementById('enemy-combat-name').innerText = enemyData.name || 'Неизвестный враг';
 }
 
 function handleExplorationError(error) {
     console.error('Ошибка:', error);
     const actionsDiv = document.getElementById('actions');
     actionsDiv.style.opacity = '1';
-
     if (error instanceof SyntaxError) {
         logExplorationEvent("Ошибка формата данных сервера!");
     } else if (error.message.includes("Некорректный")) {
@@ -162,7 +179,6 @@ function handleExplorationError(error) {
     } else {
         logExplorationEvent("Сервер не отвечает!");
     }
-
     actionsDiv.innerHTML = `
         <button onclick="exploreForest()" class="action-btn">Повторить</button>
         <button onclick="returnToCamp()" class="action-btn">В лагерь</button>
@@ -176,8 +192,7 @@ function logExplorationEvent(message) {
 }
 
 function preloadImages() {
-    const images = ['forest.png','forest_v1.png','forest_v2.png', 'goblin.png', 'mimic.png','boss.png',
-        'event_chest.png'];
+    const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'goblin.png', 'mimic.png', 'boss.png', 'event_chest.png'];
     images.forEach(img => {
         new Image().src = `images/${img}`;
     });

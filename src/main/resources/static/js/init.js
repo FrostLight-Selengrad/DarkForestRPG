@@ -100,11 +100,18 @@ async function leaveCamp() {
 function forestInitialize(data) {
     try {
         console.log('forestInitialize called with data:', data);
-        with (data) {
             console.log('Calling updateStats');
-            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+            updateStats(
+                data.currentLocation,
+                data.hp,
+                data.maxHp,
+                data.stamina,
+                data.maxStamina,
+                data.forestLevel,
+                data.gold
+            );
             console.log('Calling updateActions');
-            updateActions(currentEventType);
+            updateActions(data.currentEventType);
             console.log('Calling setActiveInterface');
             setActiveInterface('exploration-interface');
             const logElement = document.getElementById('exploration-log');
@@ -114,7 +121,6 @@ function forestInitialize(data) {
             }
             console.log('Updating exploration-log');
             logElement.innerHTML = message || 'Вы в лесу';
-        }
     } catch (error) {
         console.error('Error in forestInitialize:', error);
         throw error;
@@ -124,11 +130,18 @@ function forestInitialize(data) {
 function campInitialize(data) {
     try {
         console.log('campInitialize called with data:', data);
-        with (data) {
             console.log('Calling updateStats');
-            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+            updateStats(
+                data.currentLocation,
+                data.hp,
+                data.maxHp,
+                data.stamina,
+                data.maxStamina,
+                data.forestLevel,
+                data.gold
+            );
             console.log('Calling updateActions');
-            updateActions(currentLocation);
+            updateActions(data.currentLocation);
             console.log('Calling setActiveInterface');
             setActiveInterface('camp-interface');
             const logElement = document.getElementById('camp-log');
@@ -138,7 +151,6 @@ function campInitialize(data) {
             }
             console.log('Updating camp-log');
             logElement.innerHTML = message || 'Вы в лагере';
-        }
     } catch (error) {
         console.error('Error in campInitialize:', error);
         throw error;

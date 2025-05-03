@@ -1,7 +1,7 @@
 // camp.js - Управление лагерем
 async function loadCamp(userId) {
     try {
-        const response = await fetch(`/api/player?userId=${userId}`);
+        const response = await fetch(`/api/game/player?userId=${userId}`, { method: 'GET' });
         if (!response.ok) throw new Error('Не удалось загрузить данные игрока');
         const playerData = await response.json();
         displayCampStats(playerData);

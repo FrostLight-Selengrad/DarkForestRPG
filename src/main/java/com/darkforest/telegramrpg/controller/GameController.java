@@ -28,7 +28,9 @@ public class GameController {
     // Получение данных игрока
     @GetMapping("/player")
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
-        return playerService.loadPlayerData(userId);
+        Map<String, Object> playerData =  playerService.loadPlayerData(userId);
+        playerData.put("message", "Добро пожаловать в игру!");
+        return playerData;
     }
 
     // Перемещение в локацию

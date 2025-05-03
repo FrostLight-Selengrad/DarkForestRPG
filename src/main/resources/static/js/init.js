@@ -7,23 +7,6 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
-function setActiveInterface(interfaceName) {
-    const interfaces = ['camp', 'exploration', 'battle'];
-
-    interfaces.forEach(name => {
-        document.getElementById(`${name}-interface`).style.display =
-            name === interfaceName ? 'block' : 'none';
-    });
-
-    // Обновляем кнопки для текущего интерфейса
-    if(interfaceName === 'exploration') updateActions('forest');
-    if(interfaceName === 'camp') updateCampActions();
-}
-
-function calculateTravelTime(stamina) {
-    return 1000 + Math.floor((100 - stamina) / 4) * 500;
-}
-
 function startProgressBar(stamina, message){
     document.getElementById('exploration-progress').style.display = 'block';
 
@@ -48,7 +31,7 @@ function startProgressBar(stamina, message){
 }
 
 async function initializeGame() {
-    let response = await fetch(`/api/game/initialize?userId=${userId}`, {
+    let response = await fetch(`/api/game/player?userId=${userId}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}
     })
@@ -94,7 +77,7 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
             break;
         case "base_camp": document.getElementById('player-camp-stats').innerHTML = `
             <p>HP: ${hp}/${maxHp} | Выносливость: ${stamina}/${maxStamina}</p>
-            <p>Золото: ${resources}</p>
+            <p>Золото: ${gold}</p>
         `;
             break;
         default:

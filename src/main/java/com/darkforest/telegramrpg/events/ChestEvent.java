@@ -64,7 +64,7 @@ public class ChestEvent implements Event {
             );
         } else {
             int gold = (int) chestData.get("gold");
-            player.setResources(player.getResources() + gold);
+            player.setGold(player.getGold() + gold);
             player.setCurrentEventType("none");
             player.getEventData().clear();
             String message = "chest_open:chest_open.png:Вы открыли сундук и нашли " + gold + " золота!";

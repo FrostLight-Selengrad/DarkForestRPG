@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,12 @@ public class PlayerService {
             newPlayer.put("currentLocation", "base_camp");
             newPlayer.put("inventory", new HashMap<>(Map.of("weak_elixir", 3)));
             newPlayer.put("forestLevel", 1);
+            newPlayer.put("gold", 100);
+            newPlayer.put("currentEventType", "none");
+            newPlayer.put("battleLog", new ArrayList<>());
+            newPlayer.put("explorationLog", new ArrayList<>());
+            newPlayer.put("battleTurn", 0);
+            System.out.println("Creating new player for user " + userId + ": " + newPlayer);
             savePlayerData(userId, newPlayer);
             return newPlayer;
         }

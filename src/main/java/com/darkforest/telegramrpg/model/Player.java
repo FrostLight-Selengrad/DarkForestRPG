@@ -17,7 +17,7 @@ public class Player {
     private int magicalResistance;
     private int initiative;
     private int healthRegen;
-    private int resources;
+    private int gold;
     private int resistance;
     private int chaosResistance;
     private int rhetoric;
@@ -55,8 +55,8 @@ public class Player {
     public void setInitiative(int initiative) { this.initiative = initiative; }
     public int getHealthRegen() { return healthRegen; }
     public void setHealthRegen(int healthRegen) { this.healthRegen = healthRegen; }
-    public int getResources() { return resources; }
-    public void setResources(int resources) { this.resources = resources; }
+    public int getGold() { return gold; }
+    public void setGold(int gold) { this.gold = gold; }
     public int getResistance() { return resistance; }
     public void setResistance(int resistance) { this.resistance = resistance; }
     public int getChaosResistance() { return chaosResistance; }

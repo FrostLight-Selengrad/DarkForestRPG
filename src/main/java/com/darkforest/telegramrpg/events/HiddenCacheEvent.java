@@ -17,15 +17,15 @@ public class HiddenCacheEvent implements Event {
 
     @Override
     public Map<String, Object> execute(Map<String, Object> playerData) {
-        // Генерируем случайное количество ресурсов
-        int resources = 10 + random.nextInt(20);
+        // Генерируем случайное количество золота
+        int gold = 10 + random.nextInt(20);
 
         // Обновляем ресурсы игрока
-        int currentResources = (int) playerData.getOrDefault("resources", 0);
-        playerData.put("resources", currentResources + resources);
+        int currentGold = (int) playerData.getOrDefault("gold", 0);
+        playerData.put("gold", currentGold + gold);
 
         // Формируем сообщение
-        String message = "cache:cache.png:Вы нашли скрытый кэш и получили " + resources + " ресурсов!";
+        String message = "cache:cache.png:Вы нашли скрытый кэш и получили " + gold + " золота!";
 
         // Добавляем сообщение в исследовательский лог
         @SuppressWarnings("unchecked")

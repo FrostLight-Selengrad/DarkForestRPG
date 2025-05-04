@@ -1,5 +1,119 @@
 // exploration.js - Управление исследованием
 
+function hideAllActions() {
+    try {
+        const actions = document.getElementById('actions');
+        if (!actions) {
+            console.error('Element actions not found');
+        }
+        for (let btn of actions.children) {
+            btn.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error in hideAllActions:', error);
+        throw error;
+    }
+}
+
+function showActions(actions) {
+    console.log("Actions to show:", actions);
+    try {
+        actions.forEach(action => {
+            const actionElement = document.getElementById(`action-${action}`);
+            if (!actionElement) {
+                console.error(`Element action-${action} not found`);
+            } else {
+                actionElement.style.display = 'block';
+            }
+        });
+    } catch (error) {
+        console.error('Error in showActions:', error);
+        throw error;
+    }
+}
+
+function explorationActionsUpdate(event) {
+    try {
+        hideAllActions();
+        switch (event) {
+            case 'chest':
+                showActions(['open-chest', 'continue']);
+                break;
+            case 'trap':
+                showActions(['escape-trap']);
+                break;
+            case 'trap_missed':
+                showActions(['continue', 'return-camp']);
+                break;
+            case 'monster':
+                showActions(['fight', 'flee']);
+                break;
+            case 'abandoned_camp':
+                showActions(['rest-camp', 'continue']);
+                break;
+            case 'boss':
+                showActions(['fight']);
+                break;
+            default:
+                showActions(['continue', 'return-camp']);
+                break;
+        }
+    } catch (error) {
+        console.error('Error in updateActions:', error);
+        throw error;
+    }
+}
+
+function explorationImageUpdate(event){
+    const image = document.getElementById('forest-image');
+    switch (event) {
+        case 'chest':
+            image.src = `/images/event_chest.png`
+            break;
+        case 'trap':
+            image.src = `/images/event_trap.png`
+            break;
+        case 'trap_missed':
+            image.src = `/images/event_trap_escaped.png`
+            break;
+        case 'monster':
+            image.src = `/images/goblin.png`
+            break;
+        case 'abandoned_camp':
+            image.src = `/images/event_cave.png`
+            break;
+        case 'boss':
+            image.src = `/images/boss.png`
+            break;
+        default:
+            image.src = `/images/forest.png`
+            break;
+    }
+}
+
+function explorationInitialize(data) {
+    try {
+        explorationStatsUpdate(data.hp, data.maxHp, data.stamina, data.maxStamina, data.forestLevel, data.gold);
+        explorationActionsUpdate(data.currentEventType);
+        explorationImageUpdate(data.currentEventType);
+        const logElement = document.getElementById('exploration-log');
+        if (!logElement) {
+            console.error('Element exploration-log not found');
+            throw new Error('Missing exploration-log element');
+        }
+        logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лесу</p>`;
+    } catch (error) {
+        console.error('Error in explorationInitialize:', error);
+        throw error;
+    }
+}
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+
 async function displayExploration(locationData) {
     document.getElementById('forest-image').src = `/images/${locationData.image || 'forest_v2.png'}`;
     document.getElementById('exploration-log').innerText = locationData.message || 'Вы в лесу';
@@ -46,7 +160,7 @@ async function returnToCamp() {
         animateProgressBar(2000, () => {
             progressContainer.style.display = 'none';
             switchInterface('camp-interface');
-            displayCampStats(campData);
+            campStatsUpdate(campData);
         });
     } catch (error) {
         console.error('Ошибка возвращения:', error);
@@ -83,46 +197,26 @@ function animateProgressBar(duration, callback) {
     }, 10);
 }
 
-function forestInitialize(data) {
+function explorationStatsUpdate(hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     try {
-        console.log('forestInitialize called with data:', data);
-        updateStats(data.currentLocation, data.hp, data.maxHp, data.stamina, data.maxStamina, data.forestLevel, data.gold);
-        setActiveInterface('exploration-interface');
-        updateActions(data.currentLocation);
-        const logElement = document.getElementById('exploration-log');
-        if (!logElement) {
-            console.error('Element exploration-log not found');
-            throw new Error('Missing exploration-log element');
+        const statsElement = document.getElementById('player-stats');
+        if (!statsElement) {
+            console.error('Element player-stats not found');
+            throw new Error('Missing player-stats element');
         }
-        logElement.innerHTML = data.message || 'Вы в лесу';
+        statsElement.innerHTML = `
+            <p>HP: ${hp}/${maxHp} | Уровень леса: ${forestLevel} | </p>
+            <p>Золото: ${gold} | Выносливость: ${stamina}/${maxStamina}</p>
+        `;
     } catch (error) {
-        console.error('Error in forestInitialize:', error);
+        console.error('Error in updateStats:', error);
         throw error;
     }
 }
 
-function showActions(actions) {
-    console.log("Actions to show:", actions);
-    try {
-        actions.forEach(action => {
-            console.log("Another action to show:", action);
-            const actionElement = document.getElementById(`action-${action}`);
-            if (!actionElement) {
-                console.error(`Element action-${action} not found`);
-            } else {
-                console.log(`Element action-${action} was founded`);
-                actionElement.style.display = 'block';
-            }
-        });
-    } catch (error) {
-        console.error('Error in showActions:', error);
-        throw error;
-    }
-}
 
-function hideActions() {
-    document.querySelectorAll('#actions button').forEach(btn => btn.style.display = 'none');
-}
+
+
 
 async function fightMonster() {
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;

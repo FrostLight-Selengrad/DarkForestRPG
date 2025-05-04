@@ -34,23 +34,27 @@ public class PlayerService {
             return playerData;
         } catch (IOException e) {
             System.out.println("Creating new player for user " + userId + ": " + e.getMessage());
-            Map<String, Object> newPlayer = new HashMap<>();
-            newPlayer.put("userId", userId);
-            newPlayer.put("hp", 90);
-            newPlayer.put("maxHp", 90);
-            newPlayer.put("stamina", 100);
-            newPlayer.put("maxStamina", 100);
-            newPlayer.put("currentLocation", "base_camp");
-            newPlayer.put("inventory", new HashMap<>(Map.of("weak_elixir", 3)));
-            newPlayer.put("forestLevel", 1);
-            newPlayer.put("gold", 100);
-            newPlayer.put("currentEventType", "none");
-            newPlayer.put("battleLog", new ArrayList<>());
-            newPlayer.put("explorationLog", new ArrayList<>());
-            newPlayer.put("battleTurn", 0);
-            savePlayerData(userId, newPlayer);
-            return newPlayer;
+            return newPlayerData(userId);
         }
+    }
+
+    private Map<String, Object> newPlayerData(long userId) {
+        Map<String, Object> newPlayer = new HashMap<>();
+        newPlayer.put("userId", userId);
+        newPlayer.put("hp", 90);
+        newPlayer.put("maxHp", 90);
+        newPlayer.put("stamina", 100);
+        newPlayer.put("maxStamina", 100);
+        newPlayer.put("currentLocation", "base_camp");
+        newPlayer.put("inventory", new HashMap<>(Map.of("weak_elixir", 3)));
+        newPlayer.put("forestLevel", 1);
+        newPlayer.put("gold", 100);
+        newPlayer.put("currentEventType", "none");
+        newPlayer.put("battleLog", new ArrayList<>());
+        newPlayer.put("explorationLog", new ArrayList<>());
+        newPlayer.put("battleTurn", 0);
+        savePlayerData(userId, newPlayer);
+        return newPlayer;
     }
 
     public void savePlayerData(Long userId, Map<String, Object> playerData) {

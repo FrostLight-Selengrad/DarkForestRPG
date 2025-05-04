@@ -7,31 +7,6 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
-function startProgressBar(stamina, message) {
-    const progressContainer = document.getElementById('exploration-progress');
-    if (!progressContainer) {
-        console.error('Element exploration-progress not found');
-        return;
-    }
-    progressContainer.style.display = 'block';
-    const progressFill = document.querySelector('#exploration-progress .progress-fill');
-    const travelTime = calculateTravelTime(stamina);
-    let startTime = Date.now();
-
-    const animationFrame = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / travelTime, 1);
-        progressFill.style.width = `${progress * 100}%`;
-        if (progress < 1) {
-            requestAnimationFrame(animationFrame);
-        } else {
-            progressContainer.style.display = 'none';
-            processExplorationResult(message);
-        }
-    };
-    requestAnimationFrame(animationFrame);
-}
-
 async function initializeGame() {
     try {
         console.log('Starting initializeGame for userId:', userId);
@@ -44,7 +19,6 @@ async function initializeGame() {
         }
 
         const data = await response.json();
-        console.log('Player data:', data);
         if (!data.currentLocation) {
             console.error('Missing currentLocation in player data');
             throw new Error('Invalid player data: missing currentLocation');
@@ -54,9 +28,9 @@ async function initializeGame() {
             updateBattleInterface(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("battle-interface");
-        } else if (data.currentLocation === "forest") {
+        } else if (data.currentLocation === "forest" || data.currentLocation === "dark_forest") {
             console.log('Switching to exploration interface');
-            forestInitialize(data);
+            explorationInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("exploration-interface");
         } else if (data.currentLocation === "base_camp") {
@@ -66,62 +40,13 @@ async function initializeGame() {
             setActiveInterface("camp-interface");
         } else {
             console.error('Unknown location:', data.currentLocation);
-            //alert('Неизвестная локация');
         }
     } catch (error) {
         console.error('Initialization error:', error);
-        //alert('Не удалось загрузить данные игрока');
     }
 }
 
-async function leaveCamp() {
-    try {
-        console.log('Starting leaveCamp for userId:', userId);
-        const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        console.log('Leave camp response status:', response.status);
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Leave camp error response:', errorText);
-            throw new Error('Failed to move to forest: ' + errorText);
-        }
-        const data = await response.json();
-        console.log('Move data:', data);
-        if (!data.currentLocation) {
-            console.error('Missing currentLocation in move data');
-            throw new Error('Invalid move data: missing currentLocation');
-        }
-        forestInitialize(data);
-    } catch (error) {
-        console.error('Leave camp error:', error);
-        // alert('Не удалось выйти в лес');
-    }
-}
 
-function campInitialize(data) {
-    try {
-        console.log('campInitialize called with data:', data);
-        with (data) {
-            console.log('Calling updateStats');
-            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-            console.log('Calling updateActions with:', currentLocation);
-            updateActions(currentLocation);
-            console.log('Try to update log');
-            const logElement = document.getElementById('camp-log');
-            if (!logElement) {
-                console.error('Element camp-log not found');
-                throw new Error('Missing camp-log element');
-            }
-            console.log('Updating camp-log');
-            logElement.innerHTML = message || 'Вы в лагере';
-        }
-    } catch (error) {
-        console.error('Error in campInitialize:', error);
-        throw error;
-    }
-}
 
 function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     try {
@@ -155,60 +80,6 @@ function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold
         }
     } catch (error) {
         console.error('Error in updateStats:', error);
-        throw error;
-    }
-}
-
-function hideAllActions() {
-    try {
-        const actions = document.getElementById('actions');
-        if (!actions) {
-            console.error('Element actions not found');
-        }
-        for (let btn of actions.children) {
-            btn.style.display = 'none';
-        }
-    } catch (error) {
-        console.error('Error in hideAllActions:', error);
-        throw error;
-    }
-}
-
-function updateActions(type) {
-    try {
-        console.log('try to hideAllActions');
-        hideAllActions();
-        console.log('updateActions called with type:', type);
-        switch (type) {
-            case 'base_camp': break;
-            case 'forest':
-                console.log('showActions called with continue and return-camp');
-                showActions(['continue', 'return-camp']);
-                break;
-            case 'chest':
-                showActions(['open-chest', 'continue']);
-                break;
-            case 'trap':
-                showActions(['escape-trap']);
-                break;
-            case 'trap_missed':
-                showActions(['continue', 'return-camp']);
-                break;
-            case 'monster':
-                showActions(['fight', 'flee']);
-                break;
-            case 'abandoned_camp':
-                showActions(['rest-camp', 'continue']);
-                break;
-            case 'boss':
-                showActions(['fight']);
-                break;
-            default:
-                showActions(['continue', 'return-camp']);
-                break;
-        }
-    } catch (error) {
-        console.error('Error in updateActions:', error);
         throw error;
     }
 }
@@ -311,9 +182,36 @@ function preloadImages() {
     });
 }
 
+
+function startProgressBar(stamina, message) {
+    const progressContainer = document.getElementById('exploration-progress');
+    if (!progressContainer) {
+        console.error('Element exploration-progress not found');
+        return;
+    }
+    progressContainer.style.display = 'block';
+    const progressFill = document.querySelector('#exploration-progress .progress-fill');
+    const travelTime = calculateTravelTime(stamina);
+    let startTime = Date.now();
+
+    const animationFrame = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / travelTime, 1);
+        progressFill.style.width = `${progress * 100}%`;
+        if (progress < 1) {
+            requestAnimationFrame(animationFrame);
+        } else {
+            progressContainer.style.display = 'none';
+            processExplorationResult(message);
+        }
+    };
+    requestAnimationFrame(animationFrame);
+}
+
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded, starting initialization');
     initializeGame();
     preloadImages();
 });
+

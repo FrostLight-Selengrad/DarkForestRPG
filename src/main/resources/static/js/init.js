@@ -35,16 +35,14 @@ function startProgressBar(stamina, message) {
 async function initializeGame() {
     try {
         console.log('Starting initializeGame for userId:', userId);
-        const response = await fetch(`/api/game/player?userId=${userId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
+        const response = await fetch(`/api/game/player?userId=${userId}`);
         console.log('Initialize response status:', response.status);
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Initialize error response:', errorText);
             throw new Error('Failed to load player data: ' + errorText);
         }
+
         const data = await response.json();
         console.log('Player data:', data);
         if (!data.currentLocation) {

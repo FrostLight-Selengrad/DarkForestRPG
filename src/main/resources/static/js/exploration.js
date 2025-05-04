@@ -1,4 +1,5 @@
 // exploration.js - Управление исследованием
+
 async function displayExploration(locationData) {
     document.getElementById('forest-image').src = `/images/${locationData.image || 'forest_v2.png'}`;
     document.getElementById('exploration-log').innerText = locationData.message || 'Вы в лесу';
@@ -85,21 +86,15 @@ function animateProgressBar(duration, callback) {
 function forestInitialize(data) {
     try {
         console.log('forestInitialize called with data:', data);
-        with (data) {
-            console.log('Calling updateStats');
-            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
-            console.log('Calling setActiveInterface');
-            setActiveInterface('exploration-interface');
-            console.log('Calling updateActions');
-            updateActions(currentLocation);
-            const logElement = document.getElementById('exploration-log');
-            if (!logElement) {
-                console.error('Element exploration-log not found');
-                throw new Error('Missing exploration-log element');
-            }
-            console.log('Updating exploration-log');
-            logElement.innerHTML = message || 'Вы в лесу';
+        updateStats(data.currentLocation, data.hp, data.maxHp, data.stamina, data.maxStamina, data.forestLevel, data.gold);
+        setActiveInterface('exploration-interface');
+        updateActions(data.currentLocation);
+        const logElement = document.getElementById('exploration-log');
+        if (!logElement) {
+            console.error('Element exploration-log not found');
+            throw new Error('Missing exploration-log element');
         }
+        logElement.innerHTML = data.message || 'Вы в лесу';
     } catch (error) {
         console.error('Error in forestInitialize:', error);
         throw error;
@@ -161,4 +156,75 @@ async function tryFleeBeforeCombat() {
     }
 }
 
-// Другие функции (openChest, escapeTrap) можно реализовать аналогично
+async function openChest() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/api/game/openChest?userId=${userId}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось открыть сундук');
+        const result = await response.json();
+        const chestData = result.chestData;
+
+        if (chestData.isMimic) {
+            // Начать бой с мимиком
+            const enemyData = chestData.enemyData;
+            switchInterface('battle-interface');
+            displayBattle({ enemy: enemyData });
+        } else {
+            const gold = chestData.gold;
+            document.getElementById('forest-image').src = '/images/open-chest.png';
+            document.getElementById('exploration-log').innerText = `Вы нашли ${gold} золота!`;
+            // Обновить статистику игрока
+            const playerResponse = await fetch(`/api/game/player?userId=${userId}`);
+            if (!playerResponse.ok) throw new Error('Не удалось обновить данные игрока');
+            const playerData = await playerResponse.json();
+            updateStats(playerData.currentLocation, playerData.hp, playerData.maxHp, playerData.stamina, playerData.maxStamina, playerData.forestLevel, playerData.gold);
+            showActions(['action-continue', 'action-return-camp']);
+        }
+    } catch (error) {
+        console.error('Ошибка при открытии сундука:', error);
+        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
+        showActions(['action-continue', 'action-return-camp']);
+    }
+}
+
+async function restAtCamp() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/api/game/restAtCamp?userId=${userId}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось отдохнуть');
+        const result = await response.json();
+        const playerData = result.playerData;
+        updateStats(playerData.currentLocation, playerData.hp, playerData.maxHp, playerData.stamina, playerData.maxStamina, playerData.forestLevel, playerData.gold);
+        document.getElementById('exploration-log').innerText = 'Вы отдохнули и восстановили силы';
+        showActions(['action-continue', 'action-return-camp']);
+    } catch (error) {
+        console.error('Ошибка при отдыхе:', error);
+        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
+        showActions(['action-continue', 'action-return-camp']);
+    }
+}
+
+async function escapeTrap() {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    try {
+        const response = await fetch(`/api/game/escapeTrap?userId=${userId}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Не удалось выбраться из ловушки');
+        const result = await response.json();
+        if (result.success) {
+            document.getElementById('exploration-log').innerText = 'Вы успешно выбрались из ловушки';
+            showActions(['action-continue', 'action-return-camp']);
+        } else {
+            document.getElementById('exploration-log').innerText = 'Не удалось выбраться из ловушки';
+            // Можно добавить штраф, например, уменьшение здоровья
+            const playerResponse = await fetch(`/api/game/player?userId=${userId}`);
+            if (!playerResponse.ok) throw new Error('Не удалось обновить данные игрока');
+            const playerData = await playerResponse.json();
+            updateStats(playerData.currentLocation, playerData.hp, playerData.maxHp, playerData.stamina, playerData.maxStamina, playerData.forestLevel, playerData.gold);
+            showActions(['action-escape-trap']);
+        }
+    } catch (error) {
+        console.error('Ошибка при попытке выбраться:', error);
+        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
+        showActions(['action-escape-trap']);
+    }
+}

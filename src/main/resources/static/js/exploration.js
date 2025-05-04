@@ -82,9 +82,47 @@ function animateProgressBar(duration, callback) {
     }, 10);
 }
 
-function showActions(actionIds) {
-    document.querySelectorAll('#actions button').forEach(btn => btn.style.display = 'none');
-    actionIds.forEach(id => document.getElementById(id).style.display = 'inline-block');
+function forestInitialize(data) {
+    try {
+        console.log('forestInitialize called with data:', data);
+        with (data) {
+            console.log('Calling updateStats');
+            updateStats(currentLocation, hp, maxHp, stamina, maxStamina, forestLevel, gold);
+            console.log('Calling setActiveInterface');
+            setActiveInterface('exploration-interface');
+            console.log('Calling updateActions');
+            updateActions(currentLocation);
+            const logElement = document.getElementById('exploration-log');
+            if (!logElement) {
+                console.error('Element exploration-log not found');
+                throw new Error('Missing exploration-log element');
+            }
+            console.log('Updating exploration-log');
+            logElement.innerHTML = message || 'Вы в лесу';
+        }
+    } catch (error) {
+        console.error('Error in forestInitialize:', error);
+        throw error;
+    }
+}
+
+function showActions(actions) {
+    console.log("Actions to show:", actions);
+    try {
+        actions.forEach(action => {
+            console.log("Another action to show:", action);
+            const actionElement = document.getElementById(`action-${action}`);
+            if (!actionElement) {
+                console.error(`Element action-${action} not found`);
+            } else {
+                console.log(`Element action-${action} was founded`);
+                actionElement.style.display = 'block';
+            }
+        });
+    } catch (error) {
+        console.error('Error in showActions:', error);
+        throw error;
+    }
 }
 
 function hideActions() {

@@ -32,18 +32,22 @@ function campImageUpdate(event){
 }
 
 function campInitialize(data) {
-    console.log('Calling tCampStatsUpdate');
-    tCampStatsUpdate(data.hp, data.maxHp, data.stamina, data.maxStamina);
-    console.log('Calling campImageUpdate');
-    campImageUpdate(data.currentEventType);
-    console.log('Try to update log');
-    const logElement = document.getElementById('camp-log');
-    if (!logElement) {
-        console.error('Element camp-log not found');
-        throw new Error('Missing camp-log element');
+    try{
+        console.log('Calling tCampStatsUpdate');
+        tCampStatsUpdate(data.hp, data.maxHp, data.stamina, data.maxStamina);
+        console.log('Calling campImageUpdate');
+        campImageUpdate(data.currentEventType);
+        console.log('Try to update log');
+        const logElement = document.getElementById('camp-log');
+        if (!logElement) {
+            console.error('Element camp-log not found');
+            throw new Error('Missing camp-log element');
+        }
+        console.log('Updating camp-log');
+        logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лагере разбойников</p>`
+    } catch (error) {
+        console.error('Error in campInitialize:', error);
     }
-    console.log('Updating camp-log');
-    logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лагере разбойников</p>`
 }
 //////////////////////////////////////////////
 //////////////////////////////////////////////
@@ -92,4 +96,4 @@ async function leaveCamp() {
 }
 
 // Загрузка лагеря при старте
-const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+console.log('camp.js loaded');

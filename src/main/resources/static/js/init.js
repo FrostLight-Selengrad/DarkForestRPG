@@ -15,30 +15,29 @@ async function initializeGame() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Initialize error response:', errorText);
-            throw new Error('Failed to load player data: ' + errorText);
         }
 
         const data = await response.json();
         if (!data.currentLocation) {
             console.error('Missing currentLocation in player data');
-            throw new Error('Invalid player data: missing currentLocation');
         }
         if (data.currentEventType === "combat") {
-            console.log('Switching to battle interface');
-            updateBattleInterface(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("battle-interface");
+            console.log('Switching to battle interface');
+            updateBattleInterface(data);
         } else if (data.currentLocation === "forest") {
             console.log('Switching to exploration interface');
-            explorationInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("exploration-interface");
+            console.log('Switching to exploration interface');
+            explorationInitialize(data);
         } else if (data.currentLocation === "base_camp") {
             console.log('Switching to camp interface');
-            console.log('campInitialize called with data:', data);
-            campInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("camp-interface");
+            console.log('campInitialize called with data:', data);
+            campInitialize(data);
         } else {
             console.error('Unknown location:', data.currentLocation);
         }

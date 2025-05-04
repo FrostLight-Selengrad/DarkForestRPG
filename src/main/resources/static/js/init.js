@@ -36,7 +36,7 @@ async function initializeGame() {
     try {
         console.log('Starting initializeGame for userId:', userId);
         const response = await fetch(`/api/game/player?userId=${userId}`, {
-            method: 'GET',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
         console.log('Initialize response status:', response.status);
@@ -68,11 +68,11 @@ async function initializeGame() {
             setActiveInterface("camp-interface");
         } else {
             console.error('Unknown location:', data.currentLocation);
-            alert('Неизвестная локация');
+            //alert('Неизвестная локация');
         }
     } catch (error) {
         console.error('Initialization error:', error);
-        alert('Не удалось загрузить данные игрока');
+        //alert('Не удалось загрузить данные игрока');
     }
 }
 
@@ -98,7 +98,7 @@ async function leaveCamp() {
         forestInitialize(data);
     } catch (error) {
         console.error('Leave camp error:', error);
-        alert('Не удалось выйти в лес');
+        // alert('Не удалось выйти в лес');
     }
 }
 

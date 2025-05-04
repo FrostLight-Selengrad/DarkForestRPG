@@ -27,7 +27,7 @@ public class GameController {
     private InventoryService inventoryService;
 
     // Получение данных игрока
-    @GetMapping("/player")
+    @PostMapping("/player")
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);

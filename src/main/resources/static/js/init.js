@@ -22,22 +22,22 @@ async function initializeGame() {
             console.error('Missing currentLocation in player data');
         }
         if (data.currentEventType === "combat") {
-            console.log('Calling setActiveInterface');
-            setActiveInterface("battle-interface");
             console.log('Switching to battle interface');
             updateBattleInterface(data);
+            console.log('Calling setActiveInterface');
+            setActiveInterface("battle-interface");
         } else if (data.currentLocation === "forest") {
             console.log('Switching to exploration interface');
-            console.log('Calling setActiveInterface');
-            setActiveInterface("exploration-interface");
             console.log('Switching to exploration interface');
             explorationInitialize(data);
+            console.log('Calling setActiveInterface');
+            setActiveInterface("exploration-interface");
         } else if (data.currentLocation === "base_camp") {
             console.log('Switching to camp interface');
-            console.log('Calling setActiveInterface');
-            setActiveInterface("camp-interface");
             console.log('campInitialize called with data:', data);
             campInitialize(data);
+            console.log('Calling setActiveInterface');
+            setActiveInterface("camp-interface");
         } else {
             console.error('Unknown location:', data.currentLocation);
         }
@@ -45,8 +45,6 @@ async function initializeGame() {
         console.error('Initialization error:', error);
     }
 }
-
-
 
 function updateStats(location, hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     try {

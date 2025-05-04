@@ -32,7 +32,6 @@ public class GameController {
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        playerData.put("message", "Добро пожаловать в игру!");
         System.out.println("Returning player data: " + playerData);
         return playerData;
     }

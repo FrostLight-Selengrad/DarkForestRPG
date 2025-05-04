@@ -81,7 +81,6 @@ async function leaveCamp() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Leave camp error response:', errorText);
-            throw new Error('Failed to move to forest: ' + errorText);
         }
         const data = await response.json();
         console.log('Move data:', data);
@@ -90,6 +89,8 @@ async function leaveCamp() {
             throw new Error('Invalid move data: missing currentLocation');
         }
         explorationInitialize(data);
+        console.log('Calling setActiveInterface');
+        setActiveInterface("exploration-interface");
     } catch (error) {
         console.error('Leave camp error:', error);
     }

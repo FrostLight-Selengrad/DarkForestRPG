@@ -46,3 +46,6 @@ function endBattle(battleData) {
     switchInterface('exploration-interface');
     showActions(['action-continue', 'action-return-camp']);
 }
+
+// Загрузка battle.js при старте
+console.log('battle.js loaded');

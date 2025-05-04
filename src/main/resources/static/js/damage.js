@@ -36,3 +36,6 @@ function updateCombatHealth(actionType) {
         })
         .catch(handleExplorationError);
 }
+
+// Загрузка damage.js при старте
+console.log('damage.js loaded');

@@ -28,13 +28,14 @@ async function initializeGame() {
             updateBattleInterface(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("battle-interface");
-        } else if (data.currentLocation === "forest" || data.currentLocation === "dark_forest") {
+        } else if (data.currentLocation === "forest") {
             console.log('Switching to exploration interface');
             explorationInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("exploration-interface");
         } else if (data.currentLocation === "base_camp") {
             console.log('Switching to camp interface');
+            console.log('campInitialize called with data:', data);
             campInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("camp-interface");

@@ -32,25 +32,18 @@ function campImageUpdate(event){
 }
 
 function campInitialize(data) {
-    try {
-        console.log('campInitialize called with data:', data);
-        console.log('Calling updateStats');
-        tCampStatsUpdate(data.hp, data.maxHp, data.stamina, data.maxStamina);
-        console.log('Calling updateActions');
-        campActionsUpdate(data.currentEventType);
-        campImageUpdate(data.currentEventType);
-        console.log('Try to update log');
-        const logElement = document.getElementById('camp-log');
-        if (!logElement) {
-            console.error('Element camp-log not found');
-            throw new Error('Missing camp-log element');
-        }
-        console.log('Updating camp-log');
-        logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лагере разбойников</p>`
-    } catch (error) {
-        console.error('Error in campInitialize:', error);
-        throw error;
+    console.log('Calling tCampStatsUpdate');
+    tCampStatsUpdate(data.hp, data.maxHp, data.stamina, data.maxStamina);
+    console.log('Calling campImageUpdate');
+    campImageUpdate(data.currentEventType);
+    console.log('Try to update log');
+    const logElement = document.getElementById('camp-log');
+    if (!logElement) {
+        console.error('Element camp-log not found');
+        throw new Error('Missing camp-log element');
     }
+    console.log('Updating camp-log');
+    logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лагере разбойников</p>`
 }
 //////////////////////////////////////////////
 //////////////////////////////////////////////

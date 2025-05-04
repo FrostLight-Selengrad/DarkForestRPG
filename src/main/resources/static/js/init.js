@@ -32,20 +32,20 @@ function startProgressBar(stamina, message) {
     requestAnimationFrame(animationFrame);
 }
 
-function initializeGame() {
+async function initializeGame() {
     try {
         console.log('Starting initializeGame for userId:', userId);
-        const response =  fetch(`/api/game/player?userId=${userId}`, {
+        const response = await fetch(`/api/game/player?userId=${userId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
         console.log('Initialize response status:', response.status);
         if (!response.ok) {
-            const errorText =  response.text();
+            const errorText = await response.text();
             console.error('Initialize error response:', errorText);
             throw new Error('Failed to load player data: ' + errorText);
         }
-        const data =  response.json();
+        const data = await response.json();
         console.log('Player data:', data);
         if (!data.currentLocation) {
             console.error('Missing currentLocation in player data');
@@ -357,5 +357,8 @@ function preloadImages() {
 }
 
 // Инициализация
-initializeGame();
-preloadImages();ё
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded, starting initialization');
+    initializeGame();
+    preloadImages();
+});

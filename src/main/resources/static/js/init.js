@@ -9,7 +9,7 @@ if (!userId) {
 
 function preloadImages() {
     const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'goblin.png',
-        'mimic.png', 'boss.png', 'event_chest.png', 'event_camp.png', 'character-icon.png',
+        'mimic.png', 'boss.png', 'event_chest.png', 'event_camp.jpg', 'character-icon.png',
         'backpack-icon.png', 'talents-icon.png', 'skills-icon.png', 'char-icon.png'];
     const promises = images.map(img => {
         return new Promise((resolve, reject) => {

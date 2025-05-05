@@ -44,7 +44,7 @@ function campInitialize(data) {
             throw new Error('Missing camp-log element');
         }
         console.log('Updating camp-log');
-        logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лагере разбойников</p>`
+        logElement.innerHTML = `<p>${data.message || 'Вы успешно вернулись к игре и оказались в лагере разбойников'}</p>`;
     } catch (error) {
         console.error('Error in campInitialize:', error);
     }

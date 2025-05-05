@@ -7,6 +7,21 @@ if (!userId) {
     logExplorationEvent("Ошибка: пользователь не авторизован");
 }
 
+function preloadImages() {
+    const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'goblin.png',
+        'mimic.png', 'boss.png', 'event_chest.png', 'event_camp.png', 'character-icon.png',
+        'backpack-icon.png', 'talents-icon.png', 'skills-icon.png', 'char-icon.png'];
+    const promises = images.map(img => {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.src = `images/${img}`;
+            image.onload = resolve;
+            image.onerror = reject;
+        });
+    });
+    return Promise.all(promises);
+}
+
 async function initializeGame() {
     try {
         console.log('Starting initializeGame for userId:', userId);
@@ -173,14 +188,6 @@ function logExplorationEvent(message) {
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-function preloadImages() {
-    const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'goblin.png', 'mimic.png', 'boss.png', 'event_chest.png'];
-    images.forEach(img => {
-        new Image().src = `images/${img}`;
-    });
-}
-
-
 function startProgressBar(stamina, message) {
     const progressContainer = document.getElementById('exploration-progress');
     if (!progressContainer) {
@@ -207,9 +214,22 @@ function startProgressBar(stamina, message) {
 }
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM fully loaded, starting initialization');
-    initializeGame();
-    preloadImages();
+    try {
+        await preloadImages();
+        console.log('Images preloaded');
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+        initializeGame();
+    } catch (error) {
+        console.error('Error preloading images:', error);
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+        initializeGame();
+    }
 });
-

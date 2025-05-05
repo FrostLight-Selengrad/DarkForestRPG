@@ -86,7 +86,7 @@ function explorationImageUpdate(event){
             image.src = `/images/boss.png`
             break;
         default:
-            image.src = `/images/forest.png`
+            image.src = `/images/forest_v1.png`
             break;
     }
 }
@@ -101,7 +101,7 @@ function explorationInitialize(data) {
             console.error('Element exploration-log not found');
             throw new Error('Missing exploration-log element');
         }
-        logElement.innerHTML = `<p>${data.message}</p>` || `<p>Вы успешно вернулись к игре и оказались в лесу</p>`;
+        logElement.innerHTML = `<p>${data.message || 'Вы успешно вернулись к игре и оказались в лесу'}</p>`;
     } catch (error) {
         console.error('Error in explorationInitialize:', error);
         throw error;

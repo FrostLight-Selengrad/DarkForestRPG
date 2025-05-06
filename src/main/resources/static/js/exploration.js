@@ -113,7 +113,7 @@ function explorationInitialize(data) {
 /////////////Ниже методы исследования/////////
 //////////////////////////////////////////////
 
-async function startProgressBar(travelTime) {
+function startProgressBar(travelTime) {
     const progressContainer = document.getElementById('exploration-progress');
     if (!progressContainer) {
         console.error('Element exploration-progress not found');
@@ -136,26 +136,26 @@ async function startProgressBar(travelTime) {
     requestAnimationFrame(animationFrame);
 }
 
-async function exploreProgress(){
+function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     // Запрашиваем длительность отображению прогресс-бара
     const eventType = "explore";
-    const progressTimeResponse = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
+    const progressTimeResponse = fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
     if (!progressTimeResponse.ok) {
         throw new Error('Failed to fetch progress time');
     }
-    const travelTime = parseInt(await progressTimeResponse.text(), 10);
+    const travelTime = parseInt(progressTimeResponse.text(), 10);
 
     // Отрабатывает прогресс-бар
     const progressBarText = document.getElementById('progress-text');
     progressBarText.innerHTML = '<p>Исследование леса...</p>'
-    await startProgressBar(travelTime)
+    startProgressBar(travelTime)
 
     // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
-    const exploreDataResponse = await fetch(`/api/game/explore?userId=${userId}`);
+    const exploreDataResponse = fetch(`/api/game/explore?userId=${userId}`);
     if (!exploreDataResponse.ok) throw new Error('Не удалось исследовать лес');
-    const data = await exploreDataResponse.json();
-    await explorationInitialize(data);
+    const data = exploreDataResponse.json();
+    explorationInitialize(data);
 }
 
 async function exploreForest() {
@@ -164,7 +164,7 @@ async function exploreForest() {
         hideAllActions();
 
         // Вызываем работу прогресс-бара
-        await exploreProgress();
+        exploreProgress();
 
         // На всякий случай вызываем отображение интерфейса
         setActiveInterface("exploration-interface")
@@ -182,7 +182,7 @@ async function returnToCamp() {
     try {
         const progressContainer = document.getElementById('return-camp-progress');
         progressContainer.style.display = 'block';
-        hideAllActions()
+        hideAllActions();
 
         const response = await fetch(`/api/game/move?userId=${userId}&location=camp`, { method: 'POST' });
         if (!response.ok) throw new Error('Не удалось вернуться в лагерь');
@@ -190,7 +190,7 @@ async function returnToCamp() {
 
         const progressBarText = document.getElementById('progress-text');
         progressBarText.innerHTML = '<p>Переход в чащу леса...</p>'
-        await startProgressBar(2000);
+        startProgressBar(2000);
 
         console.log('Calling setActiveInterface in returnToCamp');
         setActiveInterface("camp-interface");

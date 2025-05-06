@@ -139,16 +139,20 @@ function startProgressBar(travelTime) {
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     // Запрашиваем длительность отображению прогресс-бара
-    const eventType = "explore"
-    const travelTime = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
+    const eventType = "explore";
+    const progressTimeResponse = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
+    if (!progressTimeResponse.ok) {
+        throw new Error('Failed to fetch progress time');
+    }
+    const travelTime = parseInt(await progressTimeResponse.text(), 10);
 
     // Отрабатывает прогресс-бар
     startProgressBar(travelTime)
 
     // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
-    const response = await fetch(`/api/game/explore?userId=${userId}`);
-    if (!response.ok) throw new Error('Не удалось исследовать лес');
-    const data = await response.json();
+    const exploreDataResponse = await fetch(`/api/game/explore?userId=${userId}`);
+    if (!exploreDataResponse.ok) throw new Error('Не удалось исследовать лес');
+    const data = await exploreDataResponse.json();
     await explorationInitialize(data);
 }
 

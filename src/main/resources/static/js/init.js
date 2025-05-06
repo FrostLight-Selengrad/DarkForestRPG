@@ -194,13 +194,13 @@ function logExplorationEvent(message) {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM fully loaded, starting initialization');
     try {
+        const loadingScreen = document.getElementById('loading-screen');
         const minLoadingTime = 3500; // 3.5 секунды
         const imagePreload = preloadImages();
-        const delay = new Promise(resolve => setTimeout(resolve, minLoadingTime));
         const initialize = initializeGame();
-        await Promise.all([imagePreload, delay, initialize]);
+        const delay = new Promise(resolve => setTimeout(resolve, minLoadingTime));
+        await Promise.all([imagePreload, initialize, delay]);
         console.log('Images preloaded and minimum time elapsed');
-        const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             loadingScreen.style.display = 'none';
         }

@@ -61,7 +61,7 @@ public class GameController {
         return response;
     }
 
-    // Исследование локации
+    // Таймер для исследования
     @GetMapping("/progress-time")
     public long getProgressTime(@RequestParam Long userId, @RequestParam String eventType) {
         System.out.println("Received progress time request: userId=" + userId + ", eventType=" + eventType);

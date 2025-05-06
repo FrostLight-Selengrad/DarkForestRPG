@@ -147,6 +147,7 @@ async function exploreProgress(){
     const travelTime = parseInt(await progressTimeResponse.text(), 10);
 
     // Отрабатывает прогресс-бар
+    console.log('Travel time:', travelTime);
     startProgressBar(travelTime)
 
     // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
@@ -180,7 +181,7 @@ async function returnToCamp() {
     try {
         const progressContainer = document.getElementById('return-camp-progress');
         progressContainer.style.display = 'block';
-        hideActions();
+        hideAllActions()
 
         const response = await fetch(`/api/game/move?userId=${userId}&location=camp`, { method: 'POST' });
         if (!response.ok) throw new Error('Не удалось вернуться в лагерь');

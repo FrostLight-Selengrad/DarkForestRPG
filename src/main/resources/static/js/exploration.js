@@ -108,40 +108,65 @@ function explorationInitialize(data) {
     }
 }
 //////////////////////////////////////////////
+/////////////Выше методы инициализации////////
 //////////////////////////////////////////////
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-//////////////////////////////////////////////
+/////////////Ниже методы исследования/////////
 //////////////////////////////////////////////
 
-async function displayExploration(locationData) {
-    document.getElementById('forest-image').src = `/images/${locationData.image || 'forest_v2.png'}`;
-    document.getElementById('exploration-log').innerText = locationData.message || 'Вы в лесу';
-    showActions(['action-continue', 'action-return-camp']); // Показываем базовые кнопки
+function startProgressBar(travelTime) {
+    const progressContainer = document.getElementById('exploration-progress');
+    if (!progressContainer) {
+        console.error('Element exploration-progress not found');
+        return;
+    }
+    progressContainer.style.display = 'block';
+    const progressFill = document.querySelector('#exploration-progress .progress-fill');
+    let startTime = Date.now();
+
+    const animationFrame = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / travelTime, 1);
+        progressFill.style.width = `${progress * 100}%`;
+        if (progress < 1) {
+            requestAnimationFrame(animationFrame);
+        } else {
+            progressContainer.style.display = 'none';
+        }
+    };
+    requestAnimationFrame(animationFrame);
+}
+
+async function exploreProgress(){
+    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    // Запрашиваем длительность отображению прогресс-бара
+    const eventType = "explore"
+    const travelTime = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
+
+    // Отрабатывает прогресс-бар
+    startProgressBar(travelTime)
+
+    // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
+    const response = await fetch(`/api/game/explore?userId=${userId}`);
+    if (!response.ok) throw new Error('Не удалось исследовать лес');
+    const data = await response.json();
+    await explorationInitialize(data);
 }
 
 async function exploreForest() {
-    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     try {
-        // Показываем прогресс-бар
-        const progressContainer = document.getElementById('exploration-progress');
-        progressContainer.style.display = 'block';
-        hideActions(); // Скрываем кнопки во время прогресса
+        // Скрываем кнопки во время прогресса
+        hideAllActions();
 
-        const response = await fetch(`/api/game/explore?userId=${userId}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Не удалось исследовать лес');
-        const eventData = await response.json();
+        // Вызываем работу прогресс-бара
+        await exploreProgress();
 
-        // Анимация прогресс-бара (зависит от выносливости)
-        const duration = (100 - eventData.stamina) * 100; // Чем меньше выносливость, тем дольше (мс)
-        animateProgressBar(duration, async () => {
-            progressContainer.style.display = 'none';
-            await handleEvent(eventData);
-        });
+        // На всякий случай вызываем отображение интерфейса
+        setActiveInterface("exploration-interface")
+
     } catch (error) {
         console.error('Ошибка исследования:', error);
-        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
-        progressContainer.style.display = 'none';
+        document.getElementById('exploration-log').innerText = 'В процессе приключения возникла ошибка <br>' +
+            'Пожалуйста попробуйте позже';
         showActions(['action-continue', 'action-return-camp']);
     }
 }
@@ -167,23 +192,6 @@ async function returnToCamp() {
         document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
         progressContainer.style.display = 'none';
         showActions(['action-continue', 'action-return-camp']);
-    }
-}
-
-async function handleEvent(eventData) {
-    document.getElementById('exploration-log').innerText = eventData.message;
-    switch (eventData.type) {
-        case 'monster':
-            showActions(['action-fight', 'action-flee']);
-            break;
-        case 'chest':
-            showActions(['action-open-chest']);
-            break;
-        case 'trap':
-            showActions(['action-escape-trap']);
-            break;
-        default:
-            showActions(['action-continue', 'action-return-camp']);
     }
 }
 

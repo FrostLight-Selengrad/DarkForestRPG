@@ -62,17 +62,34 @@ public class GameController {
     }
 
     // Исследование локации
-    @PostMapping("/explore")
-    public Map<String, Object> exploreLocation(@RequestParam Long userId) {
+    @GetMapping("/progress-time")
+    public long getProgressTime(@RequestParam Long userId, @RequestParam String eventType) {
+        System.out.println("Received progress time request: userId=" + userId + ", eventType=" + eventType);
+        Map<String, Object> playerData = playerService.loadPlayerData(userId);
+        int stamina = (int) playerData.get("stamina");
+
+        long progressTime = eventService.generateProgressTime(stamina, (int) playerData.get("maxStamina"),
+                (int) playerData.get("speed"), (int) playerData.get("agility"),(int) playerData.get("forestLevel"));
+
+        System.out.println("Returning progress time: " + progressTime);
+        return progressTime;
+    }
+
+    // Исследование локации
+    @GetMapping("/explore")
+    public Map<String, Object> getDataAfterExplore(@RequestParam Long userId) {
         System.out.println("Received explore request: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        String location = (String) playerData.get("currentLocation");
-        Map<String, Object> eventData = eventService.generateEvent(userId, location);
+        Map<String, Object> eventData = eventService.generateEvent();
+        int stamina = (int) playerData.get("stamina");
+
         playerData.put("currentEventType", eventData.get("type"));
         playerData.put("eventData", eventData);
+        playerData.put("stamina", stamina-5);;
         playerService.savePlayerData(userId, playerData);
+
         System.out.println("Returning explore response: " + eventData);
-        return eventData;
+        return playerData;
     }
 
     // Получение инвентаря

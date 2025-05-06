@@ -45,6 +45,10 @@ public class PlayerService {
         newPlayer.put("maxHp", 90);
         newPlayer.put("stamina", 100);
         newPlayer.put("maxStamina", 100);
+        newPlayer.put("speed", 100);
+        newPlayer.put("power", 5);
+        newPlayer.put("agility", 5);
+        newPlayer.put("vitality", 5);
         newPlayer.put("currentLocation", "base_camp");
         newPlayer.put("inventory", new HashMap<>(Map.of("weak_elixir", 3)));
         newPlayer.put("forestLevel", 1);

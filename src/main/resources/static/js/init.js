@@ -188,45 +188,22 @@ function logExplorationEvent(message) {
     logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-function startProgressBar(stamina, message) {
-    const progressContainer = document.getElementById('exploration-progress');
-    if (!progressContainer) {
-        console.error('Element exploration-progress not found');
-        return;
-    }
-    progressContainer.style.display = 'block';
-    const progressFill = document.querySelector('#exploration-progress .progress-fill');
-    const travelTime = calculateTravelTime(stamina);
-    let startTime = Date.now();
 
-    const animationFrame = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / travelTime, 1);
-        progressFill.style.width = `${progress * 100}%`;
-        if (progress < 1) {
-            requestAnimationFrame(animationFrame);
-        } else {
-            progressContainer.style.display = 'none';
-            processExplorationResult(message);
-        }
-    };
-    requestAnimationFrame(animationFrame);
-}
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM fully loaded, starting initialization');
     try {
-        const minLoadingTime = 3000; // 3 секунды
+        const minLoadingTime = 3500; // 3.5 секунды
         const imagePreload = preloadImages();
         const delay = new Promise(resolve => setTimeout(resolve, minLoadingTime));
-        await Promise.all([imagePreload, delay]);
+        const initialize = initializeGame();
+        await Promise.all([imagePreload, delay, initialize]);
         console.log('Images preloaded and minimum time elapsed');
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             loadingScreen.style.display = 'none';
         }
-        initializeGame();
     } catch (error) {
         console.error('Error during initialization:', error);
         const loadingScreen = document.getElementById('loading-screen');

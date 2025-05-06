@@ -72,6 +72,9 @@ function switchInterface(activeId) {
 
 async function leaveCamp() {
     try {
+        const progressBarText = document.getElementById('progress-text');
+        progressBarText.innerHTML = '<p>Переход в чащу леса...</p>'
+        await startProgressBar(2000);
         console.log('Starting leaveCamp for userId:', userId);
         const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, {
             method: 'POST',

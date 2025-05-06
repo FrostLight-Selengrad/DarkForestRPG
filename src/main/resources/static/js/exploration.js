@@ -113,7 +113,7 @@ function explorationInitialize(data) {
 /////////////Ниже методы исследования/////////
 //////////////////////////////////////////////
 
-function startProgressBar(travelTime) {
+async function startProgressBar(travelTime) {
     const progressContainer = document.getElementById('exploration-progress');
     if (!progressContainer) {
         console.error('Element exploration-progress not found');
@@ -147,8 +147,9 @@ async function exploreProgress(){
     const travelTime = parseInt(await progressTimeResponse.text(), 10);
 
     // Отрабатывает прогресс-бар
-    console.log('Travel time:', travelTime);
-    startProgressBar(travelTime)
+    const progressBarText = document.getElementById('progress-text');
+    progressBarText.innerHTML = '<p>Исследование леса...</p>'
+    await startProgressBar(travelTime)
 
     // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
     const exploreDataResponse = await fetch(`/api/game/explore?userId=${userId}`);
@@ -187,11 +188,12 @@ async function returnToCamp() {
         if (!response.ok) throw new Error('Не удалось вернуться в лагерь');
         const campData = await response.json();
 
-        animateProgressBar(2000, () => {
-            progressContainer.style.display = 'none';
-            switchInterface('camp-interface');
-            campStatsUpdate(campData);
-        });
+        const progressBarText = document.getElementById('progress-text');
+        progressBarText.innerHTML = '<p>Переход в чащу леса...</p>'
+        await startProgressBar(2000);
+
+        console.log('Calling setActiveInterface in returnToCamp');
+        setActiveInterface("camp-interface");
     } catch (error) {
         console.error('Ошибка возвращения:', error);
         document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';

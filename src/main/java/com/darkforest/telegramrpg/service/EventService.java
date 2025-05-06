@@ -31,7 +31,7 @@ public class EventService {
     }
 
     public long generateProgressTime(int stamina, int maxStamina, int speed, int agility, int forestLevel) {
-        double S_base = 1200.0;
+        double S_base = 200.0; // Значение для тестов, потом вернуть 1200
         int random_component = random.nextInt(101); // 0 to 100
         double multiplier = 1 + 0.6 * (forestLevel - 1);
         double S_adjusted = S_base * multiplier + random_component;

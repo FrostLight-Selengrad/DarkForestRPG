@@ -205,15 +205,6 @@ async function returnToCamp() {
     }
 }
 
-function animateProgressBar(duration, callback) {
-    const progressFill = document.querySelector('.progress-fill');
-    progressFill.style.width = '0%';
-    progressFill.style.transition = `width ${duration}ms linear`;
-    setTimeout(() => {
-        progressFill.style.width = '100%';
-        setTimeout(callback, duration);
-    }, 10);
-}
 
 function explorationStatsUpdate(hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     try {
@@ -231,10 +222,6 @@ function explorationStatsUpdate(hp, maxHp, stamina, maxStamina, forestLevel, gol
         throw error;
     }
 }
-
-
-
-
 
 async function fightMonster() {
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;

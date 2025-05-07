@@ -109,6 +109,7 @@ function explorationInitialize(data) {
 }
 
 window.explorationInitialize = explorationInitialize;
+
 //////////////////////////////////////////////
 /////////////Выше методы инициализации////////
 //////////////////////////////////////////////
@@ -116,31 +117,34 @@ window.explorationInitialize = explorationInitialize;
 //////////////////////////////////////////////
 
 function startProgressBar(travelTime) {
-    const progressContainer = document.getElementById('exploration-progress');
-    if (!progressContainer) {
-        console.error('Element exploration-progress not found');
-        resolve(); // Завершаем промис, даже если элемент не найден
-        return;
-    }
-    progressContainer.style.display = 'block';
-    const progressFill = document.querySelector('#exploration-progress .progress-fill');
-    let startTime = Date.now();
-
-    const animationFrame = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / travelTime, 1);
-        progressFill.style.width = `${progress * 100}%`;
-        if (progress < 1) {
-            requestAnimationFrame(animationFrame);
-        } else {
-            progressContainer.style.display = 'none';
-            resolve(); // Завершаем промис после анимации
+    return new Promise((resolve) => {
+        const progressContainer = document.getElementById('exploration-progress');
+        if (!progressContainer) {
+            console.error('Element exploration-progress not found');
+            resolve();
+            return;
         }
-    };
-    requestAnimationFrame(animationFrame);
+        progressContainer.style.display = 'block';
+        const progressFill = document.querySelector('#exploration-progress .progress-fill');
+        let startTime = Date.now();
+
+        const animationFrame = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / travelTime, 1);
+            progressFill.style.width = `${progress * 100}%`;
+            if (progress < 1) {
+                requestAnimationFrame(animationFrame);
+            } else {
+                progressContainer.style.display = 'none';
+                resolve();
+            }
+        };
+        requestAnimationFrame(animationFrame);
+    });
 }
 
 window.startProgressBar = startProgressBar;
+console.log('exploration.js loaded, startProgressBar defined');
 
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
@@ -178,8 +182,8 @@ async function exploreForest() {
 
     } catch (error) {
         console.error('Ошибка исследования:', error);
-        document.getElementById('exploration-log').innerHTML = '<p>В процессе приключения возникла ошибка<\p>' + <br/> +
-            '<p>Пожалуйста попробуйте позже<\p>';
+        document.getElementById('exploration-log').innerHTML =
+            '<p>В процессе приключения возникла ошибка</p><br/><p>Пожалуйста, попробуйте позже</p>';
         showActions(['action-continue', 'action-return-camp']);
     }
 }

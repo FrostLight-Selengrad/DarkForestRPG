@@ -138,6 +138,9 @@ function startProgressBar(travelTime) {
     requestAnimationFrame(animationFrame);
 }
 
+// Ensure startProgressBar is globally accessible
+window.startProgressBar = startProgressBar;
+
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     // Запрашиваем длительность отображению прогресс-бара
@@ -193,7 +196,7 @@ async function returnToCamp() {
 
         const progressBarText = document.getElementById('progress-text');
         progressBarText.innerHTML = '<p>Переход в чащу леса...</p>'
-        startProgressBar(2000);
+        await startProgressBar(2000);
 
         console.log('Calling setActiveInterface in returnToCamp');
         setActiveInterface("camp-interface");

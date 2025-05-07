@@ -138,9 +138,6 @@ function startProgressBar(travelTime) {
     requestAnimationFrame(animationFrame);
 }
 
-// Ensure startProgressBar is globally accessible
-window.startProgressBar = startProgressBar;
-
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     // Запрашиваем длительность отображению прогресс-бара

@@ -26,7 +26,7 @@ function campImageUpdate(event){
             image.src = `/images/event_chest.png`
             break;
         default:
-            image.src = `/images/event_camp.png`
+            image.src = `/images/event_camp.jpg`
             break;
     }
 }
@@ -68,6 +68,31 @@ function switchInterface(activeId) {
     document.getElementById('exploration-interface').style.display = 'none';
     document.getElementById('battle-interface').style.display = 'none';
     document.getElementById(activeId).style.display = 'block';
+}
+
+function startProgressBar(travelTime) {
+    const progressContainer = document.getElementById('exploration-progress');
+    if (!progressContainer) {
+        console.error('Element exploration-progress not found');
+        resolve(); // Завершаем промис, даже если элемент не найден
+        return;
+    }
+    progressContainer.style.display = 'block';
+    const progressFill = document.querySelector('#exploration-progress .progress-fill');
+    let startTime = Date.now();
+
+    const animationFrame = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / travelTime, 1);
+        progressFill.style.width = `${progress * 100}%`;
+        if (progress < 1) {
+            requestAnimationFrame(animationFrame);
+        } else {
+            progressContainer.style.display = 'none';
+            resolve(); // Завершаем промис после анимации
+        }
+    };
+    requestAnimationFrame(animationFrame);
 }
 
 async function leaveCamp() {

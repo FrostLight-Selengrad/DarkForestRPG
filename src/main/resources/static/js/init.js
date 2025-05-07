@@ -194,7 +194,7 @@ function logExplorationEvent(message) {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM fully loaded, starting initialization');
     try {
-        const minLoadingTime = 3500; // 3.5 секунды
+        const minLoadingTime = 4500; // 4.5 секунды
         const imagePreload = preloadImages();
         const delay = new Promise(resolve => setTimeout(resolve, minLoadingTime));
         await Promise.all([imagePreload, delay]);

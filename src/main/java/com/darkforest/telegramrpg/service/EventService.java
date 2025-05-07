@@ -14,12 +14,12 @@ public class EventService {
     // Генерация случайного события
     public Map<String, Object> generateEvent() {
         Map<String, Object> eventData = new HashMap<>();
-        String[] eventTypes = {"monster", "chest", "trap", "boss"};
+        String[] eventTypes = {"monster_eyes", "monster_hidden","chest", "trap", "boss"};
         String eventType = eventTypes[random.nextInt(eventTypes.length)];
         eventData.put("type", eventType);
-        if (eventType.equals("monster")) {
-            eventData.put("monsterType", "goblin");
-            eventData.put("message", "Вы встретили гоблина!");
+        if (eventType.equals("monster_eyes") || eventType.equals("monster_hidden") ) {
+            eventData.put("monsterType", "bandit");
+            eventData.put("message", "Вы встретили разбойника!");
         } else if (eventType.equals("chest")) {
             eventData.put("message", "Вы нашли сундук!");
         } else if (eventType.equals("trap")) {

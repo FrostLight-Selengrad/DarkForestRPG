@@ -45,7 +45,8 @@ function explorationActionsUpdate(event) {
             case 'trap_missed':
                 showActions(['continue', 'return-camp']);
                 break;
-            case 'monster':
+            case 'monster_eyes':
+            case 'monster_hidden':
                 showActions(['fight', 'flee']);
                 break;
             case 'abandoned_camp':
@@ -67,26 +68,32 @@ function explorationActionsUpdate(event) {
 function explorationImageUpdate(event){
     const image = document.getElementById('forest-image');
     switch (event) {
+        case 'monster_hidden':
+            image.src = `/images/monster_hidden.jpg`;
+            break;
+        case 'monster_eyes':
+            image.src = `/images/monster_eyes.jpg`;
+            break;
         case 'chest':
-            image.src = `/images/event_chest.png`
+            image.src = `/images/event_chest.png`;
             break;
         case 'trap':
-            image.src = `/images/event_trap.png`
+            image.src = `/images/event_trap.png`;
             break;
         case 'trap_missed':
-            image.src = `/images/event_trap_escaped.png`
+            image.src = `/images/event_trap_escaped.png`;
             break;
         case 'monster':
-            image.src = `/images/goblin.png`
+            image.src = `/images/goblin.png`;
             break;
         case 'abandoned_camp':
-            image.src = `/images/event_cave.png`
+            image.src = `/images/event_cave.png`;
             break;
         case 'boss':
-            image.src = `/images/boss.png`
+            image.src = `/images/boss.png`;
             break;
         default:
-            image.src = `/images/forest_v1.png`
+            image.src = `/images/forest_v1.png`;
             break;
     }
 }

@@ -117,6 +117,7 @@ function startProgressBar(travelTime) {
     const progressContainer = document.getElementById('exploration-progress');
     if (!progressContainer) {
         console.error('Element exploration-progress not found');
+        resolve(); // Завершаем промис, даже если элемент не найден
         return;
     }
     progressContainer.style.display = 'block';
@@ -131,48 +132,50 @@ function startProgressBar(travelTime) {
             requestAnimationFrame(animationFrame);
         } else {
             progressContainer.style.display = 'none';
+            resolve(); // Завершаем промис после анимации
         }
     };
     requestAnimationFrame(animationFrame);
 }
 
-function exploreProgress(){
+async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     // Запрашиваем длительность отображению прогресс-бара
     const eventType = "explore";
-    const progressTimeResponse = fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
+    const progressTimeResponse = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
     if (!progressTimeResponse.ok) {
         throw new Error('Failed to fetch progress time');
     }
-    const travelTime = parseInt(progressTimeResponse.text(), 10);
+    const travelTime = parseInt(await progressTimeResponse.text(), 10);
+    console.log('Travel time:', travelTime);
+
+    // Устанавливаем интерфейс исследования с картинкой леса
+    setActiveInterface("exploration-interface");
 
     // Отрабатывает прогресс-бар
     const progressBarText = document.getElementById('progress-text');
     progressBarText.innerHTML = '<p>Исследование леса...</p>'
-    startProgressBar(travelTime)
+    await startProgressBar(travelTime)
 
     // По завершению анимации запрашиваем данные по будущему событию и отображаем информацию
-    const exploreDataResponse = fetch(`/api/game/explore?userId=${userId}`);
+    const exploreDataResponse = await fetch(`/api/game/explore?userId=${userId}`);
     if (!exploreDataResponse.ok) throw new Error('Не удалось исследовать лес');
-    const data = exploreDataResponse.json();
-    explorationInitialize(data);
+    const data = await exploreDataResponse.json();
+    await explorationInitialize(data);
 }
 
 async function exploreForest() {
     try {
-        // Скрываем кнопки во время прогресса
+        // Скрываем кнопки во время исследования
         hideAllActions();
 
         // Вызываем работу прогресс-бара
-        exploreProgress();
-
-        // На всякий случай вызываем отображение интерфейса
-        setActiveInterface("exploration-interface")
+        await exploreProgress();
 
     } catch (error) {
         console.error('Ошибка исследования:', error);
-        document.getElementById('exploration-log').innerText = 'В процессе приключения возникла ошибка <br>' +
-            'Пожалуйста попробуйте позже';
+        document.getElementById('exploration-log').innerHTML = '<p>В процессе приключения возникла ошибка<\p>' + <br/> +
+            '<p>Пожалуйста попробуйте позже<\p>';
         showActions(['action-continue', 'action-return-camp']);
     }
 }

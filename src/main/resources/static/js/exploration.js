@@ -107,6 +107,8 @@ function explorationInitialize(data) {
         throw error;
     }
 }
+
+window.explorationInitialize = explorationInitialize;
 //////////////////////////////////////////////
 /////////////Выше методы инициализации////////
 //////////////////////////////////////////////
@@ -137,6 +139,8 @@ function startProgressBar(travelTime) {
     };
     requestAnimationFrame(animationFrame);
 }
+
+window.startProgressBar = startProgressBar;
 
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;

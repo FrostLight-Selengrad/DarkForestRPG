@@ -70,36 +70,18 @@ function switchInterface(activeId) {
     document.getElementById(activeId).style.display = 'block';
 }
 
-function startProgressBar(travelTime) {
-    const progressContainer = document.getElementById('exploration-progress');
-    if (!progressContainer) {
-        console.error('Element exploration-progress not found');
-        resolve(); // Завершаем промис, даже если элемент не найден
-        return;
-    }
-    progressContainer.style.display = 'block';
-    const progressFill = document.querySelector('#exploration-progress .progress-fill');
-    let startTime = Date.now();
-
-    const animationFrame = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / travelTime, 1);
-        progressFill.style.width = `${progress * 100}%`;
-        if (progress < 1) {
-            requestAnimationFrame(animationFrame);
-        } else {
-            progressContainer.style.display = 'none';
-            resolve(); // Завершаем промис после анимации
-        }
-    };
-    requestAnimationFrame(animationFrame);
-}
-
 async function leaveCamp() {
     try {
+        // Проверка доступности startProgressBar
+        if (typeof window.startProgressBar !== 'function') {
+            throw new Error('startProgressBar is not defined');
+        }
+
         const progressBarText = document.getElementById('progress-text');
         progressBarText.innerHTML = '<p>Переход в чащу леса...</p>'
-        await startProgressBar(2000);
+
+        await window.startProgressBar(2000);
+
         console.log('Starting leaveCamp for userId:', userId);
         const response = await fetch(`/api/game/move?userId=${userId}&location=forest`, {
             method: 'POST',
@@ -116,7 +98,11 @@ async function leaveCamp() {
             console.error('Missing currentLocation in move data');
             throw new Error('Invalid move data: missing currentLocation');
         }
-        explorationInitialize(data);
+
+        if (typeof window.explorationInitialize !== 'function') {
+            throw new Error('explorationInitialize is not defined');
+        }
+        window.explorationInitialize(data);
         console.log('Calling setActiveInterface');
         setActiveInterface("exploration-interface");
     } catch (error) {

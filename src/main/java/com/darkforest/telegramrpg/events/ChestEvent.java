@@ -1,6 +1,5 @@
 package com.darkforest.telegramrpg.events;
 
-import com.darkforest.telegramrpg.model.Player;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +41,14 @@ public class ChestEvent implements Event {
         return Map.of("message", "Вы нашли сундук!");
     }
 
-    public Map<String, Object> openChest(Player player) {
-        if (!"chest".equals(player.getCurrentEventType())) {
+    public Map<String, Object> openChest(Map<String, Object> player) {
+        if (!"chest".equals(player.get("currentEventType"))) {
             return Map.of("message", "Сундук не найден!");
         }
-        Map<String, Object> chestData = (Map<String, Object>) player.getEventData().get("chestData");
+        Map<String, Object> eventData = (Map<String, Object>) player.get("EventData");
+        Map<String, Object> chestData = (Map<String, Object>) eventData.get("chestData");
         boolean isMimic = (boolean) chestData.get("isMimic");
-        if (isMimic) {
+        /*if (isMimic) {
             player.setCurrentEventType("combat");
             Map<String, Object> enemyData = new HashMap<>();
             enemyData.put("name", "Мимик");
@@ -72,7 +72,7 @@ public class ChestEvent implements Event {
             return Map.of(
                     "message", message,
                     "eventType", "none"
-            );
-        }
+            );*/
+        return eventData;
     }
 }

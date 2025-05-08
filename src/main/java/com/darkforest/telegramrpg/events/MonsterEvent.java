@@ -1,6 +1,5 @@
 package com.darkforest.telegramrpg.events;
 
-import com.darkforest.telegramrpg.model.Player;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

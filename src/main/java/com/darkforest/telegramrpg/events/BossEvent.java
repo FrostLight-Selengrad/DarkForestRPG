@@ -1,7 +1,5 @@
 package com.darkforest.telegramrpg.events;
 
-import com.darkforest.telegramrpg.model.Player;
-
 import java.util.*;
 
 public class BossEvent implements Event {

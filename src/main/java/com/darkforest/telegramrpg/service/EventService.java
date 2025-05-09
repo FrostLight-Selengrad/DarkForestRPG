@@ -1,8 +1,10 @@
 package com.darkforest.telegramrpg.service;
 
+import com.darkforest.telegramrpg.events.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -12,21 +14,46 @@ public class EventService {
     private final Random random = new Random();
 
     // Генерация случайного события
-    public Map<String, Object> generateEvent() {
+    public Map<String, Object> generateEvent(int luck) {
         Map<String, Object> eventData = new HashMap<>();
-        String[] eventTypes = {"monster_eyes", "monster_hidden","chest", "trap", "boss"};
-        String eventType = eventTypes[random.nextInt(eventTypes.length)];
-        eventData.put("type", eventType);
-        if (eventType.equals("monster_eyes") || eventType.equals("monster_hidden") ) {
-            eventData.put("monsterType", "bandit");
-            eventData.put("message", "Вы встретили разбойника!");
-        } else if (eventType.equals("chest")) {
-            eventData.put("message", "Вы нашли сундук!");
-        } else if (eventType.equals("trap")) {
-            eventData.put("message", "Вы попали в ловушку!");
-        } else {
-            eventData.put("message", "Вы встретили босса!");
+
+        // Собираем все события с их весами
+        List<Event> events = List.of(
+                new MonsterHiddenEvent(),
+                new HiddenCachEvent(),
+                new CashEvent(),
+                new SnakeTrapEvent(),
+                new BossEvent()
+        );
+
+        // Рассчитываем суммарный вес
+        int totalWeight = events.stream()
+                .mapToInt(event -> event.getWeight(luck))
+                .sum();
+
+        // Выбираем случайное число в диапазоне [0, totalWeight)
+        int randomValue = random.nextInt(totalWeight);
+        int cumulativeWeight = 0;
+
+        // Находим событие, соответствующее randomValue
+        Event selectedEvent = null;
+        for (Event event : events) {
+            cumulativeWeight += event.getWeight(luck);
+            if (randomValue < cumulativeWeight) {
+                selectedEvent = event;
+                break;
+            }
         }
+
+        // Обрабатываем выбранное событие
+        if (selectedEvent != null) {
+            eventData = selectedEvent.execute(eventData);
+            eventData.put("type", selectedEvent.getEventType());
+        } else {
+            eventData.put("type", "none");
+            eventData.put("message", "Ничего не произошло.");
+        }
+
         return eventData;
     }
 

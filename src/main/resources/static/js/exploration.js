@@ -36,23 +36,26 @@ function explorationActionsUpdate(event) {
     try {
         hideAllActions();
         switch (event) {
-            case 'chest':
-                showActions(['open-chest', 'continue']);
+            case 'cash_event':
+                showActions(['open-cash', 'continue']);
                 break;
-            case 'trap':
+            case 'hidden_cash_event':
+                showActions(['open-cash', 'continue']);
+                break;
+            case 'trap_event':
                 showActions(['escape-trap']);
                 break;
             case 'trap_missed':
                 showActions(['continue', 'return-camp']);
                 break;
-            case 'monster_eyes':
-            case 'monster_hidden':
+            case 'monster_eyes_event':
+            case 'monster_hidden_event':
                 showActions(['fight', 'flee']);
                 break;
             case 'abandoned_camp':
                 showActions(['rest-camp', 'continue']);
                 break;
-            case 'boss':
+            case 'boss_event':
                 showActions(['fight']);
                 break;
             default:
@@ -68,28 +71,28 @@ function explorationActionsUpdate(event) {
 function explorationImageUpdate(event){
     const image = document.getElementById('forest-image');
     switch (event) {
-        case 'monster_hidden':
+        case 'monster_hidden_event':
             image.src = `/images/monster_hidden.jpg`;
             break;
-        case 'monster_eyes':
+        case 'monster_eyes_event':
             image.src = `/images/monster_eyes.jpg`;
             break;
-        case 'chest':
+        case 'cash_event':
             image.src = `/images/event_chest.png`;
             break;
-        case 'trap':
+        case 'hidden_cash_event':
+            image.src = `/images/event_chest.png`;
+            break;
+        case 'trap_event':
             image.src = `/images/event_trap.png`;
             break;
-        case 'trap_missed':
+        case 'trap_missed_event':
             image.src = `/images/event_trap_escaped.png`;
-            break;
-        case 'monster':
-            image.src = `/images/goblin.png`;
             break;
         case 'abandoned_camp':
             image.src = `/images/event_cave.png`;
             break;
-        case 'boss':
+        case 'boss_event':
             image.src = `/images/boss.png`;
             break;
         default:
@@ -107,8 +110,12 @@ function explorationInitialize(data) {
         if (!logElement) {
             console.error('Element exploration-log not found');
             throw new Error('Missing exploration-log element');
+        }const log = data.explorationLog;
+        if (Array.isArray(log) && log.length > 0) {
+            logElement.innerHTML = `<p>${log[log.length - 1]}</p>`;
+        } else {
+            logElement.innerHTML = `<p>Вы успешно вернулись к игре и оказались в лесу</p>`;
         }
-        logElement.innerHTML = `<p>${data.message || 'Вы успешно вернулись к игре и оказались в лесу'}</p>`;
     } catch (error) {
         console.error('Error in explorationInitialize:', error);
         throw error;

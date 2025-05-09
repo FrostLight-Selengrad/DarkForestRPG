@@ -2,27 +2,23 @@ package com.darkforest.telegramrpg.events;
 
 import java.util.Map;
 
-public class BossEvent implements Event {
-
+public class MonsterHiddenEvent implements Event {
     @Override
     public int getWeight(int luck) {
-        int weight = 3;
+        int weight = 40;
         weight = Math.round(weight * (1 + (float) luck / (luck + 50)));
         return weight;
     }
 
     @Override
     public String getEventType() {
-        return "boss_event";
+        return "monster_hidden_event";
     }
 
     @Override
     public Map<String, Object> execute(Map<String, Object> eventData) {
-        String message = "Опасный противник преградил вам путь! Он полон решимости" +
-                " не пустить героя дальше и уже готов к битве.";
-
-        eventData.put("message", message);
-
+        // Логика события
+        eventData.put("message", "В тени леса промелькнула чья-то тень, это точно не наш союзник");
         return eventData;
     }
 }

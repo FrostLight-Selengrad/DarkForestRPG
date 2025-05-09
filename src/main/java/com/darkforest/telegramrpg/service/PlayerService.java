@@ -45,6 +45,10 @@ public class PlayerService {
         newPlayer.put("maxHp", 90);
         newPlayer.put("stamina", 100);
         newPlayer.put("maxStamina", 100);
+        newPlayer.put("damage", 10);
+        newPlayer.put("armour", 10);
+        newPlayer.put("luck", 1);
+        newPlayer.put("eloquence", 1);
         newPlayer.put("speed", 100);
         newPlayer.put("power", 5);
         newPlayer.put("agility", 5);
@@ -55,6 +59,7 @@ public class PlayerService {
         newPlayer.put("gold", 100);
         newPlayer.put("currentEventType", "none");
         newPlayer.put("battleLog", new ArrayList<>());
+        newPlayer.put("eventData", new ArrayList<>());
         newPlayer.put("explorationLog", new ArrayList<>());
         newPlayer.put("battleTurn", 0);
         savePlayerData(userId, newPlayer);

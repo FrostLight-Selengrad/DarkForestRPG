@@ -80,12 +80,15 @@ public class GameController {
     public Map<String, Object> getDataAfterExplore(@RequestParam Long userId) {
         System.out.println("Received explore request: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        Map<String, Object> eventData = eventService.generateEvent();
+        Map<String, Object> eventData = eventService.generateEvent((int) playerData.get("luck"));
         int stamina = (int) playerData.get("stamina");
 
         playerData.put("currentEventType", eventData.get("type"));
         playerData.put("eventData", eventData);
-        playerData.put("stamina", stamina-5);;
+        playerData.put("stamina", stamina-5);
+        List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
+        log.add((String) eventData.get("message"));
+        playerData.put("explorationLog", log);
         playerService.savePlayerData(userId, playerData);
 
         System.out.println("Returning explore response: " + eventData);

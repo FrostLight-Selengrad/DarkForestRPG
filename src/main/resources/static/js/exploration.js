@@ -87,10 +87,10 @@ function explorationImageUpdate(event){
             image.src = `/images/event_open_hidden_cash.jpg`;
             break;
         case 'trap_event':
-            image.src = `/images/event_trap.png`;
+            image.src = `/images/event_snake_trap.jpg`;
             break;
         case 'trap_missed_event':
-            image.src = `/images/event_trap_escaped.png`;
+            image.src = `/images/event_snake_trap_escaped.jpg`;
             break;
         case 'abandoned_camp':
             image.src = `/images/event_cave.png`;

@@ -1,5 +1,8 @@
 package com.darkforest.telegramrpg.controller;
 
+import com.darkforest.telegramrpg.events.CashEvent;
+import com.darkforest.telegramrpg.events.Event;
+import com.darkforest.telegramrpg.events.HiddenCachEvent;
 import com.darkforest.telegramrpg.service.PlayerService;
 import com.darkforest.telegramrpg.service.EventService;
 import com.darkforest.telegramrpg.service.LocationService;
@@ -85,7 +88,7 @@ public class GameController {
 
         playerData.put("currentEventType", eventData.get("type"));
         playerData.put("eventData", eventData);
-        playerData.put("stamina", stamina-5);
+        playerData.put("stamina", stamina-2);
         List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
         log.add((String) eventData.get("message"));
         playerData.put("explorationLog", log);
@@ -105,45 +108,29 @@ public class GameController {
     }
 
     // Открытие сундука
-    @PostMapping("/openChest")
-    public Map<String, Object> openChest(@RequestParam Long userId) {
-        System.out.println("Received open chest request: userId=" + userId);
+    @GetMapping("/openCash")
+    public Map<String, Object> openCash(@RequestParam Long userId) {
+        System.out.println("[userId="+userId+"] Received open cash request");
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        Map<String, Object> chestData = new HashMap<>();
-        boolean isMimic = random.nextDouble() < 0.2;
-        chestData.put("isMimic", isMimic);
+        int stamina = (int) playerData.get("stamina");
 
-        if (!isMimic) {
-            int forestLevel = (int) playerData.getOrDefault("forestLevel", 1);
-            int gold = 5 * forestLevel + random.nextInt(10);
-            chestData.put("gold", gold);
-            int currentGold = (int) playerData.getOrDefault("gold", 0);
-            playerData.put("gold", currentGold + gold);
+        Map<String, Object> eventData;
+        if (playerData.get("currentEventType").equals("cash_event") ||
+                playerData.get("currentEventType").equals("hidden_cash_event")) {
+
+            eventData = eventService.interactEvent((int) playerData.get("forestLevel"),
+                    (int) playerData.get("luck"), (Map<String, Object>) playerData.get("eventData"));
+
+            playerData.put("currentEventType", eventData.get("type"));
+            playerData.put("eventData", eventData);
+            playerData.put("stamina", stamina-1);
+            List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
+            log.add((String) eventData.get("message"));
+            playerData.put("explorationLog", log);
+            playerService.savePlayerData(userId, playerData);
         } else {
-            Map<String, Object> enemyData = new HashMap<>();
-            enemyData.put("name", "Mimic");
-            enemyData.put("hp", 50);
-            enemyData.put("maxHp", 50);
-            enemyData.put("attack", 10);
-            enemyData.put("defense", 5);
-            chestData.put("enemyData", enemyData);
-            playerData.put("currentEventType", "combat");
-            playerData.put("eventData", Map.of("enemy", enemyData));
+            System.out.println("[userId="+userId+"] But it is not a cash_event");
         }
-
-        playerData.put("currentEventType", "chest");
-        playerData.put("chestData", chestData);
-        String message = "chest:event_chest.png:Вы нашли сундук!";
-        @SuppressWarnings("unchecked")
-        List<String> explorationLog = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
-        explorationLog.add(message);
-        playerService.savePlayerData(userId, playerData);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Вы нашли сундук!");
-        response.put("chestData", chestData);
-        response.put("playerData", playerData);
-        System.out.println("Returning open chest response: " + response);
-        return response;
+        return playerData;
     }
 }

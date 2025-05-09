@@ -1,5 +1,6 @@
 package com.darkforest.telegramrpg.events;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,10 +28,18 @@ public class CashEvent implements Event {
         return eventData;
     }
 
-    public Map<String, Object> openCash(Map<String, Object> eventData, int forestLevel) {
-        int gold = Math.round(5 * forestLevel * (1 + random.nextInt(21) * 0.01f));
-        String message =  "В кошельке нашлось {$gold} золота. Вы распорядитесь ими лучше, чем бывший владелец.";
+    @Override
+    public Map<String, Object> interact(int forestLevel, int luck, Map<String, Object> eventData) {
+        int gold = Math.round(15 * forestLevel * (1 + random.nextInt(21) * 0.01f));
+        String message =  "Внутри вы обнаружили " + gold + " золота. Вы распорядитесь ими лучше, чем бывший владелец.";
 
+        int luckChance = Math.round((float) (100 * luck) / (luck + 100));
+        if (luckChance > random.nextInt(1001) ){
+            gold += gold * (1+luckChance / 100);
+            message = "Невероятная удача! Кошель был забит " + gold + " единиц золота!";
+        }
+
+        eventData.put("type", "open_cash_event");
         eventData.put("gold", gold);
         eventData.put("message", message);
 

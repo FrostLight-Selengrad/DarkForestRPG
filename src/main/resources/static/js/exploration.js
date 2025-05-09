@@ -45,9 +45,6 @@ function explorationActionsUpdate(event) {
             case 'trap_event':
                 showActions(['escape-trap']);
                 break;
-            case 'trap_missed':
-                showActions(['continue', 'return-camp']);
-                break;
             case 'monster_eyes_event':
             case 'monster_hidden_event':
                 showActions(['fight', 'flee']);
@@ -78,10 +75,16 @@ function explorationImageUpdate(event){
             image.src = `/images/monster_eyes.jpg`;
             break;
         case 'cash_event':
-            image.src = `/images/event_chest.png`;
+            image.src = `/images/event_cash.jpg`;
+            break;
+        case 'open_cash_event':
+            image.src = `/images/event_open_cash.jpg`;
             break;
         case 'hidden_cash_event':
-            image.src = `/images/event_chest.png`;
+            image.src = `/images/event_hidden_cash.jpg`;
+            break;
+        case 'open_hidden_cash_event':
+            image.src = `/images/event_open_hidden_cash.jpg`;
             break;
         case 'trap_event':
             image.src = `/images/event_trap.png`;
@@ -114,7 +117,9 @@ function explorationInitialize(data) {
         if (Array.isArray(log) && log.length > 0) {
             logElement.innerHTML = `<p>${log[log.length - 1]}</p>`;
         } else {
-            logElement.innerHTML = `<p>Вы успешно вернулись к игре и оказались в лесу</p>`;
+            logElement.innerHTML = `<p>Добро пожаловать в Dark Forest!</p><br/>
+                                    <p>На текущий момент вам доступно исследование леса</p>
+            `;
         }
     } catch (error) {
         console.error('Error in explorationInitialize:', error);
@@ -277,33 +282,23 @@ async function tryFleeBeforeCombat() {
     }
 }
 
-async function openChest() {
+async function openCash() {
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     try {
-        const response = await fetch(`/api/game/openChest?userId=${userId}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Не удалось открыть сундук');
-        const result = await response.json();
-        const chestData = result.chestData;
+        const response = await fetch(`/api/game/openCash?userId=${userId}`);
+        if (!response.ok)
+            throw new Error('Не удалось открыть');
+        const data = await response.json();
+        const chestData = data.eventData;
 
-        if (chestData.isMimic) {
-            // Начать бой с мимиком
-            const enemyData = chestData.enemyData;
-            switchInterface('battle-interface');
-            displayBattle({ enemy: enemyData });
+        if (chestData.type === 'open_cash_event' || chestData.type === 'open_cash_hidden_event') {
+            explorationInitialize(data);
         } else {
-            const gold = chestData.gold;
-            document.getElementById('forest-image').src = '/images/open-chest.png';
-            document.getElementById('exploration-log').innerText = `Вы нашли ${gold} золота!`;
-            // Обновить статистику игрока
-            const playerResponse = await fetch(`/api/game/player?userId=${userId}`);
-            if (!playerResponse.ok) throw new Error('Не удалось обновить данные игрока');
-            const playerData = await playerResponse.json();
-            updateStats(playerData.currentLocation, playerData.hp, playerData.maxHp, playerData.stamina, playerData.maxStamina, playerData.forestLevel, playerData.gold);
-            showActions(['action-continue', 'action-return-camp']);
+            throw new Error('Не удалось открыть');
         }
     } catch (error) {
-        console.error('Ошибка при открытии сундука:', error);
-        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
+        console.error('Ошибка при открытии:', error);
+        document.getElementById('exploration-log').innerHTML = '<p>Ошибка: попробуйте позже</p>';
         showActions(['action-continue', 'action-return-camp']);
     }
 }

@@ -57,8 +57,30 @@ public class EventService {
         return eventData;
     }
 
+    public Map<String, Object> interactEvent(int luck, int forestLevel, Map<String, Object> eventData) {
+        String eventType = (String) eventData.get("type");
+
+        // Сопоставление типов событий с классами
+        Map<String, Event> eventMap = Map.of(
+                "monster_hidden_event", new MonsterHiddenEvent(),
+                "monster_eyes_event", new MonsterEyesEvent(),
+                "hidden_cach_event", new HiddenCachEvent(),
+                "cash_event", new CashEvent(),
+                "snake_trap_event", new SnakeTrapEvent(),
+                "boss_event", new BossEvent()
+        );
+
+        Event event = eventMap.get(eventType);
+        if (event != null) {
+            return event.interact(forestLevel, luck, eventData);
+        } else {
+            eventData.put("message", "Неизвестное событие: " + eventType);
+            return eventData;
+        }
+    }
+
     public long generateProgressTime(int stamina, int maxStamina, int speed, int agility, int forestLevel) {
-        double S_base = 200.0; // Значение для тестов, потом вернуть 1200
+        double S_base = 450.0; // Значение для тестов, потом вернуть 1200
         int random_component = random.nextInt(101); // 0 to 100
         double multiplier = 1 + 0.6 * (forestLevel - 1);
         double S_adjusted = S_base * multiplier + random_component;

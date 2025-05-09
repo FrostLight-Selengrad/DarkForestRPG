@@ -3,7 +3,6 @@ package com.darkforest.telegramrpg.events;
 import java.util.Map;
 
 public class BossEvent implements Event {
-
     @Override
     public int getWeight(int luck) {
         int weight = 3;
@@ -24,5 +23,10 @@ public class BossEvent implements Event {
         eventData.put("message", message);
 
         return eventData;
+    }
+
+    @Override
+    public Map<String, Object> interact(int forestLevel, int luck, Map<String, Object> eventData) {
+        return Map.of();
     }
 }

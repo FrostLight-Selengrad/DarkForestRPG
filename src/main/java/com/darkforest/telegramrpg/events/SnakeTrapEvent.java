@@ -23,4 +23,9 @@ public class SnakeTrapEvent implements Event {
 
         return eventData;
     }
+
+    @Override
+    public Map<String, Object> interact(int forestLevel, int luck, Map<String, Object> eventData) {
+        return Map.of();
+    }
 }

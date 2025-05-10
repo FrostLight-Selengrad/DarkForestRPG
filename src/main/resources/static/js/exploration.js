@@ -37,10 +37,10 @@ function explorationActionsUpdate(event) {
         hideAllActions();
         switch (event) {
             case 'cash_event':
-                showActions(['open-cash', 'continue']);
+                showActions(['open-cash', 'miss-cash']);
                 break;
             case 'hidden_cash_event':
-                showActions(['open-cash', 'continue']);
+                showActions(['open-cash', 'miss-cash']);
                 break;
             case 'trap_event':
                 showActions(['escape-trap']);

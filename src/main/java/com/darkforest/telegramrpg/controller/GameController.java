@@ -1,8 +1,5 @@
 package com.darkforest.telegramrpg.controller;
 
-import com.darkforest.telegramrpg.events.CashEvent;
-import com.darkforest.telegramrpg.events.Event;
-import com.darkforest.telegramrpg.events.HiddenCachEvent;
 import com.darkforest.telegramrpg.service.PlayerService;
 import com.darkforest.telegramrpg.service.EventService;
 import com.darkforest.telegramrpg.service.LocationService;

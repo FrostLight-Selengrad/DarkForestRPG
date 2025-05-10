@@ -64,7 +64,7 @@ public class EventService {
         Map<String, Event> eventMap = Map.of(
                 "monster_hidden_event", new MonsterHiddenEvent(),
                 "monster_eyes_event", new MonsterEyesEvent(),
-                "hidden_cach_event", new HiddenCachEvent(),
+                "hidden_cash_event", new HiddenCachEvent(),
                 "cash_event", new CashEvent(),
                 "snake_trap_event", new SnakeTrapEvent(),
                 "boss_event", new BossEvent()

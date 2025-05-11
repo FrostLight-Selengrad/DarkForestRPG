@@ -109,16 +109,19 @@ public class GameController {
     public Map<String, Object> openCash(@RequestParam Long userId) {
         System.out.println("[userId="+userId+"] Received open cash request");
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        int stamina = (int) playerData.get("stamina");
 
         Map<String, Object> eventData;
         if (playerData.get("currentEventType").equals("cash_event") ||
                 playerData.get("currentEventType").equals("hidden_cash_event")) {
 
             eventData = eventService.interactEvent((int) playerData.get("forestLevel"),
-                    (int) playerData.get("luck"), (Map<String, Object>) playerData.get("eventData"));
+                    (int) playerData.get("luck"), (int) playerData.get("agility"),
+                    (Map<String, Object>) playerData.get("eventData"));
+
+            int stamina = (int) playerData.get("stamina");
 
             playerData.put("currentEventType", eventData.get("type"));
+            playerData.put("gold", eventData.get("gold"));
             playerData.put("eventData", eventData);
             playerData.put("stamina", stamina-1);
             List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
@@ -127,6 +130,38 @@ public class GameController {
             playerService.savePlayerData(userId, playerData);
         } else {
             System.out.println("[userId="+userId+"] But it is not a cash_event");
+        }
+        return playerData;
+    }
+
+    // Отбиться от змеи
+    @GetMapping("/escapeTrap")
+    public Map<String, Object> escapeTrap(@RequestParam Long userId) {
+        System.out.println("[userId="+userId+"] Received escape trap request");
+        Map<String, Object> playerData = playerService.loadPlayerData(userId);
+
+        Map<String, Object> eventData;
+        if (playerData.get("currentEventType").equals("snake_trap_event") ||
+                playerData.get("currentEventType").equals("trap_not_escape_event")) {
+
+            eventData = eventService.interactEvent((int) playerData.get("forestLevel"),
+                    (int) playerData.get("luck"), (int) playerData.get("agility"),
+                    (Map<String, Object>) playerData.get("eventData"));
+
+            int stamina = (int) playerData.get("stamina");
+
+            playerData.put("currentEventType", eventData.get("type"));
+            playerData.put("eventData", eventData);
+            playerData.put("stamina", stamina-1);
+            if (eventData.get("eventData").equals("trap_not_escape_event")) {
+                playerData.put("hp", (int) playerData.get("hp") - (int) eventData.get("damage"));
+            }
+            List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());
+            log.add((String) eventData.get("message"));
+            playerData.put("explorationLog", log);
+            playerService.savePlayerData(userId, playerData);
+        } else {
+            System.out.println("[userId="+userId+"] But it is not a snake_trap_event or trap_not_escape_event");
         }
         return playerData;
     }

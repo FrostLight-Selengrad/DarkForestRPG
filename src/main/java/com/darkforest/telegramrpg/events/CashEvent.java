@@ -1,6 +1,5 @@
 package com.darkforest.telegramrpg.events;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 

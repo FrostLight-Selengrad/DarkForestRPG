@@ -57,7 +57,7 @@ public class EventService {
         return eventData;
     }
 
-    public Map<String, Object> interactEvent(int luck, int forestLevel, Map<String, Object> eventData) {
+    public Map<String, Object> interactEvent(int luck, int forestLevel, int agility, Map<String, Object> eventData) {
         String eventType = (String) eventData.get("type");
 
         // Сопоставление типов событий с классами
@@ -66,7 +66,8 @@ public class EventService {
                 "monster_eyes_event", new MonsterEyesEvent(),
                 "hidden_cash_event", new HiddenCachEvent(),
                 "cash_event", new CashEvent(),
-                "snake_trap_event", new SnakeTrapEvent(),
+                "snake_trap_event", new SnakeTrapEvent(agility),
+                "trap_not_escape_event", new SnakeTrapEvent(agility),
                 "boss_event", new BossEvent()
         );
 

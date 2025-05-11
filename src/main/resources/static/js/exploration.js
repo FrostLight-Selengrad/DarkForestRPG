@@ -42,7 +42,8 @@ function explorationActionsUpdate(event) {
             case 'hidden_cash_event':
                 showActions(['open-cash', 'miss-cash']);
                 break;
-            case 'trap_event':
+            case 'snake_trap_event':
+            case 'trap_not_escape_event':
                 showActions(['escape-trap']);
                 break;
             case 'monster_eyes_event':
@@ -89,8 +90,11 @@ function explorationImageUpdate(event){
         case 'snake_trap_event':
             image.src = `/images/event_snake_trap.jpg`;
             break;
-        case 'snake_trap_missed_event':
-            image.src = `/images/event_snake_trap_escaped.jpg`;
+        case 'trap_escape_event':
+            image.src = `/images/trap_escape_event.jpg`;
+            break;
+        case 'trap_not_escape_event':
+            image.src = `/images/trap_not_escape_event.jpg`;
             break;
         case 'abandoned_camp':
             image.src = `/images/event_cave.png`;
@@ -323,20 +327,15 @@ async function restAtCamp() {
 async function escapeTrap() {
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
     try {
-        const response = await fetch(`/api/game/escapeTrap?userId=${userId}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Не удалось выбраться из ловушки');
-        const result = await response.json();
-        if (result.success) {
-            document.getElementById('exploration-log').innerText = 'Вы успешно выбрались из ловушки';
-            showActions(['action-continue', 'action-return-camp']);
+        const response = await fetch(`/api/game/escapeTrap?userId=${userId}`);
+        if (!response.ok) throw new Error('Не удалось отбиться от гада');
+        const data = await response.json();
+        const trapData = data.eventData;
+
+        if (trapData.type === 'trap_not_escape_event' || trapData.type === 'trap_escape_event') {
+            explorationInitialize(data);
         } else {
-            document.getElementById('exploration-log').innerText = 'Не удалось выбраться из ловушки';
-            // Можно добавить штраф, например, уменьшение здоровья
-            const playerResponse = await fetch(`/api/game/player?userId=${userId}`);
-            if (!playerResponse.ok) throw new Error('Не удалось обновить данные игрока');
-            const playerData = await playerResponse.json();
-            updateStats(playerData.currentLocation, playerData.hp, playerData.maxHp, playerData.stamina, playerData.maxStamina, playerData.forestLevel, playerData.gold);
-            showActions(['action-escape-trap']);
+            throw new Error('Не удалось открыть');
         }
     } catch (error) {
         console.error('Ошибка при попытке выбраться:', error);

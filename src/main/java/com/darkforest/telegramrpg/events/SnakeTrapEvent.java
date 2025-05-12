@@ -60,7 +60,7 @@ public class SnakeTrapEvent implements Event {
         } else {
             eventData.put("type", "trap_escape_event");
             message = "Разделавшись с врагом вы понимаете, что это не была победа и" +
-                    " вам еще много предстоит научиться";
+                    " что еще многому предстоит научиться";
         }
         eventData.put("message", message);
         return eventData;

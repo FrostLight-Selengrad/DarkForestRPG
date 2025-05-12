@@ -295,7 +295,7 @@ async function openCash() {
         const data = await response.json();
         const chestData = data.eventData;
 
-        if (chestData.type === 'open_cash_event' || chestData.type === 'open_cash_hidden_event') {
+        if (chestData.type === 'open_cash_event' || chestData.type === 'open_hidden_cash_event') {
             explorationInitialize(data);
         } else {
             throw new Error('Не удалось открыть');

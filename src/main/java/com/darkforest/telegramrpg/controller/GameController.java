@@ -143,8 +143,8 @@ public class GameController {
 
         Map<String, Object> eventData = (Map<String, Object>) playerData.get("eventData");
         System.out.println("eventData: " + eventData);
-        if (eventData.get("type").equals("snake_trap_event") ||
-                eventData.get("type").equals("trap_not_escape_event")) {
+        if (playerData.get("currentEventType").equals("snake_trap_event") ||
+                playerData.get("currentEventType").equals("trap_not_escape_event")) {
 
             eventData = eventService.interactEvent((int) playerData.get("forestLevel"),
                     (int) playerData.get("luck"), (int) playerData.get("agility"),
@@ -155,7 +155,7 @@ public class GameController {
             playerData.put("currentEventType", eventData.get("type"));
             playerData.put("eventData", eventData);
             playerData.put("stamina", stamina-1);
-            if (eventData.get("eventData").equals("trap_not_escape_event")) {
+            if (eventData.get("type").equals("trap_not_escape_event")) {
                 playerData.put("hp", (int) playerData.get("hp") - (int) eventData.get("damage"));
             }
             List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());

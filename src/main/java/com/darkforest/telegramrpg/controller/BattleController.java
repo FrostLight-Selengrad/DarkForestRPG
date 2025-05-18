@@ -15,8 +15,8 @@ public class BattleController {
 
     // Начало боя
     @PostMapping("/start")
-    public Map<String, Object> startBattle(@RequestParam Long userId, @RequestParam String monsterType) {
-        return combatService.startBattle(userId, monsterType);
+    public Map<String, Object> startBattle(@RequestParam Long userId) {
+        return combatService.startBattle(userId);
     }
 
     // Атака

@@ -96,16 +96,19 @@
     </div>
     <!-- Боевой интерфейс (изначально скрыт) -->
     <div id="battle-interface" class="interface" style="display: none;">
-        <img id="enemy-image" src="images/goblin.png" class="enemy-img">
-        <div class="combat-health-bars">
-            <div class="combat-health-player">
-                <span>Ваше здоровье:</span>
-                <div class="combat-hp" id="player-combat-hp">100/100</div>
+        <img id="enemy-image" class="enemy-img">
+        <div class="combat-bars">
+            <div class="combat-player-bar">
+                <div class="combat-player-data" id="player-combat-hp">&#x2764;&#xFE0F; 100/100</div>
+                <div class="combat-player-data" id="player-combat-attack">&#x2694;&#xFE0F; 15</div>
+                <div class="combat-player-data" id="player-combat-defence">&#x1F6E1;&#xFE0F; 10</div>
+                <div class="combat-player-data" id="player-combat-speed">&#x1F3C3; 100</div>
             </div>
-            <div class="combat-health-enemy">
-                <span id="enemy-combat-name">Гоблин</span><br/>
-                <span class="enemy-level" id="enemy-level">Уровень 1</span>
-                <div class="combat-hp" id="enemy-combat-hp">50/50</div>
+            <div class="combat-enemy-bar">
+                <div class="combat-enemy-data" id="enemy-combat-hp">&#x2764;&#xFE0F; 100/100</div>
+                <div class="combat-enemy-data" id="enemy-combat-attack">&#x2694;&#xFE0F; 15</div>
+                <div class="combat-enemy-data" id="enemy-combat-defence">&#x1F6E1;&#xFE0F; 10</div>
+                <div class="combat-enemy-data" id="enemy-combat-speed">&#x1F3C3; 100</div>
             </div>
         </div>
         <div id="turn"></div>

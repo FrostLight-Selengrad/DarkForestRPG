@@ -10,7 +10,6 @@ import java.util.Random;
 
 @Service
 public class EventService {
-
     private final Random random = new Random();
 
     // Генерация случайного события

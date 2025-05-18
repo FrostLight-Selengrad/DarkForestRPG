@@ -1,5 +1,6 @@
 package com.darkforest.telegramrpg.service;
 
+import com.darkforest.telegramrpg.enemy.EnemyData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,23 +9,42 @@ import java.util.Map;
 @Service
 public class CombatService {
     private final PlayerService playerService;
+    private final EnemyService enemyService;
 
     @Autowired
-    public CombatService(PlayerService playerService) {
+    public CombatService(PlayerService playerService, EnemyService enemyService) {
         this.playerService = playerService;
+        this.enemyService = enemyService;
     }
 
     // Начало боя
-    public Map<String, Object> startBattle(Long userId, String monsterType) {
+    public Map<String, Object> startBattle(Long userId) {
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        Map<String, Object> enemyData = loadEnemyData(monsterType);
+        int forestLevel = (int) playerData.get("forestLevel");
+        EnemyData enemyDataObj = enemyService.generateEnemy(forestLevel);
+        Map<String, Object> enemyData = enemyDataObj.getData();
         playerData.put("currentEventType", "combat");
         playerData.put("eventData", Map.of("enemy", enemyData));
         playerService.savePlayerData(userId, playerData);
         return Map.of(
                 "message", "Бой с " + enemyData.get("name") + " начался!",
-                "enemyHp", enemyData.get("hp"),
-                "playerHp", playerData.get("hp")
+                "player", Map.of(
+                        "hp", playerData.get("hp"),
+                        "maxHp", playerData.get("maxHp"),
+                        "attack", playerData.get("attack"),
+                        "defense", playerData.get("defense"),
+                        "speed", playerData.get("speed")
+                ),
+                "enemy", Map.of(
+                        "name", enemyData.get("name"),
+                        "level", enemyData.get("level"),
+                        "hp", enemyData.get("health"),
+                        "maxHp", enemyData.get("health"),
+                        "attack", enemyData.get("damage"),
+                        "defense", enemyData.get("armor"),
+                        "speed", enemyData.get("speed"),
+                        "image", enemyData.get("name") + ".jpg"
+                )
         );
     }
 

@@ -236,7 +236,6 @@ async function returnToCamp() {
     }
 }
 
-
 function explorationStatsUpdate(hp, maxHp, stamina, maxStamina, forestLevel, gold) {
     try {
         const statsElement = document.getElementById('player-stats');
@@ -251,20 +250,6 @@ function explorationStatsUpdate(hp, maxHp, stamina, maxStamina, forestLevel, gol
     } catch (error) {
         console.error('Error in updateStats:', error);
         throw error;
-    }
-}
-
-async function fightMonster() {
-    const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    try {
-        const response = await fetch(`/api/battle/start?userId=${userId}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Не удалось начать бой');
-        const battleData = await response.json();
-        switchInterface('battle-interface');
-        displayBattle(battleData);
-    } catch (error) {
-        console.error('Ошибка начала боя:', error);
-        document.getElementById('exploration-log').innerText = 'Ошибка: попробуйте позже';
     }
 }
 

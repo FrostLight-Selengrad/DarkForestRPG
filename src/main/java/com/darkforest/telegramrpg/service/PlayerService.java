@@ -45,8 +45,8 @@ public class PlayerService {
         newPlayer.put("maxHp", 90);
         newPlayer.put("stamina", 100);
         newPlayer.put("maxStamina", 100);
-        newPlayer.put("damage", 10);
-        newPlayer.put("armour", 10);
+        newPlayer.put("attack", 10);
+        newPlayer.put("defence", 10);
         newPlayer.put("luck", 1);
         newPlayer.put("eloquence", 1);
         newPlayer.put("speed", 100);

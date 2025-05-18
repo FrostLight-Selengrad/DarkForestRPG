@@ -5,7 +5,7 @@ import java.util.Map;
 public class MonsterHiddenEvent implements Event {
     @Override
     public int getWeight(int luck) {
-        int weight = 3;
+        int weight = 30;
         weight = Math.round(weight * (1 + (float) luck / (luck + 50)));
         return weight;
     }

@@ -5,9 +5,7 @@ import java.util.Map;
 public class BossEvent implements Event {
     @Override
     public int getWeight(int luck) {
-        int weight = 3;
-        weight = Math.round(weight * (1 + (float) luck / (luck + 50)));
-        return weight;
+        return 0;
     }
 
     @Override

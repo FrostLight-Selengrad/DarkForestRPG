@@ -15,7 +15,7 @@ public class SnakeTrapEvent implements Event {
 
     @Override
     public int getWeight(int luck) {
-        int weight = 25;
+        int weight = 20;
         weight = Math.round(weight * (1 + (float) luck / (luck + 50)));
         return weight;
     }

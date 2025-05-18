@@ -121,7 +121,7 @@ public class GameController {
             int stamina = (int) playerData.get("stamina");
 
             playerData.put("currentEventType", eventData.get("type"));
-            playerData.put("gold", eventData.get("gold"));
+            playerData.put("gold", (int) playerData.get("gold") + (int) eventData.get("gold"));
             playerData.put("eventData", eventData);
             playerData.put("stamina", stamina-1);
             List<String> log = (List<String>) playerData.getOrDefault("explorationLog", new ArrayList<>());

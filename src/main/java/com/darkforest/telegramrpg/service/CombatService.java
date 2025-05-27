@@ -22,7 +22,16 @@ public class CombatService {
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
         int forestLevel = (int) playerData.get("forestLevel");
         EnemyData enemyDataObj = enemyService.generateEnemy(forestLevel);
-        Map<String, Object> enemyData = enemyDataObj.getData();
+        Map<String, Object> enemyData = Map.of(
+                "name", enemyDataObj.getData().get("name"),
+                "level", enemyDataObj.getData().get("level"),
+                "hp", enemyDataObj.getData().get("health"),
+                "maxHp", enemyDataObj.getData().get("health"),
+                "attack", enemyDataObj.getData().get("damage"),
+                "defense", enemyDataObj.getData().get("armor"),
+                "speed", enemyDataObj.getData().get("speed"),
+                "image", enemyDataObj.getData().get("image")
+        );
         playerData.put("currentEventType", "combat");
         playerData.put("eventData", Map.of("enemy", enemyData));
         playerService.savePlayerData(userId, playerData);
@@ -36,16 +45,7 @@ public class CombatService {
                         "defense", playerData.get("defense"),
                         "speed", playerData.get("speed")
                 ),
-                "enemy", Map.of(
-                        "name", enemyData.get("name"),
-                        "level", enemyData.get("level"),
-                        "hp", enemyData.get("health"),
-                        "maxHp", enemyData.get("health"),
-                        "attack", enemyData.get("damage"),
-                        "defense", enemyData.get("armor"),
-                        "speed", enemyData.get("speed"),
-                        "image", enemyData.get("image")
-                )
+                "enemy", enemyData
         );
     }
 

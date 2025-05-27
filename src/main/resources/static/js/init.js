@@ -131,26 +131,35 @@ function setActiveInterface(interfaceName) {
 
 function updateBattleInterface(data) {
     try {
-        console.log('updateBattleInterface called with data:', data);
-        const playerHpElement = document.getElementById('player-combat-hp');
-        if (!playerHpElement) {
-            console.error('Element player-combat-hp not found');
-            throw new Error('Missing player-combat-hp element');
-        }
-        playerHpElement.innerText = `${data.hp}/${data.maxHp}`;
-        const enemyData = data.eventData ? data.eventData.enemy : {};
-        const enemyHpElement = document.getElementById('enemy-combat-hp');
-        if (!enemyHpElement) {
-            console.error('Element enemy-combat-hp not found');
-            throw new Error('Missing enemy-combat-hp element');
-        }
-        enemyHpElement.innerText = `${enemyData.hp || 0}/${enemyData.maxHp || 0}`;
+        // Обновление данных игрока
+        document.getElementById('player-combat-name').innerText = data.name;
+        document.getElementById('player-combat-hp').innerText = `❤️ ${data.hp}/${data.maxHp}`;
+        document.getElementById('player-combat-attack').innerText = `⚔️ ${data.attack}`;
+        document.getElementById('player-combat-defence').innerText = `🛡️ ${data.defense}`;
+        document.getElementById('player-combat-speed').innerText = `🏃 ${data.speed}`;
+
+        // Обновление данных врага
+        document.getElementById('enemy-combat-name').innerText = data.eventData.name;
+        document.getElementById('enemy-combat-hp').innerText = `❤️ ${data.eventData.hp}/${data.eventData.maxHp}`;
+        document.getElementById('enemy-combat-attack').innerText = `⚔️ ${data.eventData.attack}`;
+        document.getElementById('enemy-combat-defence').innerText = `🛡️ ${data.eventData.defense}`;
+        document.getElementById('enemy-combat-speed').innerText = `🏃 ${data.eventData.speed}`;
+
+        // Установка имени и уровня врага, если элементы существуют
         const enemyNameElement = document.getElementById('enemy-combat-name');
-        if (!enemyNameElement) {
-            console.error('Element enemy-combat-name not found');
-            throw new Error('Missing enemy-combat-name element');
+        if (enemyNameElement) {
+            enemyNameElement.innerText = data.eventData.name;
         }
-        enemyNameElement.innerText = enemyData.name || 'Неизвестный враг';
+        const enemyLevelElement = document.getElementById('enemy-level');
+        if (enemyLevelElement) {
+            enemyLevelElement.innerText = `Уровень ${data.eventData.level}`;
+        }
+
+        // Установка изображения врага
+        document.getElementById('enemy-image').src = `/images/${data.eventData.image || 'default_enemy.png'}`;
+
+        // Обновление лога боя с сообщением от сервера
+        document.getElementById('battle-log').innerText = data.eventData.message;
     } catch (error) {
         console.error('Error in updateBattleInterface:', error);
         throw error;

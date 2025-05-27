@@ -41,6 +41,7 @@ public class PlayerService {
     private Map<String, Object> newPlayerData(long userId) {
         Map<String, Object> newPlayer = new HashMap<>();
         newPlayer.put("userId", userId);
+        newPlayer.put("name", "Player" + userId);
         newPlayer.put("hp", 90);
         newPlayer.put("maxHp", 90);
         newPlayer.put("stamina", 100);

@@ -29,6 +29,7 @@ public class CombatService {
         return Map.of(
                 "message", "Бой с " + enemyData.get("name") + " начался!",
                 "player", Map.of(
+                        "name", playerData.get("name"),
                         "hp", playerData.get("hp"),
                         "maxHp", playerData.get("maxHp"),
                         "attack", playerData.get("attack"),

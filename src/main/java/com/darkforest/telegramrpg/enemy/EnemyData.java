@@ -30,7 +30,12 @@ public class EnemyData {
 
     public Map<String, Object> getData(){
         Map<String, Object> data = new HashMap<>();
-        data.put("name", name);
+        switch (name) {
+            case "bandit": data.put("name", "Разбойник"); break;
+            case "bandit_arrow": data.put("name", "Разбойник лучник"); break;
+            case "bandit_club": data.put("name", "Матерый разбойник"); break;
+            default: data.put("name", name); break;
+        }
         data.put("level", monster_level);
         data.put("health", health);
         data.put("damage", damage);

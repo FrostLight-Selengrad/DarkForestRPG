@@ -44,7 +44,7 @@ public class CombatService {
                         "attack", enemyData.get("damage"),
                         "defense", enemyData.get("armor"),
                         "speed", enemyData.get("speed"),
-                        "image", enemyData.get("name") + ".jpg"
+                        "image", enemyData.get("image")
                 )
         );
     }

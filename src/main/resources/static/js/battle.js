@@ -17,11 +17,7 @@ function displayBattle(battleData) {
     // Установка имени и уровня врага, если элементы существуют
     const enemyNameElement = document.getElementById('enemy-combat-name');
     if (enemyNameElement) {
-        enemyNameElement.innerText = battleData.enemy.name;
-    }
-    const enemyLevelElement = document.getElementById('enemy-level');
-    if (enemyLevelElement) {
-        enemyLevelElement.innerText = `Уровень ${battleData.enemy.level}`;
+        enemyNameElement.innerText = battleData.enemy.name + ` Ур. ${battleData.enemy.level}`;
     }
 
     // Установка изображения врага

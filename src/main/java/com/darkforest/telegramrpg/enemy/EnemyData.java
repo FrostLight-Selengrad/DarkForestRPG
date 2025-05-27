@@ -45,6 +45,7 @@ public class EnemyData {
         data.put("special_attacks", special_attacks);
         data.put("start_battle_abilities", start_battle_abilities);
         data.put("abilities", abilities);
+        data.put("image", name + ".jpg");
         return data;
     }
 

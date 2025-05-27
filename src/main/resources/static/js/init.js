@@ -43,7 +43,6 @@ async function initializeGame() {
             setActiveInterface("battle-interface");
         } else if (data.currentLocation === "forest") {
             console.log('Switching to exploration interface');
-            console.log('Switching to exploration interface');
             explorationInitialize(data);
             console.log('Calling setActiveInterface');
             setActiveInterface("exploration-interface");
@@ -139,27 +138,23 @@ function updateBattleInterface(data) {
         document.getElementById('player-combat-speed').innerText = `🏃 ${data.speed}`;
 
         // Обновление данных врага
-        document.getElementById('enemy-combat-name').innerText = data.eventData.name;
-        document.getElementById('enemy-combat-hp').innerText = `❤️ ${data.eventData.hp}/${data.eventData.maxHp}`;
-        document.getElementById('enemy-combat-attack').innerText = `⚔️ ${data.eventData.attack}`;
-        document.getElementById('enemy-combat-defence').innerText = `🛡️ ${data.eventData.defense}`;
-        document.getElementById('enemy-combat-speed').innerText = `🏃 ${data.eventData.speed}`;
+        document.getElementById('enemy-combat-name').innerText = data.eventData.enemy.name;
+        document.getElementById('enemy-combat-hp').innerText = `❤️ ${data.eventData.enemy.hp}/${data.eventData.enemy.maxHp}`;
+        document.getElementById('enemy-combat-attack').innerText = `⚔️ ${data.eventData.enemy.attack}`;
+        document.getElementById('enemy-combat-defence').innerText = `🛡️ ${data.eventData.enemy.defense}`;
+        document.getElementById('enemy-combat-speed').innerText = `🏃 ${data.eventData.enemy.speed}`;
 
         // Установка имени и уровня врага, если элементы существуют
         const enemyNameElement = document.getElementById('enemy-combat-name');
         if (enemyNameElement) {
-            enemyNameElement.innerText = data.eventData.name;
-        }
-        const enemyLevelElement = document.getElementById('enemy-level');
-        if (enemyLevelElement) {
-            enemyLevelElement.innerText = `Уровень ${data.eventData.level}`;
+            enemyNameElement.innerText = data.eventData.enemy.name + ` Ур. ${data.eventData.enemy.level}`;
         }
 
         // Установка изображения врага
-        document.getElementById('enemy-image').src = `/images/${data.eventData.image || 'default_enemy.png'}`;
+        document.getElementById('enemy-image').src = `/images/${data.eventData.enemy.image || 'default_enemy.png'}`;
 
         // Обновление лога боя с сообщением от сервера
-        document.getElementById('battle-log').innerText = data.eventData.message;
+        document.getElementById('battle-log').innerText = data.eventData.enemy.message;
     } catch (error) {
         console.error('Error in updateBattleInterface:', error);
         throw error;

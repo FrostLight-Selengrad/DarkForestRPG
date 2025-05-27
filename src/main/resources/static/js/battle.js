@@ -24,7 +24,7 @@ function displayBattle(battleData) {
     document.getElementById('enemy-image').src = `/images/${battleData.enemy.image || 'default_enemy.png'}`;
 
     // Обновление лога боя с сообщением от сервера
-    document.getElementById('battle-log').innerText = battleData.message;
+    document.getElementById('battle-log').innerText = battleData.enemy.message;
 }
 
 async function fightMonster() {

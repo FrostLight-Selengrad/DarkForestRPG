@@ -30,13 +30,13 @@ public class CombatService {
                 "attack", enemyDataObj.getData().get("damage"),
                 "defense", enemyDataObj.getData().get("armor"),
                 "speed", enemyDataObj.getData().get("speed"),
-                "image", enemyDataObj.getData().get("image")
+                "image", enemyDataObj.getData().get("image"),
+                "message", "Бой с " + enemyDataObj.getData().get("name") + " начался!"
         );
         playerData.put("currentEventType", "combat");
         playerData.put("eventData", Map.of("enemy", enemyData));
         playerService.savePlayerData(userId, playerData);
         return Map.of(
-                "message", "Бой с " + enemyData.get("name") + " начался!",
                 "player", Map.of(
                         "name", playerData.get("name"),
                         "hp", playerData.get("hp"),

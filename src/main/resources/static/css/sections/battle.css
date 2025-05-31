@@ -2,7 +2,7 @@
     background-color: var(--color-bg-darkest);
     padding: 8px;
     margin: 8px 0;
-    height: 200px;
+    height: 140px;
     overflow-y: scroll;
     text-align: left;
 }
@@ -36,11 +36,9 @@
 }
 
 .scrollable-log {
-    height: 150px;
     overflow-y: auto;
     background: var(--color-bg-darker);
     padding: var(--spacing-md);
-    border-radius: 5px;
     font-size: 16px;
     text-align: left;
     width: 94%;

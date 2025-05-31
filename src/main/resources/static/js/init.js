@@ -131,30 +131,30 @@ function setActiveInterface(interfaceName) {
 function updateBattleInterface(data) {
     try {
         // Обновление данных игрока
-        document.getElementById('player-combat-name').innerText = data.name;
-        document.getElementById('player-combat-hp').innerText = `❤️ ${data.hp}/${data.maxHp}`;
-        document.getElementById('player-combat-attack').innerText = `⚔️ ${data.attack}`;
-        document.getElementById('player-combat-defence').innerText = `🛡️ ${data.defense}`;
-        document.getElementById('player-combat-speed').innerText = `🏃 ${data.speed}`;
+        document.getElementById('player-combat-name').innerText = data.player.name;
+        document.getElementById('player-combat-hp').innerText = `❤️ ${data.player.hp}/${data.player.maxHp}`;
+        document.getElementById('player-combat-attack').innerText = `⚔️ ${data.player.attack}`;
+        document.getElementById('player-combat-defence').innerText = `🛡️ ${data.player.defense}`;
+        document.getElementById('player-combat-speed').innerText = `🏃 ${data.player.speed}`;
 
         // Обновление данных врага
-        document.getElementById('enemy-combat-name').innerText = data.eventData.enemy.name;
-        document.getElementById('enemy-combat-hp').innerText = `❤️ ${data.eventData.enemy.hp}/${data.eventData.enemy.maxHp}`;
-        document.getElementById('enemy-combat-attack').innerText = `⚔️ ${data.eventData.enemy.attack}`;
-        document.getElementById('enemy-combat-defence').innerText = `🛡️ ${data.eventData.enemy.defense}`;
-        document.getElementById('enemy-combat-speed').innerText = `🏃 ${data.eventData.enemy.speed}`;
+        document.getElementById('enemy-combat-name').innerText = data.enemy.name;
+        document.getElementById('enemy-combat-hp').innerText = `❤️ ${data.enemy.hp}/${data.enemy.maxHp}`;
+        document.getElementById('enemy-combat-attack').innerText = `⚔️ ${data.enemy.attack}`;
+        document.getElementById('enemy-combat-defence').innerText = `🛡️ ${data.enemy.defense}`;
+        document.getElementById('enemy-combat-speed').innerText = `🏃 ${data.enemy.speed}`;
 
         // Установка имени и уровня врага, если элементы существуют
         const enemyNameElement = document.getElementById('enemy-combat-name');
         if (enemyNameElement) {
-            enemyNameElement.innerText = data.eventData.enemy.name + ` Ур. ${data.eventData.enemy.level}`;
+            enemyNameElement.innerText = data.enemy.name + ` Ур. ${data.enemy.level}`;
         }
 
         // Установка изображения врага
-        document.getElementById('enemy-image').src = `/images/${data.eventData.enemy.image || 'default_enemy.png'}`;
+        document.getElementById('enemy-image').src = `/images/${data.enemy.image || 'default_enemy.png'}`;
 
         // Обновление лога боя с сообщением от сервера
-        document.getElementById('battle-log').innerText = data.eventData.enemy.message;
+        document.getElementById('battle-log').innerText = data.enemy.message;
     } catch (error) {
         console.error('Error in updateBattleInterface:', error);
         throw error;

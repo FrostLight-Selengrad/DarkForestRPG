@@ -4,6 +4,7 @@ import com.darkforest.telegramrpg.enemy.EnemyData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -17,6 +18,20 @@ public class CombatService {
         this.enemyService = enemyService;
     }
 
+    public static Map<String, Object> getBattleData(Map<String, Object> playerData){
+        Map<String, Object> eventData = (Map<String, Object>) playerData.get("eventData");
+        return Map.of(
+                "player", Map.of(
+                        "name", playerData.get("name"),
+                        "hp", playerData.get("hp"),
+                        "maxHp", playerData.get("maxHp"),
+                        "attack", playerData.get("attack"),
+                        "defense", playerData.get("defense"),
+                        "speed", playerData.get("speed")
+                ),
+                "enemy", eventData.get("enemy")
+        );
+    }
     // Начало боя
     public Map<String, Object> startBattle(Long userId) {
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
@@ -36,17 +51,7 @@ public class CombatService {
         playerData.put("currentEventType", "combat");
         playerData.put("eventData", Map.of("enemy", enemyData));
         playerService.savePlayerData(userId, playerData);
-        return Map.of(
-                "player", Map.of(
-                        "name", playerData.get("name"),
-                        "hp", playerData.get("hp"),
-                        "maxHp", playerData.get("maxHp"),
-                        "attack", playerData.get("attack"),
-                        "defense", playerData.get("defense"),
-                        "speed", playerData.get("speed")
-                ),
-                "enemy", enemyData
-        );
+        return getBattleData(playerData);
     }
 
     // Обработка атаки

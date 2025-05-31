@@ -1,9 +1,6 @@
 package com.darkforest.telegramrpg.controller;
 
-import com.darkforest.telegramrpg.service.PlayerService;
-import com.darkforest.telegramrpg.service.EventService;
-import com.darkforest.telegramrpg.service.LocationService;
-import com.darkforest.telegramrpg.service.InventoryService;
+import com.darkforest.telegramrpg.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +29,12 @@ public class GameController {
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        System.out.println("Returning player data: " + playerData);
-        return playerData;
+        System.out.println("Returning all player data: " + playerData);
+        if (playerData.get("currentEventType") == "combat") {
+            return playerData;
+        } else {
+            return CombatService.getBattleData(playerData);
+        }
     }
 
     // Перемещение в локацию

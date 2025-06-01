@@ -4,7 +4,6 @@ import com.darkforest.telegramrpg.enemy.EnemyData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -29,7 +28,8 @@ public class CombatService {
                         "defense", playerData.get("defense"),
                         "speed", playerData.get("speed")
                 ),
-                "enemy", eventData.get("enemy")
+                "enemy", eventData.get("enemy"),
+                "currentEventType", playerData.get("currentEventType")
         );
     }
     // Начало боя
@@ -99,15 +99,5 @@ public class CombatService {
         double defenseReduction = defense / (defense + 50.0);
         int damage = (int) (attack * (1 - defenseReduction) - defense);
         return Math.max(1, damage);
-    }
-
-    // Загрузка данных монстра (пример)
-    private Map<String, Object> loadEnemyData(String monsterType) {
-        return Map.of(
-                "name", monsterType,
-                "hp", 100,
-                "defense", 10,
-                "attack", 20
-        );
     }
 }

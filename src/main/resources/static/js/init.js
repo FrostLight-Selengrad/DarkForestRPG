@@ -207,13 +207,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (loadingScreen) {
             loadingScreen.style.display = 'none';
         }
-        const initialize = initializeGame();
+        await initializeGame();
     } catch (error) {
         console.error('Error during initialization:', error);
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             loadingScreen.style.display = 'none';
         }
-        initializeGame();
+        await initializeGame();
     }
 });

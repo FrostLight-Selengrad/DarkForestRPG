@@ -20,6 +20,7 @@ public class CombatService {
     public static Map<String, Object> getBattleData(Map<String, Object> playerData){
         Map<String, Object> eventData = (Map<String, Object>) playerData.get("eventData");
         return Map.of(
+                "currentEventType", playerData.get("currentEventType"),
                 "player", Map.of(
                         "name", playerData.get("name"),
                         "hp", playerData.get("hp"),
@@ -28,8 +29,7 @@ public class CombatService {
                         "defense", playerData.get("defense"),
                         "speed", playerData.get("speed")
                 ),
-                "enemy", eventData.get("enemy"),
-                "currentEventType", playerData.get("currentEventType")
+                "enemy", eventData.get("enemy")
         );
     }
     // Начало боя

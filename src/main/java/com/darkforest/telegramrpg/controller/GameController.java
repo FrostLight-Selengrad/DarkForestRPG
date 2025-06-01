@@ -30,7 +30,7 @@ public class GameController {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
         System.out.println("Returning all player data: " + playerData);
-        if (playerData.get("currentEventType") != "combat") {
+        if (playerData.get("currentEventType") == "combat") {
             return CombatService.getBattleData(playerData);
         } else {
             return playerData;

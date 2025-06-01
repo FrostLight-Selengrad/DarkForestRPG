@@ -22,17 +22,16 @@ public class GameController {
     @Autowired
     private InventoryService inventoryService;
 
-    private final Random random = new Random();
-
     // Получение данных игрока
     @GetMapping("/player")
     public Map<String, Object> getPlayerData(@RequestParam Long userId) {
         System.out.println("Received request for player data: userId=" + userId);
         Map<String, Object> playerData = playerService.loadPlayerData(userId);
-        System.out.println("Returning all player data: " + playerData);
         if (playerData.get("currentEventType").equals("combat")) {
+            System.out.println("Returning only battle data: " + playerData);
             return CombatService.getBattleData(playerData);
         } else {
+            System.out.println("Returning all player data: " + playerData);
             return playerData;
         }
     }

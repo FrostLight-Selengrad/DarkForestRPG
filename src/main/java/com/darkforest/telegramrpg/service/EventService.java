@@ -19,6 +19,7 @@ public class EventService {
         // Собираем все события с их весами
         List<Event> events = List.of(
                 new MonsterHiddenEvent(),
+                new MonsterEyesEvent(),
                 new HiddenCachEvent(),
                 new CashEvent(),
                 new SnakeTrapEvent(),

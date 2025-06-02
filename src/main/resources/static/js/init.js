@@ -13,6 +13,7 @@ function preloadImages() {
         'bandit.jpg', 'bandit_arrow.jpg', 'bandit_club.jpg',
         'trap_escape_event.jpg', 'trap_not_escape_event.jpg', 'event_snake_trap.jpg',
         'event_cash.jpg', 'event_hidden_cash.jpg', 'event_open_cash.jpg', 'event_open_hidden_cash.jpg',
+        'monster_hidden.jpg', 'monster_eyes.jpg',
         'boss.png',
         'character-icon.png',
         'backpack-icon.png', 'talents-icon.png', 'skills-icon.png', 'char-icon.png'];

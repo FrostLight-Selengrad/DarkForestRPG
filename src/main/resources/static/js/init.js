@@ -8,8 +8,13 @@ if (!userId) {
 }
 
 function preloadImages() {
-    const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'goblin.png',
-        'mimic.png', 'boss.png', 'event_chest.png', 'event_camp.jpg', 'character-icon.png',
+    const images = ['forest.png', 'forest_v1.png', 'forest_v2.png', 'forest_v3.png',
+        'event_camp.jpg',
+        'bandit.jpg', 'bandit_arrow.jpg', 'bandit_club.jpg',
+        'trap_escape_event.jpg', 'trap_not_escape_event.jpg', 'event_snake_trap.jpg',
+        'event_cash.jpg', 'event_hidden_cash.jpg', 'event_open_cash.jpg', 'event_open_hidden_cash.jpg',
+        'boss.png',
+        'character-icon.png',
         'backpack-icon.png', 'talents-icon.png', 'skills-icon.png', 'char-icon.png'];
     const promises = images.map(img => {
         return new Promise((resolve, reject) => {

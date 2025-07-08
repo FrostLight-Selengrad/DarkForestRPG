@@ -171,8 +171,8 @@ console.log('exploration.js loaded, startProgressBar defined');
 
 async function exploreProgress(){
     const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    // Запрашиваем длительность отображению прогресс-бара
     const eventType = "explore";
+    // Запрашиваем длительность отображению прогресс-бара
     const progressTimeResponse = await fetch(`/api/game/progress-time?userId=${userId}&eventType=${eventType}`);
     if (!progressTimeResponse.ok) {
         throw new Error('Failed to fetch progress time');

@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface Event {
     int getWeight(int luck); // Вес с учетом удачи
-    String getEventType();   // Тип события (например, "cash_event")
+    String getEventType();   // Тип события
     Map<String, Object> execute(Map<String, Object> eventData);
     Map<String, Object> interact(int forestLevel, int luck, Map<String, Object> eventData);
 }

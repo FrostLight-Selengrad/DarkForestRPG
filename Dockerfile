@@ -5,10 +5,10 @@ FROM eclipse-temurin:23-jdk AS build
 WORKDIR /app
 
 # Копируем файлы Maven и исходный код
-COPY pom.xml .
-COPY src ./src
 COPY mvnw .
 COPY .mvn ./.mvn
+COPY pom.xml .
+COPY src ./src
 
 # Собираем проект
 RUN chmod +x mvnw

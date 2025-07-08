@@ -3,17 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forest RPG</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            background: url('/images/background.jpg') center center no-repeat;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #loading-screen {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/images/loading-forest.jpg') center center no-repeat;
+            background-size: cover;
+            z-index: 9999;
+        }
+        .loader {
+            border: 12px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 12px solid #3498db;
+            width: 10vw;
+            height: 10vw;
+            min-width: 45px;
+            min-height: 45px;
+            animation: spin 2s linear infinite;
+
+            /* Новые стили для позиционирования */
+            position: absolute;
+            bottom: 20%;
+            left: 44vw;
+            transform: translateX(-50%);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-<div id="game-container">
-    <h1>Forest RPG</h1>
-    <div id="player-stats"></div>
-    <div id="event-log"></div>
-    <div id="actions"></div>
+<div id="loading-screen">
+    <div class="loader"></div>
 </div>
+<!-- Контейнеры прогресса -->
+<div id="exploration-progress" class="progress-container" style="display: none;">
+    <div id="progress-text"></div>
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+</div>
+<div id="game-container">
+    <!-- Лагерь -->
+    <div id="camp-interface" class="interface" style="display: none;">
+        <div id="player-camp-stats"></div>
+        <img id="camp-image" src="images/event_camp.jpg" class="event-image">
+        <div id="camp-log"></div>
+        <div id="camp-actions">
+            <button class="action-btn" onclick="leaveCamp()">Выйти в лес</button>
+            <button class="action-btn" onclick="takeRest()">Отдохнуть</button>
+        </div>
+    </div>
+    <!-- Интерфейс путешествия (изначально скрыт) -->
+    <div id="exploration-interface" class="interface" style="display: none;">
+        <div id="player-stats"></div>
+        <div id="exploration-image">
+            <img id="forest-image" src="images/forest_v2.png" class="enemy-img">
+        </div>
+        <div id="exploration-log"></div>
+
+
+        <div id="return-camp-progress" class="progress-container" style="display: none;">
+            <p>Возвращение в лагерь...</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Все возможные кнопки -->
+        <div id="actions">
+            <button id="action-continue" class="action-btn" onclick="exploreForest()" style="display: none;">Исследовать</button>
+            <button id="action-return-camp" class="action-btn" onclick="returnToCamp()" style="display: none;">Вернуться в лагерь</button>
+            <button id="action-miss-cash" class="action-btn" onclick="exploreForest()" style="display: none;">Пройти мимо</button>
+            <button id="action-open-cash" class="action-btn" onclick="openCash()" style="display: none;">Открыть</button>
+            <button id="action-fight" class="action-btn" onclick="fightMonster()" style="display: none;">Вступить в бой</button>
+            <button id="action-flee" class="action-btn" onclick="tryFleeBeforeCombat()" style="display: none;">Прокрасться мимо</button>
+            <button id="action-rest-camp" class="action-btn" onclick="restAtCamp()" style="display: none;">Разжечь костер</button>
+            <button id="action-escape-trap" class="action-btn" onclick="escapeTrap()" style="display: none;">Отбиться</button>
+        </div>
+    </div>
+    <!-- Боевой интерфейс (изначально скрыт) -->
+    <div id="battle-interface" class="interface" style="display: none;">
+        <img id="enemy-image" class="enemy-img">
+        <div class="combat-bars">
+            <div class="combat-player-bar">
+                <div class="combat-enemy-data" id="player-combat-name"></div>
+                <div class="combat-player-data" id="player-combat-hp">&#x2764;&#xFE0F; 100/100</div>
+                <div class="combat-stats-row">
+                    <div class="combat-player-data" id="player-combat-attack">&#x2694;&#xFE0F; 15</div>
+                    <div class="combat-player-data" id="player-combat-defence">&#x1F6E1;&#xFE0F; 10</div>
+                    <div class="combat-player-data" id="player-combat-speed">&#x1F3C3; 100</div>
+                </div>
+            </div>
+            <div class="combat-enemy-bar">
+                <div class="combat-enemy-data" id="enemy-combat-name"></div>
+                <div class="combat-enemy-data" id="enemy-combat-hp">&#x2764;&#xFE0F; 100/100</div>
+                <div class="combat-stats-row">
+                    <div class="combat-enemy-data" id="enemy-combat-attack">&#x2694;&#xFE0F; 15</div>
+                    <div class="combat-enemy-data" id="enemy-combat-defence">&#x1F6E1;&#xFE0F; 10</div>
+                    <div class="combat-enemy-data" id="enemy-combat-speed">&#x1F3C3; 100</div>
+                </div>
+            </div>
+        </div>
+        <div id="turn"></div>
+        <div id="battle-log" class="scrollable-log"></div>
+        <div class="battle-action-grid">
+            <button class="action-btn" onclick="attack()">Атаковать</button>
+            <button class="action-btn" onclick="openAbilities()">Способности</button>
+            <button class="action-btn" onclick="openPotionsModal()">Зелья</button>
+            <button class="action-btn" onclick="tryFlee()">Сбежать</button>
+        </div>
+    </div>
+    <!-- Модальное окно зелий -->
+    <div id="potions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePotionsModal()">×</span>
+            <div id="potions-grid"></div>
+        </div>
+    </div>
+</div>
+<button id="character-btn" onclick="toggleMenu()" width="30">
+    <img src="images/character-icon.png" width="30">
+</button>
+<div id="character-menu" class="dropdown-menu" width="30">
+    <button class="menu-item" width="30"><img src="images/backpack-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/talents-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/skills-icon.png"></button>
+    <button class="menu-item" width="30"><img src="images/char-icon.png"></button>
+</div>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="/script.js"></script>
+<script src="/js/init.js"></script>
+<script src="/js/exploration.js"></script>
+<script src="/js/camp.js"></script>
+<script src="/js/battle.js"></script>
+<script src="/js/modals.js"></script>
+<script src="/js/characterMenu.js"></script>
 </body>
 </html>

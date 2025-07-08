@@ -1,0 +1,42 @@
+.interface {
+    transition: opacity 0.3s ease;
+}
+
+.interface.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#health-status {
+    margin: var(--spacing-md) 0;
+}
+
+#player-health,
+#enemy-health {
+    font-weight: bold;
+    margin: var(--spacing-xs) 0;
+}
+
+#camp-actions,
+#actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+#exploration-interface {
+    display: none;
+    opacity: 1 !important;
+    transition: opacity 0.5s ease;
+}
+
+#exploration-interface,
+#battle-interface,
+#camp-interface {
+    padding-bottom: 50px;
+}
+
+.hidden-interface {
+    display: none !important;
+    opacity: 0 !important;
+}

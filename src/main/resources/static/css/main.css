@@ -1,0 +1,74 @@
+@import 'base/variables.css';
+@import 'base/typography.css';
+@import 'base/reset.css';
+@import 'layout/game-container.css';
+@import 'layout/interface.css';
+@import 'components/buttons.css';
+@import 'components/modals.css';
+@import 'components/dropdowns.css';
+@import 'components/progress.css';
+@import 'components/cards.css';
+@import 'sections/battle.css';
+@import 'sections/exploration.css';
+@import 'sections/camp.css';
+@import 'animations.css';
+
+/* Общие стили */
+.interface {
+    transition: opacity 0.3s ease;
+}
+
+.interface.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+#game-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: var(--color-text-main);
+    background-color: var(--color-bg-main);
+    text-align: center;
+    margin: 0;
+    padding: var(--spacing-md);
+}
+
+.combat-bars {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+}
+
+.combat-player-bar, .combat-enemy-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 35%;
+}
+
+.combat-stats-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.combat-player-data, .combat-enemy-data {
+    margin: 5px 0;
+    text-align: center;
+}
+
+.battle-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+}

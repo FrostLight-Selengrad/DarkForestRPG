@@ -1,0 +1,32 @@
+{
+  "bandit": {
+    "health": 100,
+    "damage": 10,
+    "armor": 5,
+    "speed": 95,
+    "base_attack": "physical_attack",
+    "special_attacks": ["cut"],
+    "start_battle_abilities": [],
+    "abilities": ["power_up", "parry"]
+  },
+  "bandit_arrow": {
+    "health": 80,
+    "damage": 15,
+    "armor": 3,
+    "speed": 120,
+    "base_attack": "physical_shoot",
+    "special_attacks": ["jump_shoot"],
+    "start_battle_abilities": ["quick_shoot"],
+    "abilities": ["quick_shoot", "jump_back"]
+  },
+  "bandit_club": {
+    "health": 120,
+    "damage": 12,
+    "armor": 6,
+    "speed": 95,
+    "base_attack": "physical_attack",
+    "special_attacks": ["power_punch"],
+    "start_battle_abilities": ["power_up"],
+    "abilities": ["power_up"]
+  }
+}

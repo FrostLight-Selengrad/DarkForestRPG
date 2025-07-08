@@ -1,0 +1,61 @@
+#character-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень для выделения */
+    border-radius: 50%; /* Делаем кнопку круглой */
+}
+
+#character-btn img, .menu-item img {
+    width: 100%;
+    height: 100%;
+}
+
+.dropdown-menu {
+    display: flex;
+    flex-direction: column; /* Добавляем вертикальное направление */
+    gap: 10px; /* Расстояние между элементами */
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    background: var(--color-bg-darker);
+    padding: var(--spacing-md);
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    will-change: transform, opacity;
+    min-width: 40px;
+    max-width: 60px;
+}
+
+/* Для мобильных устройств */
+@media screen and (max-width: 400px) {
+    .dropdown-menu {
+        right: 10px;
+        bottom: 60px;
+        padding: var(--spacing-sm);
+        gap: 7px; /* Уменьшаем расстояние на маленьких экранах */
+    }
+
+    #character-btn {
+        width: 36px; /* Чуть меньше на мобильных */
+        height: 36px;
+    }
+}
+
+.dropdown-menu.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
